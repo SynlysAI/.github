@@ -1,63 +1,28 @@
-# 完整的 GitHub Metrics 配置文件（修复 rendering 卡住问题）
-# 参考文档：https://github.com/lowlighter/metrics/blob/master/action.yml
-name: Metrics
-
-# 触发规则：每小时自动运行 + 手动触发 + 主分支提交触发
+name: Minimal Metrics (Fix Rendering)
 on:
-  schedule:
-    - cron: "0 * * * *"  # 每小时执行一次（可根据需求调整，比如改为每天：0 0 * * *）
-  workflow_dispatch:     # 允许手动触发
-  push:
-    branches: ["master", "main"]  # 主分支提交时触发
-
-# 权限配置（最小必要权限，避免权限过大导致的问题）
+  workflow_dispatch:  # 只保留手动触发，避免自动触发限流
 permissions:
-  contents: write       # 用于写入 metrics 结果
-  actions: read         # 用于读取工作流状态
-  pull-requests: read   # 可选，避免部分插件隐式依赖
-  repository-projects: read
-
+  contents: write
+  actions: read
+  read:user: read     # 显式声明用户读取权限
 jobs:
-  github-metrics:
+  metrics:
     runs-on: ubuntu-latest
-    # 设置超时时间（默认3600秒太长，缩短为5分钟避免卡住）
-    timeout-minutes: 5
+    timeout-minutes: 3  # 进一步缩短超时
     steps:
-      # 检出仓库（可选，但能避免部分环境问题）
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # 运行 metrics 插件（核心步骤）
-      - name: Generate GitHub Metrics
-        uses: lowlighter/metrics@latest
+      - name: Generate Metrics
+        uses: lowlighter/metrics@v3  # 改用稳定的 v3 版本（新版bug多）
         with:
-          # GitHub Token（需在仓库 Secrets 中配置 METRICS_TOKEN）
           token: ${{ secrets.METRICS_TOKEN }}
-
-          # 核心配置
-          user: SynlysAI                  # 要生成 metrics 的用户名
-          template: classic               # 使用经典模板
-          config_timezone: Asia/Shanghai  # 时区设置为上海
-
-          # 关键优化：关闭不必要的基础模块，减少渲染负载
-          base: header                    # 仅显示头部（不包含仓库列表）
-          base_header_repositories: false # 强制关闭头部的仓库展示
-
-          # 限制数据量（避免拉取过多数据导致卡死）
-          repositories: 0                # 不加载任何仓库数据
-          repositories_forks: false       # 不显示复刻仓库
-
-          # 禁用所有非必要插件（彻底减少渲染压力）
-          plugin_achievements: no
-          plugin_followup: no
-          plugin_habits: no
-          plugin_introduction: no
-          plugin_languages: no
-          plugin_traffic: no
-
-          # 关闭动画和 Base64 图片（避免渲染耗时）
+          user: SynlysAI
+          template: base  # 改用最基础的 base 模板（classic 模板更重）
+          config_timezone: UTC  # 先改用 UTC 时区，排除时区冲突
+          base: ""  # 不加载任何基础模块，只显示核心信息
           use_animations: false
           base64_encoded_images: false
-
-          # 可选：输出调试日志（方便排查问题，稳定后可删除）
-          debug: false
+          # 强制关闭所有可能的加载项
+          repositories: 0
+          followers: 0
+          following: 0
+          plugin_achievements: no
+          plugin_languages: no
