@@ -1,4 +1,4 @@
-[![banner](../logo.jpg)](https://github.com/SynlysAI)
+[![banner](../logo.png)](https://github.com/SynlysAI)
 
 [![Metrics](../github-metrics.svg)](https://github.com/SynlysAI)
 
