@@ -4,7 +4,7 @@ on:
 permissions:
   contents: write
   actions: read
-  read:user: read     # 显式声明用户读取权限
+  user: read  # 修正：正确的用户读取权限写法
 jobs:
   metrics:
     runs-on: ubuntu-latest
