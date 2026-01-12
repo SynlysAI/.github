@@ -1,28 +1,47 @@
-name: Minimal Metrics (Fix Rendering)
+name: Minimal Metrics
 on:
-  workflow_dispatch:  # 只保留手动触发，避免自动触发限流
+  # 只保留手动触发，避免自动触发限流
+  workflow_dispatch:
+  # 也可以保留定时触发，但建议先测试手动触发
+  # schedule: [{cron: "0 * * * *"}]
+
 permissions:
   contents: write
   actions: read
-  # user: read  # 修正：GitHub Actions permissions中没有user字段
+
 jobs:
-  metrics:
+  github-metrics:
     runs-on: ubuntu-latest
-    timeout-minutes: 3  # 进一步缩短超时
+    timeout-minutes: 5  # 设置合理的超时时间
     steps:
       - name: Generate Metrics
-        uses: lowlighter/metrics@v3  # 使用稳定的 v3 版本 (新版bug多)
+        uses: lowlighter/metrics@v3  # 使用稳定的 v3 版本，避免新版bug
         with:
+          # GitHub Token
           token: ${{ secrets.METRICS_TOKEN }}
+          
+          # 核心配置
           user: SynlysAI
-          template: base  # 使用最基础的 base 模板 (classic 模板超重)
-          config_timezone: UTC  # 先改用 UTC 时区，排除时区冲突
-          base: ""  # 不加任何基础模块，只显示核心信息
-          use_animations: false
-          base64_encoded_images: false
-          # 强制关闭所有可能的加载项
-          repositories: 0
-          followers: 0
-          following: 0
+          template: base  # 使用最基础的模板，减少渲染负担
+          config_timezone: UTC  # 使用UTC时区，避免时区冲突
+          
+          # 最小化功能
+          base: header  # 只保留header模块
+          repositories_forks: false  # 不包含fork仓库
+          
+          # 关闭所有插件
           plugin_achievements: no
+          plugin_followup: no
+          plugin_habits: no
+          plugin_introduction: no
           plugin_languages: no
+          plugin_traffic: no
+          
+          # 优化渲染
+          use_animations: false  # 关闭CSS动画
+          base64_encoded_images: false  # 关闭Base64编码图片
+          
+          # 限制数据量
+          repositories: 10  # 限制显示的仓库数量
+          followers: 0  # 不显示关注者
+          following: 0  # 不显示关注的用户
