@@ -1,6 +1,8 @@
-[![banner](../图片4.png)](https://github.com/SynlysAI)
+[![banner](../logo.jpg)](https://github.com/SynlysAI)
 
 [SynlysAI](https://github.com/SynlysAI)
+
+[![Metrics](https://github.com/SynlysAI/.github/raw/main/github-metrics.svg)](https://github.com/SynlysAI)
 
 # SynlysAI
 Where AI meets lab automation to supercharge materials science.
