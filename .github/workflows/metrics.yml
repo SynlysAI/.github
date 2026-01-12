@@ -4,20 +4,20 @@ on:
 permissions:
   contents: write
   actions: read
-  user: read  # 修正：正确的用户读取权限写法
+  # user: read  # 修正：GitHub Actions permissions中没有user字段
 jobs:
   metrics:
     runs-on: ubuntu-latest
     timeout-minutes: 3  # 进一步缩短超时
     steps:
       - name: Generate Metrics
-        uses: lowlighter/metrics@v3  # 改用稳定的 v3 版本（新版bug多）
+        uses: lowlighter/metrics@v3  # 使用稳定的 v3 版本 (新版bug多)
         with:
           token: ${{ secrets.METRICS_TOKEN }}
           user: SynlysAI
-          template: base  # 改用最基础的 base 模板（classic 模板更重）
+          template: base  # 使用最基础的 base 模板 (classic 模板超重)
           config_timezone: UTC  # 先改用 UTC 时区，排除时区冲突
-          base: ""  # 不加载任何基础模块，只显示核心信息
+          base: ""  # 不加任何基础模块，只显示核心信息
           use_animations: false
           base64_encoded_images: false
           # 强制关闭所有可能的加载项
