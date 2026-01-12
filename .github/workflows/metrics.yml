@@ -58,7 +58,3 @@ jobs:
           plugin_languages_threshold: 0%
           plugin_traffic: yes
           config_padding: 0, 8 + 15%
-          # Output configuration
-          filename: github-metrics.svg
-          dest: ./github-metrics.svg
-          push_branch: main
