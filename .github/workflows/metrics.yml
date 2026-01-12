@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 5  # 设置合理的超时时间
     steps:
       - name: Generate Metrics
-        uses: lowlighter/metrics@v3  # 使用稳定的 v3 版本，避免新版bug
+        uses: lowlighter/metrics@latest  # 使用latest版本，避免版本号问题
         with:
           # GitHub Token
           token: ${{ secrets.METRICS_TOKEN }}
