@@ -2,8 +2,6 @@ name: Minimal Metrics
 on:
   # 只保留手动触发，避免自动触发限流
   workflow_dispatch:
-  # 也可以保留定时触发，但建议先测试手动触发
-  # schedule: [{cron: "0 * * * *"}]
 
 permissions:
   contents: write
@@ -12,18 +10,18 @@ permissions:
 jobs:
   github-metrics:
     runs-on: ubuntu-latest
-    timeout-minutes: 5  # 设置合理的超时时间
+    timeout-minutes: 5
     steps:
       - name: Generate Metrics
-        uses: lowlighter/metrics@latest  # 使用latest版本，避免版本号问题
+        uses: lowlighter/metrics@latest
         with:
           # GitHub Token
           token: ${{ secrets.METRICS_TOKEN }}
           
           # 核心配置
           user: SynlysAI
-          template: base  # 使用最基础的模板，减少渲染负担
-          config_timezone: UTC  # 使用UTC时区，避免时区冲突
+          template: base  # 使用最基础的模板
+          config_timezone: UTC  # 使用UTC时区
           
           # 最小化功能
           base: header  # 只保留header模块
@@ -37,11 +35,5 @@ jobs:
           plugin_languages: no
           plugin_traffic: no
           
-          # 优化渲染
-          use_animations: false  # 关闭CSS动画
-          base64_encoded_images: false  # 关闭Base64编码图片
-          
           # 限制数据量
           repositories: 10  # 限制显示的仓库数量
-          followers: 0  # 不显示关注者
-          following: 0  # 不显示关注的用户
