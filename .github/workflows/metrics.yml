@@ -1,6 +1,5 @@
 name: Minimal Metrics
 on:
-  # 只保留手动触发，避免自动触发限流
   workflow_dispatch:
 
 permissions:
@@ -15,25 +14,21 @@ jobs:
       - name: Generate Metrics
         uses: lowlighter/metrics@latest
         with:
-          # GitHub Token
           token: ${{ secrets.METRICS_TOKEN }}
-          
-          # 核心配置
           user: SynlysAI
-          template: base  # 使用最基础的模板
-          config_timezone: UTC  # 使用UTC时区
+          template: classic  # 更换为更兼容的模板
+          config_timezone: UTC
           
-          # 最小化功能
-          base: header  # 只保留header模块
-          repositories_forks: false  # 不包含fork仓库
+          base: header, repositories  # 增加基础内容
+          repositories_forks: false
+          repositories: 10
           
-          # 关闭所有插件
+          # 只关闭非必要插件，保留一个轻量插件
           plugin_achievements: no
           plugin_followup: no
           plugin_habits: no
-          plugin_introduction: no
           plugin_languages: no
           plugin_traffic: no
+          plugin_introduction: yes  # 保留个人简介插件
           
-          # 限制数据量
-          repositories: 10  # 限制显示的仓库数量
+          debug: true  # 开启调试日志
