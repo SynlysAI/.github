@@ -1,7 +1,5 @@
 [![banner](../logo.jpg)](https://github.com/SynlysAI)
 
-[SynlysAI](https://github.com/SynlysAI)
-
 [![Metrics](../github-metrics.svg)](https://github.com/SynlysAI)
 
 # SynlysAI
