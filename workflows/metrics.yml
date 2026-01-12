@@ -6,6 +6,11 @@ on:
   # Lines below let you run workflow manually and on each commit
   workflow_dispatch:
   push: {branches: ["master", "main"]}
+
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   github-metrics:
     runs-on: ubuntu-latest
@@ -53,3 +58,7 @@ jobs:
           plugin_languages_threshold: 0%
           plugin_traffic: yes
           config_padding: 0, 8 + 15%
+          # Output configuration
+          filename: github-metrics.svg
+          dest: ./github-metrics.svg
+          push_branch: main

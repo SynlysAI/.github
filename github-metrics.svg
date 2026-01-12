@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="200" class="">
+    <defs>
+        <style/>
+    </defs>
+    <style>svg{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;font-size:14px;color:#777}h1,h2,h3{margin:8px 0 2px;padding:0;color:#0366d6}h1{font-size:20px;font-weight:700}</style>
+    <foreignObject x="0" y="0" width="100%" height="100%">
+        <div xmlns="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink" class="items-wrapper">
+            <section>
+                <h1 class="field">
+                    <span>SynlysAI</span>
+                </h1>
+                <div class="row">
+                    <section>
+                        <div class="field ">
+                            Joined GitHub recently
+                        </div>
+                    </section>
+                    <section>
+                        <div class="field">
+                            Team members
+                        </div>
+                    </section>
+                </div>
+            </section>
+            <section>
+                <h2 class="field">
+                    Repositories
+                </h2>
+                <div class="row">
+                    <section>
+                        <div class="field">
+                            Several repositories available
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </div>
+    </foreignObject>
+</svg>

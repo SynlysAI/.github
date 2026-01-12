@@ -2,7 +2,7 @@
 
 [SynlysAI](https://github.com/SynlysAI)
 
-[![Metrics](https://github.com/SynlysAI/.github/raw/main/github-metrics.svg)](https://github.com/SynlysAI)
+[![Metrics](../github-metrics.svg)](https://github.com/SynlysAI)
 
 # SynlysAI
 Where AI meets lab automation to supercharge materials science.
