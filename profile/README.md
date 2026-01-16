@@ -7,7 +7,7 @@ Where AI meets lab automation to supercharge materials science.
 
 ## Team Profile
 
-SynlysAI is a pioneering high-tech research team at the intersection of AI and laboratory automation, dedicated to redefining materials and chemical research paradigms. Our interdisciplinary team—specializing in AI algorithms, materials science, chemical engineering, and robotic systems integration—combines deep domain expertise with innovative thinking to merge cutting-edge technologies with scientific exploration, advancing intelligent lab research.
+SynlysAI is a pioneering high-tech research team at the intersection of AI and laboratory automation, which refers Synthsis-Analysis, dedicated to redefining materials and chemical research paradigms. Our interdisciplinary team—specializing in AI algorithms, materials science, chemical engineering, and robotic systems integration—combines deep domain expertise with innovative thinking to merge cutting-edge technologies with scientific exploration, advancing intelligent lab research.
 
 We focus on AI-powered autonomous laboratory solutions, building robot-assisted self-driving systems for materials/chemical synthesis, characterization, and analytical development. By integrating machine learning, adaptive robotics, and real-time data analytics, we create closed-loop intelligent lab ecosystems that eliminate inefficiencies of manual experimentation. Our work enables seamless integration of experimental design, automated execution, characterization, and data-driven optimization, helping researchers accelerate discovery, reduce resource use, and push new frontiers in materials and chemical science.
 
