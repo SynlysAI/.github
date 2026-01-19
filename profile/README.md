@@ -32,8 +32,7 @@ By equipping researchers worldwide with intelligent tools to turn theoretical pr
 
 - Renewable Energy Materials
 - Advanced Functional Materials
-- Pharmaceutical Chemistry
-- Green Chemicals
+- Polymer Chemicals
 
 ## Contact Us
 
