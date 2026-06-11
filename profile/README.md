@@ -4,7 +4,17 @@
 
 *Where AI meets lab automation to supercharge materials science.*
 
-SynlysAI builds AI-native workflows for autonomous experimentation, scientific instrumentation, and closed-loop materials discovery. This organization profile is designed to read less like a brochure and more like an operating surface: public code velocity, contributor activity, repository pulse, and language footprint are rendered directly from GitHub data.
+SynlysAI is an AI for Science organization focused on autonomous experimentation, intelligent instrumentation, and closed-loop discovery for chemistry and materials research. We work at the intersection of machine learning, robotics, scientific workflows, and domain knowledge to build systems that can plan, execute, observe, and optimize experiments with minimal manual intervention.
+
+Our goal is not only to build useful software, but to help define a new research stack for AI-native laboratories: one where data generation, decision making, and experimental control are deeply integrated.
+
+## Research Focus
+
+- Autonomous laboratories for materials and chemical discovery
+- Machine learning systems for experiment design and adaptive optimization
+- Scientific workflow orchestration across synthesis, characterization, and analysis
+- Robotics-aware infrastructure for closed-loop experimental execution
+- AI-native data pipelines for spectroscopic, imaging, and multimodal scientific signals
 
 ## Open Source Radar
 
@@ -14,31 +24,33 @@ SynlysAI builds AI-native workflows for autonomous experimentation, scientific i
 
 [![SynlysAI GitHub metrics](../github-metrics.svg)](https://github.com/SynlysAI/.github/actions/workflows/metrics.yml)
 
-## What We Build
+## What We Are Building
 
-- Autonomous lab software for materials and chemical workflows
-- AI systems for experiment design, sensing, and analysis
-- Robotics-aware infrastructure for closed-loop scientific discovery
-- Research tooling that turns instrumentation data into model-ready pipelines
+We are building an open technical foundation for AI4S research teams that need more than isolated models. That includes:
+
+- Research code for scientific machine learning and optimization
+- Interfaces between AI systems and lab instrumentation
+- Analysis tooling for spectroscopy and experiment feedback loops
+- Reproducible infrastructure for data-centric scientific automation
 
 ## Featured Repositories
 
-| Project | Focus | Signal |
+| Project | Focus | Role in the stack |
 | --- | --- | --- |
-| [`auto_raman`](https://github.com/SynlysAI/auto_raman) | Automated Raman workflow and scientific analysis tooling | Main public engineering surface today |
-| [`/.github`](https://github.com/SynlysAI/.github) | Organization profile, automation, and analytics assets | Powers this profile and refresh pipeline |
+| [`auto_raman`](https://github.com/SynlysAI/auto_raman) | Automated Raman workflow and scientific analysis tooling | Experimental characterization and signal analysis surface |
+| [`/.github`](https://github.com/SynlysAI/.github) | Organization profile, analytics assets, and automation workflows | Public organization interface and telemetry layer |
 
-## How The Analytics Work
+## Collaboration
 
-- Contributor ranking is aggregated from public repository contributor endpoints.
-- Project pulse combines repository-level commit totals, capability flags, and rolling 30-day activity.
-- Code footprint is computed from GitHub language byte counts across tracked repositories.
-- Activity trend is built from recent public commit history and refreshed by GitHub Actions.
-- Collaboration stream highlights the latest public issues and pull requests when they exist.
-- Release lane and roadmap modules surface public releases and milestones, with graceful empty states when those workflows are not exposed yet.
-- The workflow can aggregate private repositories too; when enabled, private repository names and item titles are masked before rendering this public profile.
+We are interested in open collaboration around:
 
-When organization membership is hidden on GitHub, people panels fall back to public contributors instead of private member rosters.
+- AI for materials and chemistry
+- Self-driving laboratory systems
+- Autonomous experimental platforms
+- Scientific foundation models and multimodal lab data
+- Reproducible infrastructure for AI-enabled discovery
+
+If your work overlaps with these directions, this organization is intended to be a visible, evolving research surface rather than a static lab homepage.
 
 ## Contact
 
