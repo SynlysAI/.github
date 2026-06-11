@@ -75,4 +75,13 @@ jobs:
             exit 0
           fi
           git commit -m "chore: refresh organization profile analytics"
-          git push origin HEAD:main
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push failed on attempt $attempt, rebasing onto latest origin/main"
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "Failed to push refreshed assets after 3 attempts"
+          exit 1
