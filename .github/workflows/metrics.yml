@@ -3,7 +3,7 @@ name: Refresh Profile Assets
 on:
   workflow_dispatch:
   schedule:
-    - cron: "20 2 * * *"
+    - cron: "20 2 * * 1"
 
 permissions:
   contents: write
@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -59,7 +61,15 @@ jobs:
           python scripts/generate_org_dashboard.py --org SynlysAI --output github-analytics.svg
 
       - name: Commit refreshed assets
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: refresh organization profile analytics"
-          file_pattern: github-metrics.svg github-analytics.svg
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git rebase origin/main
+          git add github-metrics.svg github-analytics.svg
+          if git diff --cached --quiet; then
+            echo "No asset changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: refresh organization profile analytics"
+          git push origin HEAD:main
