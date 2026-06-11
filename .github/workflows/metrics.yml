@@ -1,34 +1,65 @@
-name: Minimal Metrics
+name: Refresh Profile Assets
+
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "20 2 * * *"
 
 permissions:
   contents: write
-  actions: read
+
+concurrency:
+  group: profile-assets
+  cancel-in-progress: true
 
 jobs:
-  github-metrics:
+  refresh-assets:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
-      - name: Generate Metrics
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate organization overview
         uses: lowlighter/metrics@latest
         with:
-          token: ${{ secrets.METRICS_TOKEN }}
+          filename: github-metrics.svg
+          token: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
           user: SynlysAI
-          template: classic  # 更换为更兼容的模板
-          config_timezone: UTC
-          
-          base: header, repositories  # 增加基础内容
+          template: classic
+          config_timezone: Asia/Shanghai
+          base: header, activity, community, repositories, metadata
+          repositories: 12
           repositories_forks: false
-          repositories: 10
-          
-          # 只关闭非必要插件，保留一个轻量插件
-          plugin_achievements: no
-          plugin_followup: no
-          plugin_habits: no
-          plugin_languages: no
+          plugin_introduction: yes
+          plugin_languages: yes
+          plugin_languages_limit: 8
+          plugin_languages_analysis_timeout: 15
+          plugin_languages_recent_categories: markup, programming
+          plugin_languages_recent_days: 365
+          plugin_lines: yes
+          plugin_topics: yes
+          plugin_topics_mode: icons
           plugin_traffic: no
-          plugin_introduction: yes  # 保留个人简介插件
-          
-          debug: true  # 开启调试日志
+          plugin_habits: no
+          plugin_followup: no
+          plugin_achievements: no
+
+      - name: Generate custom analytics dashboard
+        env:
+          GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+          REPO_VISIBILITY: all
+          HIDE_PRIVATE_REPO_NAMES: "true"
+        run: |
+          python scripts/generate_org_dashboard.py --org SynlysAI --output github-analytics.svg
+
+      - name: Commit refreshed assets
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: refresh organization profile analytics"
+          file_pattern: github-metrics.svg github-analytics.svg

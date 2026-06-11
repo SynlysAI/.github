@@ -1,39 +1,45 @@
-[![banner](../logo.png)](https://github.com/SynlysAI)
-
-[![Metrics](../github-metrics.svg)](https://github.com/SynlysAI)
+[![SynlysAI banner](../logo.png)](https://github.com/SynlysAI)
 
 # SynlysAI
-Where AI meets lab automation to supercharge materials science.
 
-## Team Profile
+*Where AI meets lab automation to supercharge materials science.*
 
-SynlysAI is a pioneering high-tech research team at the intersection of AI and laboratory automation, which refers Synthsis-Analysis, dedicated to redefining materials and chemical research paradigms. Our interdisciplinary team—specializing in AI algorithms, materials science, chemical engineering, and robotic systems integration—combines deep domain expertise with innovative thinking to merge cutting-edge technologies with scientific exploration, advancing intelligent lab research.
+SynlysAI builds AI-native workflows for autonomous experimentation, scientific instrumentation, and closed-loop materials discovery. This organization profile is designed to read less like a brochure and more like an operating surface: public code velocity, contributor activity, repository pulse, and language footprint are rendered directly from GitHub data.
 
-We focus on AI-powered autonomous laboratory solutions, building robot-assisted self-driving systems for materials/chemical synthesis, characterization, and analytical development. By integrating machine learning, adaptive robotics, and real-time data analytics, we create closed-loop intelligent lab ecosystems that eliminate inefficiencies of manual experimentation. Our work enables seamless integration of experimental design, automated execution, characterization, and data-driven optimization, helping researchers accelerate discovery, reduce resource use, and push new frontiers in materials and chemical science.
+## Open Source Radar
 
-## Vision
+[![SynlysAI analytics dashboard](../github-analytics.svg)](https://github.com/SynlysAI/.github/actions/workflows/metrics.yml)
 
-We aim to become a global leader in AI-driven laboratory automation, transforming how materials and chemicals are discovered and developed. We envision a future where our AI-powered, robot-assisted autonomous systems replace traditional trial-and-error research, enabling unprecedented speed, precision, and sustainability in scientific innovation.
+## Organization Snapshot
 
-By equipping researchers worldwide with intelligent tools to turn theoretical predictions into tangible solutions, we strive to accelerate breakthroughs in renewable energy materials, advanced functional materials, pharmaceutical chemistry, and green chemicals—addressing global challenges and building a more sustainable, innovative future for humanity.
+[![SynlysAI GitHub metrics](../github-metrics.svg)](https://github.com/SynlysAI/.github/actions/workflows/metrics.yml)
 
-## Core Technologies
+## What We Build
 
-- AI Algorithm Development
-- Materials Science Research
-- Chemical Engineering
-- Robotic System Integration
-- Machine Learning
-- Adaptive Robotics
-- Real-time Data Analytics
-- Closed-loop Intelligent Lab Ecosystems
+- Autonomous lab software for materials and chemical workflows
+- AI systems for experiment design, sensing, and analysis
+- Robotics-aware infrastructure for closed-loop scientific discovery
+- Research tooling that turns instrumentation data into model-ready pipelines
 
-## Application Areas
+## Featured Repositories
 
-- Renewable Energy Materials
-- Advanced Functional Materials
-- Polymer Chemicals
+| Project | Focus | Signal |
+| --- | --- | --- |
+| [`auto_raman`](https://github.com/SynlysAI/auto_raman) | Automated Raman workflow and scientific analysis tooling | Main public engineering surface today |
+| [`/.github`](https://github.com/SynlysAI/.github) | Organization profile, automation, and analytics assets | Powers this profile and refresh pipeline |
 
-## Contact Us
+## How The Analytics Work
 
-[![GitHub followers](https://img.shields.io/github/followers/SynlysAI.svg?style=social&label=Follow)](https://github.com/SynlysAI)
+- Contributor ranking is aggregated from public repository contributor endpoints.
+- Project pulse combines repository-level commit totals, capability flags, and rolling 30-day activity.
+- Code footprint is computed from GitHub language byte counts across tracked repositories.
+- Activity trend is built from recent public commit history and refreshed by GitHub Actions.
+- Collaboration stream highlights the latest public issues and pull requests when they exist.
+- Release lane and roadmap modules surface public releases and milestones, with graceful empty states when those workflows are not exposed yet.
+- The workflow can aggregate private repositories too; when enabled, private repository names and item titles are masked before rendering this public profile.
+
+When organization membership is hidden on GitHub, people panels fall back to public contributors instead of private member rosters.
+
+## Contact
+
+[![GitHub followers](https://img.shields.io/github/followers/SynlysAI.svg?style=social&label=Follow%20SynlysAI)](https://github.com/SynlysAI)
