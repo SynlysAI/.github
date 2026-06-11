@@ -27,6 +27,11 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Sync with latest main
+        run: |
+          git fetch origin main
+          git rebase origin/main
+
       - name: Generate organization overview
         uses: lowlighter/metrics@latest
         with:
@@ -64,8 +69,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git rebase origin/main
           git add github-metrics.svg github-analytics.svg
           if git diff --cached --quiet; then
             echo "No asset changes to commit"
