@@ -29,7 +29,7 @@ jobs:
         uses: lowlighter/metrics@latest
         with:
           filename: github-metrics.svg
-          token: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.METRICS_CLASSIC_TOKEN || secrets.GITHUB_TOKEN }}
           user: SynlysAI
           template: classic
           config_timezone: Asia/Shanghai
