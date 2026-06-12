@@ -20,10 +20,6 @@ Our goal is not only to build useful software, but to help define a new research
 
 [![SynlysAI analytics dashboard](../github-analytics.svg)](https://github.com/SynlysAI/.github/actions/workflows/metrics.yml)
 
-## Organization Snapshot
-
-[![SynlysAI GitHub metrics](../github-metrics.svg)](https://github.com/SynlysAI/.github/actions/workflows/metrics.yml)
-
 ## What We Are Building
 
 We are building an open technical foundation for AI4S research teams that need more than isolated models. That includes:

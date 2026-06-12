@@ -61,6 +61,12 @@ def truncate(value: str, limit: int) -> str:
     return value[: limit - 1] + "..."
 
 
+def parse_csv_values(value: str | None) -> set[str]:
+    if not value:
+        return set()
+    return {item.strip() for item in value.split(",") if item.strip()}
+
+
 def xml_escape(value: str) -> str:
     return html.escape(value, quote=True)
 
@@ -182,6 +188,8 @@ def collect_org_analytics(
     max_commit_pages: int,
     repo_visibility: str,
     hide_private_repo_names: bool,
+    include_forks: bool,
+    repo_allowlist: set[str],
 ) -> dict[str, Any]:
     now = datetime.now(UTC)
     since_30 = now - timedelta(days=30)
@@ -195,7 +203,27 @@ def collect_org_analytics(
         f"/orgs/{org}/repos?per_page=100&type={repo_visibility}&sort=updated",
         max_pages=4,
     )
-    repos_payload = [repo for repo in repos_payload if not repo.get("archived")]
+    normalized_org = org.casefold()
+    repo_allowlist_normalized = {name.casefold() for name in repo_allowlist}
+    skipped_repos = Counter()
+    filtered_repos = []
+    for repo in repos_payload:
+        repo_name = repo.get("name") or ""
+        repo_owner = ((repo.get("owner") or {}).get("login") or "").casefold()
+        if repo_owner != normalized_org:
+            skipped_repos["owner_mismatch"] += 1
+            continue
+        if repo.get("archived"):
+            skipped_repos["archived"] += 1
+            continue
+        if repo.get("fork") and not include_forks:
+            skipped_repos["fork"] += 1
+            continue
+        if repo_allowlist_normalized and repo_name.casefold() not in repo_allowlist_normalized:
+            skipped_repos["not_allowlisted"] += 1
+            continue
+        filtered_repos.append(repo)
+    repos_payload = filtered_repos
 
     contributor_totals: dict[str, dict[str, Any]] = {}
     language_totals: Counter[str] = Counter()
@@ -396,6 +424,10 @@ def collect_org_analytics(
             "rate_reset": rate_reset,
             "repo_visibility": repo_visibility,
             "hide_private_repo_names": hide_private_repo_names,
+            "owner": org,
+            "include_forks": include_forks,
+            "repo_allowlist": sorted(repo_allowlist),
+            "skipped_repos": dict(skipped_repos),
         },
     }
 
@@ -430,6 +462,9 @@ def render_dashboard(data: dict[str, Any]) -> str:
     roadmap_open = sum(1 for item in roadmap if item["state"] == "open")
     visibility_mode = data["source_facts"]["repo_visibility"]
     private_mask = data["source_facts"]["hide_private_repo_names"]
+    include_forks = data["source_facts"]["include_forks"]
+    skipped_repos = data["source_facts"]["skipped_repos"]
+    skipped_count = sum(skipped_repos.values())
 
     parts.append(
         f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
@@ -668,8 +703,11 @@ def render_dashboard(data: dict[str, Any]) -> str:
 
     member_mode = data["source_facts"]["member_mode"]
     member_label = "visible org members" if member_mode == "visible-members" else "public contributors"
+    scope_note = f"Scope={visibility_mode}; owner={data['source_facts']['owner']}; forks={'included' if include_forks else 'excluded'}"
+    if skipped_count:
+        scope_note += f"; skipped {skipped_count} non-tracked repos"
     parts.append(svg_rect(52, 1640, 1336, 62, cls="panel-bright", rx=20))
-    parts.append(svg_text(74, 1678, f"Telemetry source: GitHub REST API. Scope={visibility_mode}. People panels reflect {member_label}; hidden organization membership is not available from public endpoints.", cls="footer"))
+    parts.append(svg_text(74, 1678, f"Telemetry source: GitHub REST API. {scope_note}. People panels reflect {member_label}.", cls="footer"))
     parts.append(svg_text(1362, 1678, f"{'private names masked' if private_mask else 'private names visible'} · refreshed {generated_at.strftime('%Y-%m-%d %H:%M UTC')}", cls="footer", anchor="end"))
     parts.append("</svg>")
     return "\n".join(parts)
@@ -700,6 +738,8 @@ def main() -> None:
     if repo_visibility not in {"public", "private", "all"}:
         repo_visibility = "public"
     hide_private_repo_names = env_flag("HIDE_PRIVATE_REPO_NAMES", True)
+    include_forks = env_flag("INCLUDE_FORKS", False)
+    repo_allowlist = parse_csv_values(os.getenv("REPO_ALLOWLIST"))
 
     client = GitHubClient(token=token)
     data = collect_org_analytics(
@@ -708,6 +748,8 @@ def main() -> None:
         max_commit_pages=args.max_commit_pages,
         repo_visibility=repo_visibility,
         hide_private_repo_names=hide_private_repo_names,
+        include_forks=include_forks,
+        repo_allowlist=repo_allowlist,
     )
     svg = render_dashboard(data)
     output_path = os.path.abspath(args.output)
