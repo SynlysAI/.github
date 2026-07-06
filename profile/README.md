@@ -2,7 +2,7 @@
 
 # SynlysAI
 
-*Where AI meets lab automation to supercharge materials science.*
+*Bridging Synthesis, Characterization and AI.*
 
 SynlysAI is an AI for Science organization focused on autonomous experimentation, intelligent instrumentation, and closed-loop discovery for chemistry and materials research. We work at the intersection of machine learning, robotics, scientific workflows, and domain knowledge to build systems that can plan, execute, observe, and optimize experiments with minimal manual intervention.
 
@@ -28,13 +28,6 @@ We are building an open technical foundation for AI4S research teams that need m
 - Interfaces between AI systems and lab instrumentation
 - Analysis tooling for spectroscopy and experiment feedback loops
 - Reproducible infrastructure for data-centric scientific automation
-
-## Featured Repositories
-
-| Project | Focus | Role in the stack |
-| --- | --- | --- |
-| [`auto_raman`](https://github.com/SynlysAI/auto_raman) | Automated Raman workflow and scientific analysis tooling | Experimental characterization and signal analysis surface |
-| [`/.github`](https://github.com/SynlysAI/.github) | Organization profile, analytics assets, and automation workflows | Public organization interface and telemetry layer |
 
 ## Collaboration
 
