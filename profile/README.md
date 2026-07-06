@@ -2,7 +2,7 @@
 
 # SynlysAI
 
-*Bridging Synthesis, Characterization and AI.*
+*Bridging Synthesis, Analysis and AI.*
 
 SynlysAI is an AI for Science organization focused on autonomous experimentation, intelligent instrumentation, and closed-loop discovery for chemistry and materials research. We work at the intersection of machine learning, robotics, scientific workflows, and domain knowledge to build systems that can plan, execute, observe, and optimize experiments with minimal manual intervention.
 
