@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-10T00:00:00Z",
+  "dataVersion": "1",
+  "collections": {
+    "products": {"path":"products.json","sha256":"ca7f2c311baafea45647a95eaa5cc90c1419e330000a6481cd5e1ba4d72066be","bytes":2257},
+    "releases": {"path":"releases.json","sha256":"5adde158e02262bba1e82d6e14e5fd90afb314c04174e8b4b88ef84bccc79a22","bytes":33},
+    "timeline": {"path":"timeline.json","sha256":"ee4bf8d62f17c6d4710710c1fe1d56e02eba5621a74ec483d4a35719ee574215","bytes":31},
+    "faqs": {"path":"faqs.json","sha256":"b489ee7996d4678992155a7cf427821114989ed9eacf5f050921606974a3cb42","bytes":29},
+    "meta": {"path":"meta.json","sha256":"4423b95a4302982da7eff5dcabce59e869bd9bfe13b2a989a900c9a7306aa67e","bytes":504}
+  },
+  "files": [
+    {"name":"products.json","path":"products.json","sha256":"ca7f2c311baafea45647a95eaa5cc90c1419e330000a6481cd5e1ba4d72066be","bytes":2257},
+    {"name":"releases.json","path":"releases.json","sha256":"5adde158e02262bba1e82d6e14e5fd90afb314c04174e8b4b88ef84bccc79a22","bytes":33},
+    {"name":"timeline.json","path":"timeline.json","sha256":"ee4bf8d62f17c6d4710710c1fe1d56e02eba5621a74ec483d4a35719ee574215","bytes":31},
+    {"name":"faqs.json","path":"faqs.json","sha256":"b489ee7996d4678992155a7cf427821114989ed9eacf5f050921606974a3cb42","bytes":29},
+    {"name":"meta.json","path":"meta.json","sha256":"4423b95a4302982da7eff5dcabce59e869bd9bfe13b2a989a900c9a7306aa67e","bytes":504}
+  ]
+}

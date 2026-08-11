@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-10T00:00:00Z",
+  "dataVersion": "1",
+  "sourceWatermarks": {},
+  "collections": {
+    "products": {"sha256": "ca7f2c311baafea45647a95eaa5cc90c1419e330000a6481cd5e1ba4d72066be", "count": 6},
+    "releases": {"sha256": "5adde158e02262bba1e82d6e14e5fd90afb314c04174e8b4b88ef84bccc79a22", "count": 0},
+    "timeline": {"sha256": "ee4bf8d62f17c6d4710710c1fe1d56e02eba5621a74ec483d4a35719ee574215", "count": 0},
+    "faqs": {"sha256": "b489ee7996d4678992155a7cf427821114989ed9eacf5f050921606974a3cb42", "count": 0}
+  }
+}
