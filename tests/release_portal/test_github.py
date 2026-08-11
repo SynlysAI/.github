@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+import requests
 
 from scripts.release_portal.github import GitHubClient, GitHubError
 
@@ -86,3 +87,48 @@ def test_repository_outside_catalog_is_rejected_without_request():
     with pytest.raises(ValueError):
         client.list_releases("evil/private")
     assert session.calls == []
+
+
+def test_403_and_5xx_use_exponential_backoff():
+    session = FakeSession([
+        FakeResponse(status=403, payload={}), FakeResponse(status=500, payload={}),
+        FakeResponse(payload=[]),
+    ])
+    waits = []
+    client = GitHubClient(session=session, api_root="https://api.test", sleep=waits.append, backoff_factor=2)
+    assert client.list_releases("SynlysAI/AI4MS") == []
+    assert waits == [2, 4]
+
+
+def test_rate_limit_reset_header_is_respected(monkeypatch):
+    monkeypatch.setattr("scripts.release_portal.github.time.time", lambda: 100)
+    session = FakeSession([FakeResponse(status=429, payload={}, headers={"X-RateLimit-Reset": "145"}), FakeResponse(payload=[])])
+    waits = []
+    client = GitHubClient(session=session, api_root="https://api.test", sleep=waits.append)
+    assert client.list_releases("SynlysAI/AI4MS") == []
+    assert waits == [45.0]
+
+
+def test_network_error_and_malformed_json_are_structured():
+    session = FakeSession([requests.ConnectionError("offline")])
+    client = GitHubClient(session=session, api_root="https://api.test", max_retries=0, sleep=lambda _: None)
+    with pytest.raises(GitHubError) as network_error:
+        client.list_releases("SynlysAI/AI4MS")
+    assert network_error.value.method == "GET" and network_error.value.retryable is True
+
+    class BrokenResponse(FakeResponse):
+        def json(self):
+            raise ValueError("bad json")
+
+    client = GitHubClient(session=FakeSession([BrokenResponse(text="not-json")]), api_root="https://api.test", sleep=lambda _: None)
+    with pytest.raises(GitHubError) as json_error:
+        client.list_releases("SynlysAI/AI4MS")
+    assert json_error.value.status == 200 and json_error.value.path.startswith("/repos/")
+
+
+def test_commit_author_date_falls_back_to_committer_date():
+    commit = GitHubClient.normalize_commit({
+        "sha": "b" * 40,
+        "commit": {"message": "fix: x", "author": {"date": None}, "committer": {"date": "2026-02-01T00:00:00Z"}},
+    })
+    assert commit.occurred_at == "2026-02-01T00:00:00Z"

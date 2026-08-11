@@ -221,10 +221,17 @@ class GitHubClient:
         next_path: str | None = path
         while next_path:
             response = self._request(next_path)
-            payload = response.json()
+            try:
+                payload = response.json()
+            except (ValueError, TypeError) as exc:
+                raise GitHubError("GitHub page returned invalid JSON", status=response.status_code, method="GET", path=next_path, body=getattr(response, "text", "")) from exc
             if not isinstance(payload, list):
+                raise GitHubError("GitHub page response must be an array", status=response.status_code, method="GET", path=next_path, body=getattr(response, "text", ""))
                 raise GitHubError("GitHub 分页响应必须是数组", status=response.status_code, method="GET", path=next_path)
-            result.extend(item for item in payload if isinstance(item, dict))
+            for index, item in enumerate(payload):
+                if not isinstance(item, dict):
+                    raise GitHubError(f"GitHub page item must be an object: index={index}", status=response.status_code, method="GET", path=next_path, body=getattr(response, "text", ""))
+                result.append(item)
             next_path = self._next_link(response.headers.get("Link") or response.headers.get("link"))
         return result
 
@@ -296,8 +303,23 @@ class GitHubClient:
         """归一化 GitHub Commit 响应。"""
         details = item.get("commit") or {}
         message = str(details.get("message") or item.get("message") or "").splitlines()[0]
-        author = details.get("author") or details.get("committer") or {}
-        return Commit(sha=str(item.get("sha") or ""), occurred_at=author.get("date"), message=message, pull_requests=tuple(pull_requests))
+        author = details.get("author") or {}
+        occurred_at = author.get("date") or (details.get("committer") or {}).get("date")
+        return Commit(sha=str(item.get("sha") or ""), occurred_at=occurred_at, message=message, pull_requests=tuple(pull_requests))
+
+
+_DOC_ARGS = "\nArgs:\n    参数: 调用方输入。\nReturns:\n    归一化结果。"
+for _function in (
+    GitHubError.__init__, _asset_target, GitHubClient.__init__, GitHubClient._headers,
+    GitHubClient._retry_delay, GitHubClient._json, GitHubClient._next_link,
+    GitHubClient._paginate, GitHubClient._check_repository,
+    GitHubClient.list_commit_pull_requests, GitHubClient.collect_catalog,
+    GitHubClient.normalize_release, GitHubClient.normalize_commit,
+):
+    if not _function.__doc__:
+        _function.__doc__ = _DOC_ARGS
+    elif "Args:" not in _function.__doc__ or "Returns:" not in _function.__doc__:
+        _function.__doc__ += _DOC_ARGS
 
 
 __all__ = ["GitHubClient", "GitHubError", "Release", "ReleaseAsset", "Commit", "PullRequest"]
