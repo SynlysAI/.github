@@ -32,6 +32,7 @@ _TOKEN_PATTERN = re.compile(
     re.IGNORECASE,
 )
 _CODE_BLOCK_PATTERN = re.compile(r"```.*?```", re.DOTALL)
+_DIFF_BLOCK_PATTERN = re.compile(r"^diff --git .+?(?=^diff --git |\Z)", re.MULTILINE | re.DOTALL)
 _DIFF_LINE_PATTERN = re.compile(r"^(?:diff --git|index [0-9a-f]|--- |\+\+\+ |@@ ).*$", re.MULTILINE)
 _RETRYABLE_STATUS_CODES = frozenset({408, 409, 425, 429})
 _BILINGUAL_KEYS = frozenset({"zh", "en"})
@@ -79,6 +80,7 @@ def redact_text(value: Any, *, max_length: int = MAX_INPUT_TEXT_LENGTH) -> str:
     """
     text = str(value or "")
     text = _CODE_BLOCK_PATTERN.sub("[REDACTED_CODE]", text)
+    text = _DIFF_BLOCK_PATTERN.sub("[REDACTED_DIFF]", text)
     text = _DIFF_LINE_PATTERN.sub("[REDACTED_DIFF]", text)
     text = _EMAIL_PATTERN.sub("[REDACTED_EMAIL]", text)
     text = _TOKEN_PATTERN.sub("[REDACTED_TOKEN]", text)
@@ -117,7 +119,12 @@ def build_ai_request(
         raise ValueError("module 不能为空")
     safe_commits = []
     for item in list(commit_messages or ())[:MAX_INPUT_ITEMS]:
-        source = item.get("message", "") if isinstance(item, Mapping) else getattr(item, "message", "")
+        if isinstance(item, Mapping):
+            source = item.get("message", "")
+        elif isinstance(item, str):
+            source = item
+        else:
+            source = getattr(item, "message", "")
         text = redact_text(source)
         if text:
             safe_commits.append(text)
@@ -341,7 +348,7 @@ class AIClient:
             AITimeoutError: 重试后仍超时。
             AITransportError: 网络或 HTTP 层不可恢复失败。
         """
-        session = self.session or requests.Session()
+        session = self.session if self.session is not None else requests.Session()
         last_exception: Exception | None = None
         for attempt in range(self.max_retries + 1):
             try:
@@ -490,7 +497,7 @@ class AIClient:
         pull_requests: Iterable[Any] = (),
         change_type: str,
         module: str,
-        repository_private: bool = False,
+        repository_private: bool = True,
         deterministic_candidate: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         """生成合规双语文案，失败时保留确定性候选并标记复核原因。
@@ -547,7 +554,7 @@ class AIClient:
         product_name: str,
         commit_messages: Iterable[Any] = (),
         pull_requests: Iterable[Any] = (),
-        repository_private: bool = False,
+        repository_private: bool = True,
     ) -> dict[str, Any]:
         """将 AI 文案合入确定性候选，失败时原样保留候选供人工审核。
 

@@ -44,6 +44,13 @@ class FakeSession:
         return result
 
 
+class FalseySession(FakeSession):
+    """模拟实现了 ``__bool__`` 且结果为 False 的注入客户端。"""
+
+    def __bool__(self):
+        return False
+
+
 def _model_response(**overrides):
     value = {
         "title": {"zh": "新增解析能力", "en": "Added parsing capability"},
@@ -75,6 +82,7 @@ def test_valid_response_is_strictly_parsed():
         pull_requests=[{"title": "Parser", "body": "Improves parsing."}],
         change_type="feature",
         module="parser",
+        repository_private=False,
     )
     assert result["title"]["zh"] == "新增解析能力"
     assert result["changeType"] == "feature"
@@ -94,7 +102,7 @@ def test_valid_response_is_strictly_parsed():
 def test_non_json_or_missing_field_raises(payload):
     session = FakeSession([FakeResponse({"choices": [{"message": {"content": payload}}]})])
     with pytest.raises(AIResponseError):
-        _client(session).generate(product_name="AI4MS", change_type="feature", module="parser")
+        _client(session).generate(product_name="AI4MS", change_type="feature", module="parser", repository_private=False)
 
 
 def test_invalid_change_type_is_rejected():
@@ -103,14 +111,14 @@ def test_invalid_change_type_is_rejected():
     response = {"choices": [{"message": {"content": json.dumps(invalid)}}]}
     session = FakeSession([FakeResponse(response)])
     with pytest.raises(AIResponseError):
-        _client(session).generate(product_name="AI4MS", change_type="feature", module="parser")
+        _client(session).generate(product_name="AI4MS", change_type="feature", module="parser", repository_private=False)
 
 
 def test_timeout_retries_then_succeeds():
     import requests
 
     session = FakeSession([requests.Timeout("slow"), FakeResponse(_model_response())])
-    result = _client(session, max_retries=1).generate(product_name="AI4MS", change_type="feature", module="parser")
+    result = _client(session, max_retries=1).generate(product_name="AI4MS", change_type="feature", module="parser", repository_private=False)
     assert result["module"] == "parser"
     assert len(session.calls) == 2
 
@@ -125,6 +133,7 @@ def test_unrecoverable_timeout_keeps_deterministic_candidate():
         change_type="feature",
         module="parser",
         deterministic_candidate=candidate,
+        repository_private=False,
     )
     assert result["title"]["zh"] == "确定性标题"
     assert result["reviewReason"] == "ai_failed"
@@ -134,19 +143,48 @@ def test_request_contains_only_redacted_allowlist_fields():
     session = FakeSession([FakeResponse(_model_response())])
     _client(session).generate(
         product_name="AI4MS",
-        commit_messages=[{"message": "feat: add feature", "author_email": "person@example.com", "diff": "SECRET_DIFF"}],
+        commit_messages=[{
+            "message": "feat: add feature\ndiff --git a/secret.py b/secret.py\n"
+            "--- a/secret.py\n+++ b/secret.py\n@@\n+TOP_SECRET",
+            "author_email": "person@example.com",
+            "diff": "SECRET_DIFF",
+        }],
         pull_requests=[{"title": "Add endpoint", "body": "Description https://private.example/x", "comments": "SECRET_COMMENT", "files": ["secret.py"], "attachments": ["x"]}],
         change_type="feature",
         module="api",
+        repository_private=False,
     )
     request = session.calls[0][1]["json"]
     serialized = json.dumps(request, ensure_ascii=False)
     assert "SECRET_DIFF" not in serialized
+    assert "TOP_SECRET" not in serialized
     assert "SECRET_COMMENT" not in serialized
     assert "secret.py" not in serialized
     assert "person@example.com" not in serialized
     assert "feat: add feature" in serialized
     assert "Add endpoint" in serialized
+
+
+def test_string_commit_message_is_preserved_in_allowlist_payload():
+    session = FakeSession([FakeResponse(_model_response())])
+    _client(session).generate(
+        product_name="AI4MS",
+        commit_messages=["feat: string message person@example.com"],
+        change_type="feature",
+        module="api",
+        repository_private=False,
+    )
+    request = session.calls[0][1]["json"]
+    user_content = request["messages"][1]["content"]
+    assert "feat: string message" in user_content
+    assert "person@example.com" not in user_content
+
+
+def test_falsey_injected_session_is_still_used():
+    session = FalseySession([FakeResponse(_model_response())])
+    result = _client(session).generate(product_name="AI4MS", change_type="feature", module="api", repository_private=False)
+    assert result["module"] == "api"
+    assert len(session.calls) == 1
 
 
 def test_private_repository_requires_approved_endpoint():
@@ -157,6 +195,12 @@ def test_private_repository_requires_approved_endpoint():
     forbidden = _client(FakeSession([]), private_endpoint_allowlist=["https://other.example/v1"])
     with pytest.raises(ValueError):
         forbidden.generate(product_name="AI4MS", change_type="feature", module="parser", repository_private=True)
+
+
+def test_repository_visibility_defaults_to_fail_closed():
+    client = _client(FakeSession([]))
+    with pytest.raises(ValueError):
+        client.generate(product_name="AI4MS", change_type="feature", module="parser")
 
 
 def test_validate_ai_result_rejects_overlong_text():
