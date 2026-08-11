@@ -53,7 +53,10 @@ def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     assert "--limit 500" in workflow
     assert "actions/upload-artifact@v4" in workflow
     assert "automation/release-portal-candidates" in workflow
-    assert "AI_PRIVATE_ENDPOINT_ALLOWLIST" not in workflow
+    assert "environment: release-portal-private-ai" in workflow
+    assert "AI_PRIVATE_ENDPOINT_ALLOWLIST: ${{ vars.AI_PRIVATE_ENDPOINT_ALLOWLIST }}" in workflow
+    assert "AI_PRIVATE_ENDPOINT_ALLOWLIST: ${{ vars.AI_BASE_URL }}" not in workflow
+    assert "受保护审批配置" in workflow
     assert "scripts.release_portal.review_summary" in workflow
     assert "--body-file" in workflow
     _assert_trusted_main_runs_cli(workflow, "backfill")
@@ -143,9 +146,31 @@ def test_sync_command_uploads_formal_asset_with_original_name(tmp_path: Path, mo
                 )
             ]
 
+        @staticmethod
+        def list_commits(_repository, *, include_pull_requests, stop_at_sha):
+            """同步测试不产生新的提交。"""
+            assert include_pull_requests is False
+            assert stop_at_sha is None
+            return []
+
     monkeypatch.setattr(cli, "_download_release_asset", lambda *_args: downloaded)
+    (tmp_path / "backfill.json").write_text(
+        '{"schemaVersion": 1, "repositories": {"SynlysAI/AI4MS": '
+        '{"page": 1, "processedShas": [], "watermark": {}}}}\n',
+        encoding="utf-8",
+    )
     args = cli._parser().parse_args(
-        ["sync", "--product", "ai4ms", "--candidates", str(tmp_path / "releases.json")]
+        [
+            "sync",
+            "--product",
+            "ai4ms",
+            "--candidates",
+            str(tmp_path / "releases.json"),
+            "--timeline",
+            str(tmp_path / "timeline.json"),
+            "--state",
+            str(tmp_path / "backfill.json"),
+        ]
     )
 
     assert cli._sync(args, object_store=InMemoryR2Client(), github_client=FakeGitHubClient()) == 0
@@ -199,19 +224,27 @@ def test_publish_command_uploads_manifest_after_all_other_collections(tmp_path: 
     )
 
     assert result == 0
-    assert store.keys[-1] == "portal/v1/manifest.json"
     generation_prefix = store.keys[0].rsplit("/", 1)[0]
     assert generation_prefix.startswith("portal/v1/generations/")
-    assert store.keys[:-1] == [
+    assert store.keys == [
         f"{generation_prefix}/products.json",
         f"{generation_prefix}/releases.json",
         f"{generation_prefix}/timeline.json",
         f"{generation_prefix}/faqs.json",
         f"{generation_prefix}/meta.json",
+        "portal/v1/manifest.json",
+        "portal/v1/products.json",
+        "portal/v1/releases.json",
+        "portal/v1/timeline.json",
+        "portal/v1/faqs.json",
+        "portal/v1/meta.json",
     ]
+    assert store.keys[5] == "portal/v1/manifest.json"
     pointer = json.loads(store.bodies["portal/v1/manifest.json"])
     assert all(item["path"].startswith(f"{generation_prefix}/") for item in pointer["collections"].values())
     assert all(item["path"].startswith(f"{generation_prefix}/") for item in pointer["files"])
+    for filename in ("products.json", "releases.json", "timeline.json", "faqs.json", "meta.json"):
+        assert store.bodies[f"portal/v1/{filename}"] == store.bodies[f"{generation_prefix}/{filename}"]
 
 
 def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_path: Path):
@@ -236,6 +269,11 @@ def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_pa
                 "portal/v1/generations/old/timeline.json": b"old-timeline\n",
                 "portal/v1/generations/old/faqs.json": b"old-faqs\n",
                 "portal/v1/generations/old/meta.json": b"old-meta\n",
+                "portal/v1/products.json": b"old-products\n",
+                "portal/v1/releases.json": b"old-releases\n",
+                "portal/v1/timeline.json": b"old-timeline\n",
+                "portal/v1/faqs.json": b"old-faqs\n",
+                "portal/v1/meta.json": b"old-meta\n",
             }
 
         def put_object(self, *, Bucket, Key, Body, **_kwargs):  # noqa: N803
@@ -276,7 +314,8 @@ def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_pa
         key: store.objects[key]
         for key in old_snapshot
     } == old_snapshot
-    assert not any(key == "portal/v1/products.json" for key in store.objects)
+    assert store.objects["portal/v1/products.json"] == b"old-products\n"
+    assert store.objects["portal/v1/meta.json"] == b"old-meta\n"
 
 
 def test_backfill_uses_bounded_page_and_advances_checkpoint(tmp_path: Path, monkeypatch):
@@ -348,7 +387,134 @@ def test_backfill_uses_bounded_page_and_advances_checkpoint(tmp_path: Path, monk
     assert repository_state["completed"] is True
     assert repository_state["processed"] == 3
     assert client.calls == [
-        ("SynlysAI/AI4MS", 2, 1, False),
-        ("SynlysAI/AI4MS", 2, 2, False),
+        ("SynlysAI/AI4MS", 2, 1, True),
+        ("SynlysAI/AI4MS", 2, 2, True),
     ]
     assert all(call[1] <= 2 for call in client.calls)
+
+
+def test_backfill_full_batch_advances_by_consumed_github_pages(tmp_path: Path, monkeypatch):
+    """500 条完整批次应消耗五页并让下一批从第六页开始。"""
+    state_path = tmp_path / "backfill.json"
+    candidate_path = tmp_path / "timeline.json"
+    state_path.write_text(
+        '{"schemaVersion": 1, "repositories": {"SynlysAI/AI4MS": {'
+        '"page": 1, "processedShas": [], "watermark": {}}}}\n',
+        encoding="utf-8",
+    )
+    candidate_path.write_text('{"schemaVersion": 1, "events": []}\n', encoding="utf-8")
+
+    class FullPageClient:
+        """模拟每次刚好返回 500 条提交的分页客户端。"""
+
+        def __init__(self):
+            """初始化调用页号记录。"""
+            self.pages: list[int] = []
+
+        def list_commits(self, _repository, *, max_items, page, include_pull_requests):
+            """为每个请求页返回互不重复的完整批次。"""
+            assert max_items == 500
+            assert include_pull_requests is True
+            self.pages.append(page)
+            offset = (page - 1) * 500
+            return [
+                {
+                    "sha": f"{offset + index:040x}",
+                    "message": "feat(core): batch",
+                    "occurred_at": "2026-08-10T00:00:00Z",
+                }
+                for index in range(500)
+            ]
+
+    monkeypatch.delenv("AI_API_KEY", raising=False)
+    args = cli._parser().parse_args(
+        [
+            "backfill",
+            "--product",
+            "ai4ms",
+            "--limit",
+            "500",
+            "--state",
+            str(state_path),
+            "--candidates",
+            str(candidate_path),
+        ]
+    )
+    client = FullPageClient()
+
+    assert cli._backfill(args, github_client=client) == 0
+    assert cli._backfill(args, github_client=client) == 0
+    assert client.pages == [1, 6]
+
+
+def test_sync_adds_only_commits_newer_than_watermark(tmp_path: Path, monkeypatch):
+    """同步应以水位停止读取，并只将新增提交合并入 timeline 候选。"""
+    releases_path = tmp_path / "releases.json"
+    timeline_path = tmp_path / "timeline.json"
+    state_path = tmp_path / "backfill.json"
+    old_sha = "a" * 40
+    new_sha = "b" * 40
+    releases_path.write_text('{"schemaVersion": 1, "releases": []}\n', encoding="utf-8")
+    timeline_path.write_text('{"schemaVersion": 1, "events": []}\n', encoding="utf-8")
+    state_path.write_text(
+        json.dumps(
+            {
+                "schemaVersion": 1,
+                "repositories": {
+                    "SynlysAI/AI4MS": {
+                        "page": 1,
+                        "processed": 1,
+                        "processedShas": [old_sha],
+                        "watermark": {"sha": old_sha, "publishedAt": "2026-08-09T00:00:00Z"},
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    class IncrementalClient:
+        """提供一个水位之后的新提交。"""
+
+        def __init__(self):
+            """初始化水位调用记录。"""
+            self.calls: list[tuple[str, bool, str | None]] = []
+
+        @staticmethod
+        def list_releases(_repository):
+            """本测试不产生正式 Release。"""
+            return []
+
+        def list_commits(self, repository, *, include_pull_requests, stop_at_sha):
+            """返回客户端已在旧水位前截断的新提交。"""
+            self.calls.append((repository, include_pull_requests, stop_at_sha))
+            return [
+                {
+                    "sha": new_sha,
+                    "message": "feat(core): new incremental change",
+                    "occurred_at": "2026-08-10T00:00:00Z",
+                }
+            ]
+
+    monkeypatch.delenv("AI_API_KEY", raising=False)
+    args = cli._parser().parse_args(
+        [
+            "sync",
+            "--product",
+            "ai4ms",
+            "--candidates",
+            str(releases_path),
+            "--timeline",
+            str(timeline_path),
+            "--state",
+            str(state_path),
+        ]
+    )
+    client = IncrementalClient()
+
+    assert cli._sync(args, object_store=InMemoryR2Client(), github_client=client) == 0
+    timeline = json.loads(timeline_path.read_text(encoding="utf-8"))
+    updated_state = json.loads(state_path.read_text(encoding="utf-8"))
+    assert client.calls == [("SynlysAI/AI4MS", False, old_sha)]
+    assert [sha for event in timeline["events"] for sha in event["source"]["commitShas"]] == [new_sha[:7]]
+    assert updated_state["repositories"]["SynlysAI/AI4MS"]["watermark"]["sha"] == new_sha

@@ -20,6 +20,8 @@ concurrency:
 
 jobs:
   backfill:
+    # 该 Environment 需在仓库设置中启用 required reviewers，白名单由受保护审批配置维护。
+    environment: release-portal-private-ai
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -74,10 +76,13 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ vars.AI_BASE_URL }}
           AI_MODEL: ${{ vars.AI_MODEL }}
+          AI_PRIVATE_ENDPOINT_ALLOWLIST: ${{ vars.AI_PRIVATE_ENDPOINT_ALLOWLIST }}
         run: >-
           python -m scripts.release_portal.cli backfill
           --product "${{ inputs.product }}"
           --limit 500
+          --candidates release-portal/candidates/timeline.json
+          --state release-portal/state/backfill.json
 
       - name: 用主分支代码生成审核摘要
         run: >-

@@ -198,6 +198,24 @@ def test_private_repository_requires_approved_endpoint():
         forbidden.generate(product_name="AI4MS", change_type="feature", module="parser", repository_private=True)
 
 
+def test_private_repository_uses_independent_environment_allowlist(monkeypatch):
+    """私有仓库可由独立受保护环境白名单批准，而不是由基础 URL 自证。"""
+    monkeypatch.setenv("AI_BASE_URL", "https://approved.example/v1")
+    monkeypatch.setenv("AI_MODEL", "release-model")
+    monkeypatch.setenv("AI_API_KEY", "test-key")
+    monkeypatch.setenv("AI_PRIVATE_ENDPOINT_ALLOWLIST", "https://approved.example/v1")
+    client = AIClient.from_environment(session=FakeSession([FakeResponse(_model_response())]), sleep=lambda _: None)
+
+    result = client.generate(
+        product_name="AI4MS",
+        change_type="feature",
+        module="parser",
+        repository_private=True,
+    )
+
+    assert result["module"] == "parser"
+
+
 def test_repository_visibility_defaults_to_fail_closed():
     client = _client(FakeSession([]))
     with pytest.raises(ValueError):

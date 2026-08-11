@@ -72,8 +72,8 @@ def test_commit_and_associated_pr_are_normalized():
     assert commits[0].pull_requests[0].title == "Add parser"
 
 
-def test_commit_batch_stops_at_limit_without_per_commit_pr_requests():
-    """历史回填批次应受记录和分页上限约束，不为每条提交读取 PR。"""
+def test_commit_batch_stops_at_limit_before_pr_enrichment():
+    """提交分页必须在达到批次上限后停止，调用者可显式跳过 PR 富化。"""
     payload = [
         {"sha": character * 40, "commit": {"message": f"feat: {character}", "author": {"date": "2026-08-10T00:00:00Z"}}}
         for character in ("a", "b", "c")
@@ -97,6 +97,31 @@ def test_commit_batch_stops_at_limit_without_per_commit_pr_requests():
     assert len(session.calls) == 1
     assert len(session.calls) <= 2
     assert "page=1" in session.calls[0][0]
+
+
+def test_commit_list_stops_before_existing_watermark():
+    """增量同步遇到已有水位 SHA 时不得把该提交或更早记录纳入候选。"""
+    old_sha = "a" * 40
+    new_sha = "b" * 40
+    session = FakeSession([
+        FakeResponse(
+            payload=[
+                {"sha": new_sha, "commit": {"message": "feat: new", "author": {"date": "2026-08-10T00:00:00Z"}}},
+                {"sha": old_sha, "commit": {"message": "feat: old", "author": {"date": "2026-08-09T00:00:00Z"}}},
+                {"sha": "c" * 40, "commit": {"message": "feat: older", "author": {"date": "2026-08-08T00:00:00Z"}}},
+            ]
+        )
+    ])
+    client = GitHubClient(session=session, api_root="https://api.test", sleep=lambda _: None)
+
+    commits = client.list_commits(
+        "SynlysAI/AI4MS",
+        include_pull_requests=False,
+        stop_at_sha=old_sha,
+    )
+
+    assert [commit.sha for commit in commits] == [new_sha]
+    assert len(session.calls) == 1
 
 
 def test_rate_limit_retry_after_and_unrecoverable_error():

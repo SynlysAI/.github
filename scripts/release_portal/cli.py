@@ -27,7 +27,7 @@ from .aggregate import (
 from .ai import AIClient
 from .classify import load_overrides as load_classification_overrides
 from .config import load_catalog
-from .github import GitHubClient
+from .github import COMMIT_PAGE_SIZE, GitHubClient
 from .publish import (
     build_manifest,
     build_public_collections,
@@ -83,6 +83,8 @@ def _parser() -> argparse.ArgumentParser:
     _add_product_argument(sync)
     _add_storage_arguments(sync)
     sync.add_argument("--candidates", default=str(CANDIDATE_RELEASES_PATH))
+    sync.add_argument("--timeline", default=str(CANDIDATE_TIMELINE_PATH))
+    sync.add_argument("--state", default=str(BACKFILL_STATE_PATH))
 
     backfill = commands.add_parser("backfill", help="回填并生成待审核 Commit 候选")
     _add_product_argument(backfill)
@@ -417,9 +419,14 @@ def _sync(args: argparse.Namespace, *, object_store: Any | None = None, github_c
         store = object_store if object_store is not None else build_object_store(args, require_remote=True)
         uploader = AssetUploader(store, args.bucket, config=StorageConfig())
         candidates = _load_collection(args.candidates, "releases")
+        timeline = _load_collection(args.timeline, "events")
+        state = load_backfill_state(args.state)
+        overrides = load_classification_overrides(ROOT / "release-portal" / "overrides.yml")
         selected_ids = {product.product_id for product in products}
         records = [item for item in candidates["releases"] if item.get("productId") not in selected_ids]
+        timeline_additions: list[dict[str, Any]] = []
         synced = 0
+        processed = 0
         for product in products:
             for release in client.list_releases(product.repository):
                 if release.draft or release.prerelease:
@@ -455,15 +462,105 @@ def _sync(args: argparse.Namespace, *, object_store: Any | None = None, github_c
                             pass
                 records.append(_release_record(product, release, public_assets))
                 synced += 1
+            repository_state = state.setdefault("repositories", {}).setdefault(product.repository, {})
+            watermark = str((repository_state.get("watermark") or {}).get("sha") or "")
+            commits = []
+            for commit in client.list_commits(
+                product.repository,
+                include_pull_requests=False,
+                stop_at_sha=watermark or None,
+            ):
+                value = commit.to_dict() if hasattr(commit, "to_dict") else dict(commit)
+                value["repository"] = product.repository
+                commits.append(value)
+            known = {str(sha) for sha in repository_state.get("processedShas", [])}
+            new_commits = [item for item in commits if str(item.get("sha") or "") not in known]
+            if new_commits:
+                _update_incremental_state(
+                    state,
+                    product.repository,
+                    new_commits,
+                    completed=bool(repository_state.get("completed", False)),
+                )
+                events = aggregate_commits(
+                    product.product_id,
+                    new_commits,
+                    overrides=overrides,
+                    repository=product.repository,
+                )
+                timeline_additions.extend(events)
+                processed += len(new_commits)
         records.sort(key=lambda item: (str(item.get("publishedAt") or ""), str(item.get("id") or "")), reverse=True)
         _atomic_write_json(args.candidates, {"schemaVersion": 1, "releases": records})
+        timeline["events"] = _merge_candidate_events(timeline["events"], timeline_additions)
+        _atomic_write_json(args.timeline, timeline)
+        save_backfill_state(state, args.state)
     except Exception as exc:
         elapsed = int((time.perf_counter() - started) * 1000)
         _log(run_id=run_id, product_id=args.product_id, stage="sync", count=0, duration_ms=elapsed, status="failed", error=type(exc).__name__)
         return 1
     elapsed = int((time.perf_counter() - started) * 1000)
-    _log(run_id=run_id, product_id=args.product_id, stage="sync", count=synced, duration_ms=elapsed, status="success")
+    _log(run_id=run_id, product_id=args.product_id, stage="sync", count=synced + processed, duration_ms=elapsed, status="success")
     return 0
+
+
+def _update_incremental_state(
+    state: dict[str, Any],
+    repository: str,
+    commits: list[dict[str, Any]],
+    *,
+    completed: bool,
+) -> None:
+    """记录同步批次的全部提交并将水位设为最新提交。
+
+    Args:
+        state: 可变回填状态映射。
+        repository: owner/name 仓库名。
+        commits: 按 GitHub 返回顺序排列的增量提交。
+        completed: 是否保留该仓库的完成状态。
+
+    Returns:
+        无返回值。
+    """
+    repositories = state.setdefault("repositories", {})
+    current = repositories.setdefault(
+        repository,
+        {
+            "cursor": None,
+            "page": 1,
+            "completed": False,
+            "processed": 0,
+            "processedShas": [],
+            "watermark": {"sha": None, "publishedAt": None},
+        },
+    )
+    processed_shas = list(dict.fromkeys(str(sha) for sha in current.get("processedShas", []) if sha))
+    known = set(processed_shas)
+    fresh = [item for item in commits if str(item.get("sha") or "") and str(item.get("sha")) not in known]
+    if fresh:
+        processed_shas.extend(str(item["sha"]) for item in fresh)
+        processed_shas = list(dict.fromkeys(processed_shas))
+        current["processedShas"] = processed_shas
+        current["processed"] = len(processed_shas)
+        current["cursor"] = str(fresh[-1].get("sha") or current.get("cursor") or "") or None
+        newest = max(
+            fresh,
+            key=lambda item: str(
+                item.get("occurred_at")
+                or item.get("occurredAt")
+                or item.get("published_at")
+                or item.get("publishedAt")
+                or ""
+            ),
+        )
+        occurred_at = (
+            newest.get("occurred_at")
+            or newest.get("occurredAt")
+            or newest.get("published_at")
+            or newest.get("publishedAt")
+        )
+        current["watermark"] = {"sha": str(newest["sha"]), "publishedAt": occurred_at}
+    current["completed"] = bool(completed)
 
 
 def _merge_candidate_events(existing: list[dict[str, Any]], additions: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -556,7 +653,7 @@ def _backfill(args: argparse.Namespace, *, github_client: Any | None = None) -> 
                 product.repository,
                 max_items=limit,
                 page=page,
-                include_pull_requests=False,
+                include_pull_requests=True,
             ):
                 value = commit.to_dict() if hasattr(commit, "to_dict") else dict(commit)
                 value["repository"] = product.repository
@@ -564,7 +661,8 @@ def _backfill(args: argparse.Namespace, *, github_client: Any | None = None) -> 
             batch = [item for item in fetched_commits if str(item.get("sha") or "") not in known]
             completed = len(fetched_commits) < limit
             update_backfill_state(state, product.repository, batch, completed=completed, max_batch=limit)
-            repository_state["page"] = page if completed else page + 1
+            pages_used = max(1, (len(fetched_commits) + COMMIT_PAGE_SIZE - 1) // COMMIT_PAGE_SIZE)
+            repository_state["page"] = page + pages_used
             events = aggregate_commits(
                 product.product_id,
                 batch,
@@ -732,7 +830,15 @@ def _publish(args: argparse.Namespace, *, object_store: Any | None = None) -> in
                 f"{prefix}/manifest.json",
                 _canonical_json_bytes(manifest),
             )
-            count = len(PUBLIC_COLLECTION_FILENAMES)
+            # 固定根路径仅为旧消费者保留；官网以 generation manifest 为权威读入口。
+            for filename in PUBLIC_COLLECTION_FILENAMES[:-1]:
+                _put_public_object(
+                    client,
+                    args.bucket,
+                    f"{prefix}/{filename}",
+                    (output / filename).read_bytes(),
+                )
+            count = len(PUBLIC_COLLECTION_FILENAMES[:-1]) * 2 + 1
     except Exception as exc:
         elapsed = int((time.perf_counter() - started) * 1000)
         _log(run_id=run_id, product_id="all", stage="publish", count=0, duration_ms=elapsed, status="failed", error=type(exc).__name__)

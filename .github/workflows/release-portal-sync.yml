@@ -80,6 +80,8 @@ jobs:
         run: >-
           python -m scripts.release_portal.cli sync
           --product "${{ inputs.product || 'all' }}"
+          --timeline release-portal/candidates/timeline.json
+          --state release-portal/state/backfill.json
 
       - name: 用主分支代码生成审核摘要
         run: >-

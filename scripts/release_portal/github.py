@@ -17,6 +17,7 @@ from .models import Catalog, Product
 
 API_ROOT = "https://api.github.com"
 USER_AGENT = "synlysai-release-portal/1.0"
+COMMIT_PAGE_SIZE = 100
 _RETRY_STATUSES = {403, 429}
 
 
@@ -312,6 +313,7 @@ Returns:
         *,
         max_items: int | None = None,
         max_pages: int | None = None,
+        stop_when: Callable[[dict[str, Any]], bool] | None = None,
     ) -> list[dict[str, Any]]:
         """读取受上限约束的 GitHub 分页结果。
 
@@ -319,6 +321,7 @@ Returns:
             path: 首页 API 路径。
             max_items: 最多返回的记录数；``None`` 表示不设记录数上限。
             max_pages: 最多请求的页数；``None`` 表示不设页数上限。
+            stop_when: 记录满足该条件时停止，且不包含该记录。
 
         Returns:
             不超过上限的对象列表。
@@ -342,6 +345,8 @@ Returns:
             for index, item in enumerate(payload):
                 if not isinstance(item, dict):
                     raise GitHubError(f"GitHub page item must be an object: index={index}", status=response.status_code, method="GET", path=next_path, body=self._safe_body(getattr(response, "text", "")))
+                if stop_when is not None and stop_when(item):
+                    return result
                 result.append(item)
                 if max_items is not None and len(result) >= max_items:
                     return result
@@ -385,6 +390,7 @@ Returns:
         max_items: int | None = None,
         page: int = 1,
         include_pull_requests: bool = True,
+        stop_at_sha: str | None = None,
     ) -> list[Commit]:
         """读取一个受限提交批次，并补充关联 PR 标题与正文。
 
@@ -393,7 +399,8 @@ Returns:
             catalog: 可选产品注册表，默认读取正式 catalog。
             max_items: 本次最多读取的提交数；缺省读取全部分页。
             page: GitHub REST 起始页号，从 1 开始。
-            include_pull_requests: 是否读取关联 PR；批量回填可关闭以限制请求量。
+            include_pull_requests: 是否为本批命中的提交读取关联 PR；调用者可关闭以限制请求量。
+            stop_at_sha: 遇到该 SHA 时停止读取且不包含该提交，用于增量同步水位。
         Returns:
             归一化 Commit 列表。
         """
@@ -405,11 +412,18 @@ Returns:
         if normalized_page < 1:
             raise ValueError("提交页号必须从 1 开始")
         normalized_limit = None if max_items is None else max(0, int(max_items))
-        max_pages = None if normalized_limit is None else max(1, (normalized_limit + 99) // 100)
+        max_pages = (
+            None
+            if normalized_limit is None
+            else max(1, (normalized_limit + COMMIT_PAGE_SIZE - 1) // COMMIT_PAGE_SIZE)
+        )
         items = self._paginate(
-            f"/repos/{repository}/commits?per_page=100&page={normalized_page}",
+            f"/repos/{repository}/commits?per_page={COMMIT_PAGE_SIZE}&page={normalized_page}",
             max_items=normalized_limit,
             max_pages=max_pages,
+            stop_when=(lambda item: str(item.get("sha") or "") == stop_at_sha)
+            if stop_at_sha
+            else None,
         )
         commits: list[Commit] = []
         for item in items:
@@ -498,4 +512,12 @@ Returns:
         return Commit(sha=str(item.get("sha") or ""), occurred_at=occurred_at, message=message, pull_requests=tuple(pull_requests))
 
 
-__all__ = ["GitHubClient", "GitHubError", "Release", "ReleaseAsset", "Commit", "PullRequest"]
+__all__ = [
+    "COMMIT_PAGE_SIZE",
+    "GitHubClient",
+    "GitHubError",
+    "Release",
+    "ReleaseAsset",
+    "Commit",
+    "PullRequest",
+]
