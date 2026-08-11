@@ -608,6 +608,13 @@ def _update_incremental_state(
             current.pop("syncPending", None)
         else:
             current["watermark"] = newest_watermark
+    elif reached_limit and isinstance(pending, dict):
+        pages_used = max(1, (len(commits) + COMMIT_PAGE_SIZE - 1) // COMMIT_PAGE_SIZE)
+        current["syncPending"] = {
+            "frontier": dict(pending.get("frontier") or {}),
+            "nextPage": page + pages_used,
+            "stop": dict(stop_watermark),
+        }
     elif not reached_limit and isinstance(pending, dict):
         current["watermark"] = dict(pending.get("frontier") or current.get("watermark") or {})
         current.pop("syncPending", None)

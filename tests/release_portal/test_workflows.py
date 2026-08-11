@@ -699,3 +699,88 @@ def test_sync_continues_after_full_batch_without_losing_or_repeating_commits(tmp
     assert set(candidate_shas) == {sha[:7] for sha in new_shas}
     assert final_state["repositories"]["SynlysAI/AI4MS"]["watermark"]["sha"] == new_shas[0]
     assert "syncPending" not in final_state["repositories"]["SynlysAI/AI4MS"]
+
+
+def test_sync_pending_full_duplicate_page_advances_to_next_page(tmp_path: Path, monkeypatch):
+    """续读页满 500 条但全部已处理时，也必须推进页号避免重复卡住。"""
+    releases_path = tmp_path / "releases.json"
+    timeline_path = tmp_path / "timeline.json"
+    state_path = tmp_path / "backfill.json"
+    old_sha = "a" * 40
+    known_shas = [f"{index + 1:07x}" + "0" * 33 for index in range(1000)]
+    releases_path.write_text('{"schemaVersion": 1, "releases": []}\n', encoding="utf-8")
+    timeline_path.write_text('{"schemaVersion": 1, "events": []}\n', encoding="utf-8")
+    state_path.write_text(
+        json.dumps(
+            {
+                "schemaVersion": 1,
+                "repositories": {
+                    "SynlysAI/AI4MS": {
+                        "page": 1,
+                        "processed": len(known_shas),
+                        "processedShas": known_shas,
+                        "watermark": {"sha": known_shas[499], "publishedAt": "2026-08-10T12:00:00Z"},
+                        "syncPending": {
+                            "frontier": {"sha": known_shas[0], "publishedAt": "2026-08-10T23:00:00Z"},
+                            "nextPage": 6,
+                            "stop": {"sha": old_sha, "publishedAt": "2026-08-01T00:00:00Z"},
+                        },
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    class DuplicatePageClient:
+        """第六页重复返回已处理满批，第十一页为空。"""
+
+        def __init__(self):
+            """初始化页号记录。"""
+            self.pages: list[int] = []
+
+        @staticmethod
+        def list_releases(_repository):
+            """本测试不产生 Release。"""
+            return []
+
+        def list_commits(self, _repository, *, max_items, page, include_pull_requests, stop_at_sha):
+            """模拟连续分页中的重复完整页与最终短页。"""
+            assert max_items == 500
+            assert include_pull_requests is True
+            assert stop_at_sha == old_sha
+            self.pages.append(page)
+            selected = known_shas[500:] if page == 6 else []
+            return [
+                {
+                    "sha": sha,
+                    "message": "feat(core): already processed",
+                    "occurred_at": "2026-08-10T12:00:00Z",
+                    "pull_requests": [],
+                }
+                for sha in selected
+            ]
+
+    monkeypatch.delenv("AI_API_KEY", raising=False)
+    args = cli._parser().parse_args(
+        [
+            "sync",
+            "--product",
+            "ai4ms",
+            "--candidates",
+            str(releases_path),
+            "--timeline",
+            str(timeline_path),
+            "--state",
+            str(state_path),
+        ]
+    )
+    client = DuplicatePageClient()
+
+    assert cli._sync(args, object_store=InMemoryR2Client(), github_client=client) == 0
+    intermediate = json.loads(state_path.read_text(encoding="utf-8"))
+    assert intermediate["repositories"]["SynlysAI/AI4MS"]["syncPending"]["nextPage"] == 11
+    assert cli._sync(args, object_store=InMemoryR2Client(), github_client=client) == 0
+    final_state = json.loads(state_path.read_text(encoding="utf-8"))
+    assert client.pages == [6, 11]
+    assert "syncPending" not in final_state["repositories"]["SynlysAI/AI4MS"]
