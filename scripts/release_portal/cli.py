@@ -10,7 +10,7 @@ import uuid
 from pathlib import Path
 from typing import Any, Sequence
 
-from .assets import AssetUploader, InMemoryR2Client, StorageConfig
+from .assets import AssetUploader, Boto3R2Client, FilesystemR2Client, InMemoryR2Client, StorageConfig
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST_CANDIDATE_PATH = ROOT / "release-portal" / "candidates" / "manifest.json"
@@ -39,7 +39,7 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def build_object_store(args: argparse.Namespace) -> InMemoryR2Client:
+def build_object_store(args: argparse.Namespace) -> Any:
     """构造离线对象存储客户端。
 
     Args:
@@ -48,7 +48,14 @@ def build_object_store(args: argparse.Namespace) -> InMemoryR2Client:
     Returns:
         可替换的对象存储客户端；默认使用内存实现，不访问网络。
     """
-    # 生产工作流通过依赖注入替换为 boto3/R2 客户端；CLI 默认离线可运行。
+    access_key = os.getenv("R2_ACCESS_KEY_ID")
+    secret_key = os.getenv("R2_SECRET_ACCESS_KEY")
+    account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID")
+    if access_key and secret_key and account_id:
+        return Boto3R2Client(access_key_id=access_key, secret_access_key=secret_key, account_id=account_id)
+    if args.store_root:
+        return FilesystemR2Client(args.store_root)
+    # 无 R2 配置时离线运行，测试和开发环境不会访问网络。
     return InMemoryR2Client()
 
 
@@ -85,6 +92,7 @@ def _append_manifest_candidate(path: str | Path, asset: dict[str, Any], *, produ
         value = {"schemaVersion": 1, "assets": []}
     if not isinstance(value, dict) or not isinstance(value.get("assets", []), list):
         raise ValueError("待审 manifest 格式无效")
+    value.setdefault("assets", [])
     entry = dict(asset)
     entry.update({"productId": product_id, "version": version, "channel": channel})
     value.setdefault("schemaVersion", 1)

@@ -7,6 +7,8 @@
 from __future__ import annotations
 
 import hashlib
+import io
+import json
 import mimetypes
 import os
 import posixpath
@@ -145,7 +147,7 @@ class InMemoryR2Client:
             raise FileNotFoundError(source_key)
         return self.put_object(bucket, destination_key, self.objects[source], metadata=self.metadata[source])
 
-    def delete_object(self, bucket: str, key: str) -> None:
+    def delete_object(self, bucket: str, key: str, **kwargs: Any) -> None:
         """删除当前对象及其版本记录。
 
         Args:
@@ -213,6 +215,167 @@ class InMemoryR2Client:
         self.versioning[bucket] = status.casefold() == "enabled"
 
 
+class Boto3R2Client:
+    """基于 boto3 的 Cloudflare R2 对象存储适配器。"""
+
+    def __init__(self, *, access_key_id: str, secret_access_key: str, account_id: str, endpoint_url: str | None = None, client: Any | None = None) -> None:
+        """初始化 boto3 R2 客户端，不在初始化阶段执行网络请求。
+
+        Args:
+            access_key_id: R2 Access Key ID。
+            secret_access_key: R2 Secret Access Key。
+            account_id: Cloudflare Account ID。
+            endpoint_url: 可选 R2 endpoint；缺省按 account_id 生成。
+            client: 测试用 boto 风格客户端。
+
+        Returns:
+            无返回值。
+        """
+        if client is not None:
+            self.client = client
+            return
+        try:
+            import boto3
+        except ImportError as exc:
+            raise RuntimeError("使用 R2 需要安装 boto3") from exc
+        endpoint = endpoint_url or f"https://{account_id}.r2.cloudflarestorage.com"
+        self.client = boto3.client("s3", endpoint_url=endpoint, aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key)
+
+    def head_object(self, bucket: str, key: str) -> Mapping[str, Any]:
+        """读取对象元数据。"""
+        return self.client.head_object(Bucket=bucket, Key=key)
+
+    def put_object(self, bucket: str, key: str, body: BinaryIO, **kwargs: Any) -> Any:
+        """使用 boto3 关键字参数写入对象。"""
+        return self.client.put_object(Bucket=bucket, Key=key, Body=body, ContentType=kwargs.get("content_type", kwargs.get("ContentType")), ContentDisposition=kwargs.get("content_disposition", kwargs.get("ContentDisposition")), Metadata=kwargs.get("metadata", kwargs.get("Metadata", {})))
+
+    def copy_object(self, bucket: str, source_key: str, destination_key: str) -> Any:
+        """使用 boto3 关键字参数复制对象。"""
+        return self.client.copy_object(Bucket=bucket, CopySource={"Bucket": bucket, "Key": source_key}, Key=destination_key)
+
+    def delete_object(self, bucket: str, key: str, **kwargs: Any) -> Any:
+        """删除对象当前版本。"""
+        params = {"Bucket": bucket, "Key": key}
+        if kwargs.get("version_id"):
+            params["VersionId"] = kwargs["version_id"]
+        return self.client.delete_object(**params)
+
+    def get_object(self, bucket: str, key: str) -> bytes:
+        """读取对象内容用于完整性校验和失败恢复。"""
+        response = self.client.get_object(Bucket=bucket, Key=key)
+        body = response.get("Body") if isinstance(response, Mapping) else None
+        return body.read() if hasattr(body, "read") else bytes(body or b"")
+
+    def list_object_versions(self, bucket: str, key: str) -> list[Mapping[str, Any]]:
+        """列出指定对象版本。"""
+        response = self.client.list_object_versions(Bucket=bucket, Prefix=key)
+        return [item for item in response.get("Versions", []) if item.get("Key") == key]
+
+    def prune_versions(self, bucket: str, key: str, *, keep: int = 3) -> None:
+        """删除对象较旧版本，仅保留最近 ``keep`` 个。
+
+        Args:
+            bucket: bucket 名称。
+            key: 对象 key。
+            keep: 保留版本数。
+
+        Returns:
+            无返回值。
+        """
+        versions = sorted(self.list_object_versions(bucket, key), key=lambda item: item.get("LastModified", ""), reverse=True)
+        for item in versions[keep:]:
+            version_id = item.get("VersionId")
+            if version_id:
+                self.delete_object(bucket, key, version_id=version_id)
+
+    def get_bucket_versioning(self, bucket: str) -> Mapping[str, Any]:
+        """读取 bucket 版本控制状态。"""
+        return self.client.get_bucket_versioning(Bucket=bucket)
+
+    def put_bucket_versioning(self, bucket: str, status: str = "Enabled") -> Any:
+        """开启 bucket 版本控制。"""
+        return self.client.put_bucket_versioning(Bucket=bucket, VersioningConfiguration={"Status": status})
+
+
+class FilesystemR2Client:
+    """本地文件系统对象存储，用于 CLI 离线持久化。"""
+
+    def __init__(self, root: str | Path) -> None:
+        """初始化本地对象目录。
+
+        Args:
+            root: 对象根目录。
+
+        Returns:
+            无返回值。
+        """
+        self.root = Path(root).resolve()
+        self.root.mkdir(parents=True, exist_ok=True)
+
+    def _path(self, bucket: str, key: str) -> Path:
+        """解析并校验 bucket/key 在本地根目录内。"""
+        target = (self.root / _safe_segment(bucket, "bucket") / key).resolve()
+        if self.root not in target.parents:
+            raise ValueError("对象 key 超出本地存储根目录")
+        return target
+
+    def head_object(self, bucket: str, key: str) -> Mapping[str, Any] | None:
+        """读取本地对象元数据。"""
+        target = self._path(bucket, key)
+        if not target.is_file():
+            return None
+        metadata_path = target.with_name(target.name + ".metadata.json")
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.exists() else {}
+        metadata["ContentLength"] = target.stat().st_size
+        return metadata
+
+    def put_object(self, bucket: str, key: str, body: BinaryIO | bytes, **kwargs: Any) -> Any:
+        """写入本地对象及元数据。"""
+        target = self._path(bucket, key)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        data = body.read() if hasattr(body, "read") else bytes(body)
+        target.write_bytes(data)
+        metadata = dict(kwargs.get("metadata") or kwargs.get("Metadata") or {})
+        metadata["ContentType"] = kwargs.get("content_type", kwargs.get("ContentType", metadata.get("ContentType")))
+        metadata["ContentDisposition"] = kwargs.get("content_disposition", kwargs.get("ContentDisposition", metadata.get("ContentDisposition")))
+        target.with_name(target.name + ".metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+        return {}
+
+    def copy_object(self, bucket: str, source_key: str, destination_key: str) -> Any:
+        """复制本地对象及其元数据。"""
+        source = self._path(bucket, source_key)
+        destination = self._path(bucket, destination_key)
+        if not source.is_file():
+            raise FileNotFoundError(source_key)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, destination)
+        source_meta = source.with_name(source.name + ".metadata.json")
+        if source_meta.exists():
+            shutil.copyfile(source_meta, destination.with_name(destination.name + ".metadata.json"))
+        return {}
+
+    def delete_object(self, bucket: str, key: str, **kwargs: Any) -> Any:
+        """删除本地对象及元数据。"""
+        target = self._path(bucket, key)
+        target.unlink(missing_ok=True)
+        target.with_name(target.name + ".metadata.json").unlink(missing_ok=True)
+        return {}
+
+    def get_object(self, bucket: str, key: str) -> bytes:
+        """读取本地对象内容。"""
+        return self._path(bucket, key).read_bytes()
+
+    def get_bucket_versioning(self, bucket: str) -> Mapping[str, Any]:
+        """返回本地离线存储视作已启用版本控制。"""
+        return {"Status": "Enabled"}
+
+    def put_bucket_versioning(self, bucket: str, status: str = "Enabled") -> None:
+        """记录本地离线存储版本控制设置。"""
+
+    def prune_versions(self, bucket: str, key: str, *, keep: int = 3) -> None:
+        """本地存储不保留历史版本，接口保持兼容。"""
+
+
 def validate_storage_config(client: Any, bucket: str, config: StorageConfig | Mapping[str, Any] | None = None) -> StorageConfig:
     """校验并开启对象版本控制，不执行网络请求以外的副作用。
 
@@ -253,8 +416,27 @@ def _safe_segment(value: str, field: str) -> str:
         ValueError: 片段为空或包含路径分隔符。
     """
     text = str(value).strip()
-    if not text or text in {".", ".."} or "/" in text or "\\" in text or "\x00" in text:
+    if not text or text in {".", ".."} or "/" in text or "\\" in text or "\x00" in text or '"' in text or any(ord(char) < 32 or ord(char) == 127 for char in text):
         raise ValueError(f"{field} 包含非法路径片段")
+    return text
+
+
+def _safe_public_label(value: Any, field: str) -> str:
+    """校验公开平台和架构标签，防止控制字符及 URL 注入。
+
+    Args:
+        value: 标签值。
+        field: 字段名称。
+
+    Returns:
+        清理后的标签字符串。
+
+    Raises:
+        ValueError: 标签为空、包含控制字符或 URL。
+    """
+    text = str(value or "").strip()
+    if not text or "://" in text or "/" in text or "\\" in text or any(ord(char) < 32 or ord(char) == 127 for char in text):
+        raise ValueError(f"{field} 包含非法公开内容")
     return text
 
 
@@ -307,6 +489,22 @@ def _metadata_value(metadata: Mapping[str, Any] | None, name: str) -> Any:
             if str(key).casefold() == name.casefold():
                 return value
     return None
+
+
+def _is_not_found_error(error: Exception) -> bool:
+    """判断异常是否代表对象不存在。
+
+    Args:
+        error: 客户端异常。
+
+    Returns:
+        对象不存在时返回 ``True``。
+    """
+    response = getattr(error, "response", None)
+    if isinstance(response, Mapping):
+        code = str((response.get("Error") or {}).get("Code", ""))
+        return code.casefold() in {"404", "nosuchkey", "notfound", "nosuchobject"}
+    return str(getattr(error, "code", "")).casefold() in {"404", "nosuchkey", "notfound"}
 
 
 def _guess_content_type(name: str) -> str:
@@ -379,6 +577,8 @@ class AssetUploader:
         name = _safe_segment(path.name, "assetName")
         key = asset_key(product_id, version, name)
         sha256, size = _stream_digest(path)
+        resolved_platform = _safe_public_label(platform or "unknown", "platform")
+        resolved_architecture = _safe_public_label(architecture or "unknown", "architecture")
         existing = self._head(key)
         previous = self._snapshot(key)
         if existing is not None:
@@ -392,27 +592,38 @@ class AssetUploader:
         resolved_type = content_type or _guess_content_type(name)
         disposition = f'attachment; filename="{name}"'
         temp_key = f"{key}.tmp-{uuid.uuid4().hex}"
-        metadata = {"sha256": sha256, "platform": platform or "unknown", "architecture": architecture or "unknown"}
+        metadata = {"sha256": sha256, "platform": resolved_platform, "architecture": resolved_architecture}
+        formal_written = False
         try:
             with path.open("rb") as stream:
                 self._put(temp_key, stream, resolved_type, disposition, metadata)
             uploaded = self._head(temp_key)
+            uploaded_body = self._read_object(temp_key)
+            if uploaded_body is not None and hashlib.sha256(uploaded_body).hexdigest() != sha256:
+                raise RuntimeError("临时对象 SHA-256 校验失败")
             if uploaded is None or str(_metadata_value(uploaded, "sha256") or "") != sha256:
                 raise RuntimeError("临时对象 SHA-256 校验失败")
             if int(_metadata_value(uploaded, "ContentLength") or -1) != size:
                 raise RuntimeError("临时对象大小校验失败")
             self._copy(temp_key, key)
+            formal_written = True
             final = self._head(key)
+            final_body = self._read_object(key)
+            if final_body is not None and hashlib.sha256(final_body).hexdigest() != sha256:
+                raise RuntimeError("正式对象 SHA-256 校验失败")
             if final is None or str(_metadata_value(final, "sha256") or "") != sha256:
                 raise RuntimeError("正式对象 SHA-256 校验失败")
         except Exception:
             self._delete(temp_key)
-            self._restore(key, previous)
+            if previous is not None:
+                self._restore(key, previous)
+            elif formal_written or existing is None:
+                self._delete(key)
             raise
         else:
             self._delete(temp_key)
         self._prune_versions(key)
-        return self._public_result(key, name, size, sha256, platform, architecture)
+        return self._public_result(key, name, size, sha256, resolved_platform, resolved_architecture)
 
     def upload_file(self, file_path: str | Path, **kwargs: Any) -> dict[str, Any]:
         """``upload_release_asset`` 的兼容别名。
@@ -436,9 +647,16 @@ class AssetUploader:
             对象元数据或 ``None``。
         """
         try:
-            return self.client.head_object(self.bucket, key)
+            try:
+                return self.client.head_object(Bucket=self.bucket, Key=key)
+            except TypeError:
+                return self.client.head_object(self.bucket, key)
         except (KeyError, FileNotFoundError):
             return None
+        except Exception as exc:
+            if _is_not_found_error(exc):
+                return None
+            raise
 
     def _put(self, key: str, body: BinaryIO, content_type: str, disposition: str, metadata: Mapping[str, Any]) -> Any:
         """调用对象存储 put 接口。
@@ -456,7 +674,7 @@ class AssetUploader:
         try:
             return self.client.put_object(self.bucket, key, body, content_type=content_type, content_disposition=disposition, metadata=dict(metadata))
         except TypeError:
-            return self.client.put_object(self.bucket, key, Body=body, ContentType=content_type, ContentDisposition=disposition, Metadata=dict(metadata))
+            return self.client.put_object(Bucket=self.bucket, Key=key, Body=body, ContentType=content_type, ContentDisposition=disposition, Metadata=dict(metadata))
 
     def _copy(self, source_key: str, destination_key: str) -> Any:
         """调用对象存储复制接口。
@@ -489,6 +707,32 @@ class AssetUploader:
                 self.client.delete_object(Bucket=self.bucket, Key=key)
         except Exception:
             pass
+
+    def _read_object(self, key: str) -> bytes | None:
+        """读取对象内容用于端到端 SHA 校验。
+
+        Args:
+            key: 对象 key。
+
+        Returns:
+            对象字节串；客户端不支持读取时返回 ``None``。
+        """
+        getter = getattr(self.client, "get_object", None)
+        if not callable(getter):
+            return None
+        try:
+            try:
+                result = getter(Bucket=self.bucket, Key=key)
+            except TypeError:
+                result = getter(self.bucket, key)
+        except (KeyError, FileNotFoundError):
+            return None
+        if isinstance(result, (bytes, bytearray)):
+            return bytes(result)
+        body = result.get("Body") if isinstance(result, Mapping) else None
+        if hasattr(body, "read"):
+            return body.read()
+        return bytes(body) if isinstance(body, (bytes, bytearray)) else None
 
     def _prune_versions(self, key: str) -> None:
         """调用客户端抽象保留最近三个对象版本。
@@ -535,6 +779,10 @@ class AssetUploader:
             identity = (self.bucket, key)
             if identity in objects:
                 return bytes(objects[identity]), dict(metadata.get(identity, {}))
+        body = self._read_object(key)
+        current = self._head(key)
+        if body is not None and current is not None:
+            return body, dict(current)
         return None
 
     def _restore(self, key: str, snapshot: tuple[bytes, dict[str, Any]] | None) -> None:
@@ -546,6 +794,15 @@ class AssetUploader:
         if isinstance(objects, dict) and isinstance(metadata, dict):
             identity = (self.bucket, key)
             objects[identity], metadata[identity] = snapshot
+            return
+        body, old_metadata = snapshot
+        content_type = str(_metadata_value(old_metadata, "ContentType") or "application/octet-stream")
+        disposition = str(_metadata_value(old_metadata, "ContentDisposition") or "attachment")
+        custom = old_metadata.get("Metadata") if isinstance(old_metadata.get("Metadata"), Mapping) else old_metadata
+        try:
+            self._put(key, io.BytesIO(body), content_type, disposition, custom)
+        except Exception:
+            self._delete(key)
 
 
 def public_asset_metadata(asset: Mapping[str, Any], *, product_id: str, version: str) -> dict[str, Any]:
@@ -576,8 +833,8 @@ def public_asset_metadata(asset: Mapping[str, Any], *, product_id: str, version:
         "downloadPath": asset_key(product_id, version, name),
         "name": name,
         "size": size,
-        "platform": str(asset.get("platform") or "unknown"),
-        "architecture": str(asset.get("architecture") or "unknown"),
+        "platform": _safe_public_label(asset.get("platform") or "unknown", "platform"),
+        "architecture": _safe_public_label(asset.get("architecture") or "unknown", "architecture"),
         "sha256": sha256,
     }
 
@@ -600,6 +857,8 @@ def public_release_assets(release: Any, *, product_id: str, version: str) -> lis
 __all__ = [
     "AssetConflictError",
     "AssetUploader",
+    "Boto3R2Client",
+    "FilesystemR2Client",
     "InMemoryR2Client",
     "ObjectStore",
     "StorageConfig",
