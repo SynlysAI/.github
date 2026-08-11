@@ -84,6 +84,10 @@ def test_sanitization_rejects_unknown_repository_and_private_release_url():
     event["source"]["releaseUrl"] = "https://github.com/SynlysAI/Other/releases/tag/v1"
     public = sanitize_public_event(event)
     assert public["source"]["releaseUrl"] is None
+    event = _event("path-traversal")
+    event["source"]["releaseUrl"] = "https://github.com/SynlysAI/Spec_Agent/releases/../pull/3"
+    public = sanitize_public_event(event)
+    assert public["source"]["releaseUrl"] is None
 
 
 def test_sensitive_pattern_is_rejected():

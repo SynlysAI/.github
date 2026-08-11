@@ -12,7 +12,7 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 import yaml
 from jsonschema import Draft202012Validator, FormatChecker
@@ -267,6 +267,26 @@ def _short_sha(value: Any) -> str | None:
     return None
 
 
+def _is_public_release_url(value: str, repository: str) -> bool:
+    """判断 URL 是否为指定 allowlist 仓库的公开 Release 页面。
+
+    Args:
+        value: 待校验的 Release URL。
+        repository: ``owner/repo`` 格式的允许仓库名。
+
+    Returns:
+        URL 可安全公开时返回 ``True``，否则返回 ``False``。
+    """
+    parsed = urlparse(value)
+    if parsed.scheme != "https" or parsed.netloc.casefold() not in {"github.com", "www.github.com"}:
+        return False
+    owner, repo = repository.split("/", 1)
+    segments = [unquote(part) for part in parsed.path.split("/") if part]
+    if any(part in {".", ".."} for part in segments):
+        return False
+    return len(segments) >= 3 and segments[:3] == [owner, repo, "releases"]
+
+
 def sanitize_public_event(event: Mapping[str, Any]) -> dict[str, Any]:
     """移除候选中的私有字段并限制公开来源信息。
 
@@ -293,9 +313,7 @@ def sanitize_public_event(event: Mapping[str, Any]) -> dict[str, Any]:
     public_source["commitShas"] = [value for value in shas if value]
     release_url = source.get("releaseUrl")
     if isinstance(release_url, str):
-        parsed = urlparse(release_url)
-        expected_prefix = f"/{repository}/releases"
-        if parsed.scheme == "https" and parsed.netloc.casefold() in {"github.com", "www.github.com"} and parsed.path.casefold().startswith(expected_prefix.casefold()):
+        if _is_public_release_url(release_url, repository):
             public_source["releaseUrl"] = release_url
         else:
             public_source["releaseUrl"] = None
