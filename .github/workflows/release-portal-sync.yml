@@ -66,7 +66,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          if git diff --quiet -- release-portal/candidates; then
+          if git diff --quiet -- release-portal/candidates && [ -z "$(git ls-files --others --exclude-standard -- release-portal/candidates)" ]; then
             echo "没有新增候选数据"
             exit 0
           fi

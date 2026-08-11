@@ -34,6 +34,7 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
     assert "automation/release-portal-candidates" in workflow
     assert "python -m scripts.release_portal.cli sync" in workflow
     assert "cancel-in-progress: true" in workflow
+    assert "git ls-files --others" in workflow
 
 
 def test_backfill_workflow_is_manual_and_limits_each_product_batch():
