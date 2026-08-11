@@ -26,6 +26,20 @@ class GitHubError(RuntimeError):
     def __init__(self, message: str, *, status: int | None = None,
                  method: str | None = None, path: str | None = None,
                  body: str | None = None, retryable: bool = False) -> None:
+        """初始化 GitHub 请求异常。
+
+        Args:
+            message: 异常消息。
+            status: GitHub HTTP 状态码。
+            method: 触发异常的 HTTP 方法。
+            path: 触发异常的 API 路径。
+            body: 响应正文或其他错误详情。
+            retryable: 是否可以通过重试恢复。
+        Returns:
+            无。
+        Raises:
+            无。
+        """
         super().__init__(message)
         self.status = status
         self.method = method
