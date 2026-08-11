@@ -75,6 +75,7 @@ python -m scripts.release_portal.cli publish --bucket "$R2_BUCKET"
 
 ```bash
 export R2_ENDPOINT="https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com"
+export AWS_DEFAULT_REGION="auto"
 export AWS_ACCESS_KEY_ID="${R2_ACCESS_KEY_ID:?请先配置 R2_ACCESS_KEY_ID}"
 export AWS_SECRET_ACCESS_KEY="${R2_SECRET_ACCESS_KEY:?请先配置 R2_SECRET_ACCESS_KEY}"
 export ASSET_KEY="assets/smartaccess/v1.0.0/SmartAccess-linux-amd64.tar.gz"
