@@ -5,7 +5,11 @@ from pathlib import Path
 
 from jsonschema import validate
 
-from scripts.release_portal.aggregate import aggregate_commits, update_backfill_state
+from scripts.release_portal.aggregate import (
+    aggregate_commits,
+    initial_backfill_state,
+    update_backfill_state,
+)
 
 
 def _commit(sha, when, release, message="feat(core): change"):
@@ -48,6 +52,12 @@ def test_source_repository_is_non_empty_and_can_be_overridden():
     assert event["source"]["repository"] == "SynlysAI/Spec_Agent"
 
 
+def test_member_repository_has_priority_over_repository_argument():
+    commit = {**_commit("a", "2026-01-05T00:00:00Z", "r1"), "repository": "SynlysAI/Spec_Agent"}
+    event = aggregate_commits("spec-agent", [commit], repository="fallback/repository")[0]
+    assert event["source"]["repository"] == "SynlysAI/Spec_Agent"
+
+
 def test_timeline_event_source_passes_schema_with_fallback_repository():
     event = aggregate_commits("spec-agent", [_commit("abcdef1234567890", "2026-01-05T00:00:00Z", "r1")])[0]
     schema = json.loads((Path(__file__).parents[2] / "release-portal" / "schemas" / "timeline.schema.json").read_text(encoding="utf-8"))
@@ -61,3 +71,19 @@ def test_backfill_checkpoint_is_idempotent_for_repeated_shas():
     update_backfill_state(state, "repo", batch)
     assert state["repositories"]["repo"]["processed"] == 2
     assert state["repositories"]["repo"]["processedShas"] == ["a", "b"]
+
+
+def test_initial_backfill_state_includes_empty_processed_sha_list():
+    state = initial_backfill_state(["SynlysAI/Spec_Agent"])
+    assert state["repositories"]["SynlysAI/Spec_Agent"]["processedShas"] == []
+
+
+def test_backfill_processes_at_most_500_then_advances_next_batch():
+    state = initial_backfill_state(["repo"])
+    first_batch = [{"sha": f"{index:07x}", "occurred_at": "2026-01-05T00:00:00Z"} for index in range(501)]
+    update_backfill_state(state, "repo", first_batch)
+    assert state["repositories"]["repo"]["processed"] == 500
+    assert state["repositories"]["repo"]["cursor"] == "00001f3"
+    update_backfill_state(state, "repo", first_batch[500:])
+    assert state["repositories"]["repo"]["processed"] == 501
+    assert state["repositories"]["repo"]["cursor"] == "00001f4"

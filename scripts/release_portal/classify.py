@@ -40,6 +40,7 @@ class ClassifiedCommit:
         module: 归属模块。
         release_id: 关联 Release 标识（若有）。
         product_id: 产品标识（若有）。
+        repository: 来源仓库名（若有）。
         pinned: 是否置顶。
     """
 
@@ -50,6 +51,7 @@ class ClassifiedCommit:
     module: str
     release_id: str | None = None
     product_id: str | None = None
+    repository: str | None = None
     pinned: bool = False
 
     def to_dict(self) -> dict[str, Any]:
@@ -62,14 +64,34 @@ class ClassifiedCommit:
 
 
 def _as_mapping(commit: Any) -> Mapping[str, Any]:
+    """将提交对象归一化为字段映射。
+
+    Args:
+        commit: 提交映射、支持 ``to_dict`` 的对象或普通提交对象。
+    Returns:
+        包含可用提交字段的映射。
+    """
     if isinstance(commit, Mapping):
         return commit
     if hasattr(commit, "to_dict"):
         return commit.to_dict()
-    return {"sha": getattr(commit, "sha", ""), "message": getattr(commit, "message", ""), "occurred_at": getattr(commit, "occurred_at", None)}
+    return {
+        "sha": getattr(commit, "sha", ""),
+        "message": getattr(commit, "message", ""),
+        "occurred_at": getattr(commit, "occurred_at", None),
+        "repository": getattr(commit, "repository", None) or getattr(commit, "repo", None),
+    }
 
 
 def _override_for(sha: str, overrides: Iterable[Mapping[str, Any]]) -> Mapping[str, Any]:
+    """查找与指定 SHA 匹配的首个覆盖规则。
+
+    Args:
+        sha: 待匹配的提交 SHA。
+        overrides: 覆盖规则迭代器。
+    Returns:
+        匹配规则；不存在时返回空映射。
+    """
     for override in overrides:
         identifiers = {str(override.get(key, "")) for key in ("sha", "commitSha", "id")}
         shas = override.get("commitShas") or []
@@ -93,6 +115,13 @@ def load_overrides(path: str | Path) -> list[dict[str, Any]]:
 
 
 def _files(commit: Mapping[str, Any]) -> list[str]:
+    """提取并统一提交变更文件路径。
+
+    Args:
+        commit: 包含 files、paths 或 changed_files 的提交映射。
+    Returns:
+        使用正斜杠的文件路径列表。
+    """
     raw = commit.get("files") or commit.get("paths") or commit.get("changed_files") or []
     result = []
     for item in raw:
@@ -103,6 +132,16 @@ def _files(commit: Mapping[str, Any]) -> list[str]:
 
 
 def _is_noise(kind: str, subject: str, message: str, commit: Mapping[str, Any]) -> bool:
+    """判断提交是否属于默认过滤的噪声类型。
+
+    Args:
+        kind: Conventional Commit 类型。
+        subject: Conventional Commit 标题正文。
+        message: 原始提交标题。
+        commit: 用于识别机器人作者的提交映射。
+    Returns:
+        噪声提交时返回 ``True``。
+    """
     lower = f"{kind} {subject} {message}".casefold()
     if kind.casefold() in NOISE_TYPES:
         return True
@@ -127,7 +166,8 @@ def classify_commit(commit: Any, *, product_id: str | None = None, overrides: It
     """
     value = _as_mapping(commit)
     sha = str(value.get("sha") or "")
-    message = str(value.get("message") or "").splitlines()[0].strip()
+    message_lines = str(value.get("message") or "").splitlines()
+    message = message_lines[0].strip() if message_lines else ""
     override = _override_for(sha, overrides)
     if override.get("hide") is True:
         return None
@@ -167,6 +207,7 @@ def classify_commit(commit: Any, *, product_id: str | None = None, overrides: It
         module=module,
         release_id=value.get("release_id") or value.get("releaseId"),
         product_id=product_id or value.get("product_id") or value.get("productId"),
+        repository=value.get("repository") or value.get("repo"),
         pinned=bool(override.get("pin", False)),
     )
 
@@ -192,6 +233,8 @@ def classify_commits(commits: Iterable[Any], *, product_id: str | None = None, o
             parsed = datetime.fromisoformat((item.occurred_at or "").replace("Z", "+00:00"))
         except ValueError:
             parsed = datetime.min.replace(tzinfo=timezone.utc)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
         return parsed, item.sha
     return sorted(unique.values(), key=sort_key)
 

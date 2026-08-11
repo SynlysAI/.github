@@ -43,6 +43,11 @@ def test_override_can_restore_non_conventional_merge_message():
     assert restored is not None and restored.change_type == "feature"
 
 
+def test_empty_or_none_message_is_filtered_without_an_exception():
+    assert classify_commit({"sha": "empty", "message": ""}) is None
+    assert classify_commit({"sha": "none", "message": None}) is None
+
+
 def test_classify_commits_is_sorted_and_deduplicated():
     values = classify_commits([
         {"sha": "b", "message": "feat: b", "occurred_at": "2026-01-02T00:00:00Z"},
@@ -50,3 +55,11 @@ def test_classify_commits_is_sorted_and_deduplicated():
         {"sha": "a", "message": "feat: duplicate", "occurred_at": "2026-01-01T00:00:00Z"},
     ])
     assert [item.sha for item in values] == ["a", "b"]
+
+
+def test_classify_commits_handles_naive_and_utc_timestamps_together():
+    values = classify_commits([
+        {"sha": "naive", "message": "feat: naive", "occurred_at": "2026-01-01T00:00:00"},
+        {"sha": "aware", "message": "feat: aware", "occurred_at": "2026-01-02T00:00:00Z"},
+    ])
+    assert [item.sha for item in values] == ["naive", "aware"]

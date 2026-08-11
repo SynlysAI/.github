@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "repositories": {
-    "SynlysAI/AI4MS": {"cursor": null, "completed": false, "processed": 0, "watermark": {"sha": null, "publishedAt": null}},
-    "SynlysAI/Spec_Agent": {"cursor": null, "completed": false, "processed": 0, "watermark": {"sha": null, "publishedAt": null}},
-    "SynlysAI/Poly_Agent": {"cursor": null, "completed": false, "processed": 0, "watermark": {"sha": null, "publishedAt": null}},
-    "SynlysAI/SpecLabOS": {"cursor": null, "completed": false, "processed": 0, "watermark": {"sha": null, "publishedAt": null}},
-    "SynlysAI/RAGPortal": {"cursor": null, "completed": false, "processed": 0, "watermark": {"sha": null, "publishedAt": null}},
-    "SynlysAI/SmartAccess": {"cursor": null, "completed": false, "processed": 0, "watermark": {"sha": null, "publishedAt": null}}
+    "SynlysAI/AI4MS": {"cursor": null, "completed": false, "processed": 0, "processedShas": [], "watermark": {"sha": null, "publishedAt": null}},
+    "SynlysAI/Spec_Agent": {"cursor": null, "completed": false, "processed": 0, "processedShas": [], "watermark": {"sha": null, "publishedAt": null}},
+    "SynlysAI/Poly_Agent": {"cursor": null, "completed": false, "processed": 0, "processedShas": [], "watermark": {"sha": null, "publishedAt": null}},
+    "SynlysAI/SpecLabOS": {"cursor": null, "completed": false, "processed": 0, "processedShas": [], "watermark": {"sha": null, "publishedAt": null}},
+    "SynlysAI/RAGPortal": {"cursor": null, "completed": false, "processed": 0, "processedShas": [], "watermark": {"sha": null, "publishedAt": null}},
+    "SynlysAI/SmartAccess": {"cursor": null, "completed": false, "processed": 0, "processedShas": [], "watermark": {"sha": null, "publishedAt": null}}
   }
 }
