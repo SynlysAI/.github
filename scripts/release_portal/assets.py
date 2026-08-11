@@ -613,15 +613,30 @@ class AssetUploader:
                 raise RuntimeError("正式对象 SHA-256 校验失败")
             if final is None or str(_metadata_value(final, "sha256") or "") != sha256:
                 raise RuntimeError("正式对象 SHA-256 校验失败")
-        except Exception:
-            self._delete(temp_key)
+        except Exception as exc:
+            cleanup_errors: list[Exception] = []
+            temporary_error = self._delete(temp_key)
+            if temporary_error is not None:
+                cleanup_errors.append(temporary_error)
             if previous is not None:
-                self._restore(key, previous)
+                restore_error = self._restore(key, previous)
+                if restore_error is not None:
+                    cleanup_errors.append(restore_error)
             elif formal_written or existing is None:
-                self._delete(key)
+                deletion_error = self._delete(key)
+                if deletion_error is not None:
+                    cleanup_errors.append(deletion_error)
+            try:
+                self._prune_versions(key)
+            except Exception as prune_error:
+                cleanup_errors.append(prune_error)
+            if cleanup_errors and hasattr(exc, "add_note"):
+                exc.add_note("附件回滚清理未完全完成")
             raise
         else:
-            self._delete(temp_key)
+            temporary_error = self._delete(temp_key)
+            if temporary_error is not None:
+                raise RuntimeError("临时对象清理失败") from temporary_error
         self._prune_versions(key)
         return self._public_result(key, name, size, sha256, resolved_platform, resolved_architecture)
 
@@ -691,22 +706,23 @@ class AssetUploader:
         except TypeError:
             return self.client.copy_object(Bucket=self.bucket, CopySource={"Bucket": self.bucket, "Key": source_key}, Key=destination_key)
 
-    def _delete(self, key: str) -> None:
+    def _delete(self, key: str) -> Exception | None:
         """尽力删除临时对象，不覆盖原始异常。
 
         Args:
             key: 待删除对象 key。
 
         Returns:
-            无返回值。
+            删除失败时返回异常，否则返回 ``None``。
         """
         try:
             try:
                 self.client.delete_object(self.bucket, key)
             except TypeError:
                 self.client.delete_object(Bucket=self.bucket, Key=key)
-        except Exception:
-            pass
+        except Exception as exc:
+            return exc
+        return None
 
     def _read_object(self, key: str) -> bytes | None:
         """读取对象内容用于端到端 SHA 校验。
@@ -785,24 +801,26 @@ class AssetUploader:
             return body, dict(current)
         return None
 
-    def _restore(self, key: str, snapshot: tuple[bytes, dict[str, Any]] | None) -> None:
+    def _restore(self, key: str, snapshot: tuple[bytes, dict[str, Any]] | None) -> Exception | None:
         """在正式复制后失败时恢复内存客户端的旧对象。"""
         if snapshot is None:
-            return
+            return None
         objects = getattr(self.client, "objects", None)
         metadata = getattr(self.client, "metadata", None)
         if isinstance(objects, dict) and isinstance(metadata, dict):
             identity = (self.bucket, key)
             objects[identity], metadata[identity] = snapshot
-            return
+            return None
         body, old_metadata = snapshot
         content_type = str(_metadata_value(old_metadata, "ContentType") or "application/octet-stream")
         disposition = str(_metadata_value(old_metadata, "ContentDisposition") or "attachment")
         custom = old_metadata.get("Metadata") if isinstance(old_metadata.get("Metadata"), Mapping) else old_metadata
         try:
             self._put(key, io.BytesIO(body), content_type, disposition, custom)
-        except Exception:
-            self._delete(key)
+        except Exception as exc:
+            deletion_error = self._delete(key)
+            return deletion_error or exc
+        return None
 
 
 def public_asset_metadata(asset: Mapping[str, Any], *, product_id: str, version: str) -> dict[str, Any]:

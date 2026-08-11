@@ -154,6 +154,31 @@ def test_wrong_copy_restores_old_object(tmp_path: Path):
     assert replacement.get_object("downloads", "assets/ai4ms/v1/SpecAgent-linux-amd64.tar.gz") == b"old"
 
 
+def test_failed_replacement_prunes_versions_to_three(tmp_path: Path):
+    class WrongCopy(InMemoryR2Client):
+        wrong_copy = False
+
+        def copy_object(self, bucket, source_key, destination_key):
+            result = super().copy_object(bucket, source_key, destination_key)
+            if self.wrong_copy:
+                self.objects[(bucket, destination_key)] = b"wrong"
+            return result
+
+    client = WrongCopy()
+    uploader = AssetUploader(client, bucket="downloads")
+    path = _asset_file(tmp_path, b"one")
+    for content in (b"one", b"two", b"three"):
+        path.write_bytes(content)
+        uploader.upload_release_asset(path, product_id="ai4ms", version="v1", replace=content != b"one")
+    path.write_bytes(b"four")
+    client.wrong_copy = True
+
+    with pytest.raises(RuntimeError, match="SHA-256"):
+        uploader.upload_release_asset(path, product_id="ai4ms", version="v1", replace=True)
+    key = "assets/ai4ms/v1/SpecAgent-linux-amd64.tar.gz"
+    assert len(client.list_object_versions("downloads", key)) <= 3
+
+
 def test_public_asset_metadata_does_not_expose_github_url():
     result = public_asset_metadata(
         {
