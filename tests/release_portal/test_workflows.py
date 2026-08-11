@@ -232,6 +232,10 @@ def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_pa
             self.objects = {
                 "portal/v1/manifest.json": b'{"generation":"old"}\n',
                 "portal/v1/generations/old/products.json": b"old-products\n",
+                "portal/v1/generations/old/releases.json": b"old-releases\n",
+                "portal/v1/generations/old/timeline.json": b"old-timeline\n",
+                "portal/v1/generations/old/faqs.json": b"old-faqs\n",
+                "portal/v1/generations/old/meta.json": b"old-meta\n",
             }
 
         def put_object(self, *, Bucket, Key, Body, **_kwargs):  # noqa: N803
@@ -244,7 +248,11 @@ def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_pa
 
     store = FailingStore()
     old_manifest = store.objects["portal/v1/manifest.json"]
-    old_products = store.objects["portal/v1/generations/old/products.json"]
+    old_snapshot = {
+        key: value
+        for key, value in store.objects.items()
+        if key.startswith("portal/v1/generations/old/")
+    }
     result = cli.main(
         [
             "publish",
@@ -264,7 +272,10 @@ def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_pa
 
     assert result == 1
     assert store.objects["portal/v1/manifest.json"] == old_manifest
-    assert store.objects["portal/v1/generations/old/products.json"] == old_products
+    assert {
+        key: store.objects[key]
+        for key in old_snapshot
+    } == old_snapshot
     assert not any(key == "portal/v1/products.json" for key in store.objects)
 
 
