@@ -84,10 +84,15 @@ def test_sanitization_rejects_unknown_repository_and_private_release_url():
     event["source"]["releaseUrl"] = "https://github.com/SynlysAI/Other/releases/tag/v1"
     public = sanitize_public_event(event)
     assert public["source"]["releaseUrl"] is None
-    event = _event("path-traversal")
-    event["source"]["releaseUrl"] = "https://github.com/SynlysAI/Spec_Agent/releases/../pull/3"
-    public = sanitize_public_event(event)
-    assert public["source"]["releaseUrl"] is None
+    for url in (
+        "https://github.com/SynlysAI/Spec_Agent/releases/../pull/3",
+        "https://github.com/SynlysAI/Spec_Agent/releases/%2e%2e%2fpull%2f3",
+        "https://github.com/SynlysAI/Spec_Agent/releases//tag/v1",
+    ):
+        event = _event("path-traversal")
+        event["source"]["releaseUrl"] = url
+        public = sanitize_public_event(event)
+        assert public["source"]["releaseUrl"] is None
 
 
 def test_sensitive_pattern_is_rejected():
@@ -143,6 +148,39 @@ def test_meta_and_manifest_hashes_are_deterministic(tmp_path: Path):
 def test_meta_requires_strict_fields_and_collection_hashes():
     with pytest.raises(ValueError, match="meta"):
         validate_public_collections({"meta": {}}, require_all=False)
+
+
+def test_meta_hash_and_count_must_match_collections():
+    products = {"schemaVersion": 1, "products": [{
+        "productId": product.product_id,
+        "repository": product.repository,
+        "entryType": product.entry_type,
+        "webUrl": product.web_url,
+        "name": product.name,
+        "tagline": product.tagline,
+        "category": product.category,
+        "logo": product.logo,
+        "defaultBranch": product.default_branch,
+        "aiPolicy": product.ai_policy,
+    } for product in load_catalog().products]}
+    collections = {"products": products, "releases": {"schemaVersion": 1, "releases": []}, "timeline": {"schemaVersion": 1, "events": []}, "faqs": {"schemaVersion": 1, "faqs": []}}
+    meta = build_meta(collections, generated_at="2026-08-10T00:00:00Z")
+    meta["collections"]["products"]["count"] += 1
+    collections["meta"] = meta
+    with pytest.raises(ValueError, match="集合计数"):
+        validate_public_collections(collections)
+
+
+def test_meta_generated_at_rejects_impossible_utc_date():
+    with pytest.raises(ValueError, match="generatedAt") as error:
+        validate_public_collections({"meta": {
+            "schemaVersion": 1,
+            "generatedAt": "2026-99-99T99:99:99Z",
+            "dataVersion": "1",
+            "sourceWatermarks": {},
+            "collections": {name: {"sha256": "0" * 64, "count": 0} for name in ("products", "releases", "timeline", "faqs")},
+        }}, require_all=False)
+    assert "2026-99" not in str(error.value)
 
 
 def test_products_bilingual_fields_cannot_be_empty():

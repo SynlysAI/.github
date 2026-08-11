@@ -9,7 +9,7 @@ import os
 import re
 import shutil
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 from urllib.parse import unquote, urlparse
@@ -281,8 +281,12 @@ def _is_public_release_url(value: str, repository: str) -> bool:
     if parsed.scheme != "https" or parsed.netloc.casefold() not in {"github.com", "www.github.com"}:
         return False
     owner, repo = repository.split("/", 1)
-    segments = [unquote(part) for part in parsed.path.split("/") if part]
-    if any(part in {".", ".."} for part in segments):
+    decoded_path = unquote(parsed.path)
+    if not decoded_path.startswith("/"):
+        return False
+    path_without_root = decoded_path[1:]
+    segments = path_without_root.split("/")
+    if any(not part or part in {".", ".."} for part in segments):
         return False
     return len(segments) >= 3 and segments[:3] == [owner, repo, "releases"]
 
@@ -393,6 +397,16 @@ def validate_public_collections(collections: Mapping[str, Mapping[str, Any]], *,
             raise ValueError(f"Schema 校验失败 ({name})，错误数: {len(errors)}")
     if "meta" in collections:
         _validate_meta(collections["meta"])
+        base_names = ("products", "releases", "timeline", "faqs")
+        if all(name in collections for name in base_names):
+            records = collections["meta"]["collections"]
+            for name in base_names:
+                expected_hash = _sha256(collections[name])
+                expected_count = _collection_count(name, collections[name])
+                if records[name]["sha256"] != expected_hash:
+                    raise ValueError(f"meta 集合哈希不匹配: {name}")
+                if records[name]["count"] != expected_count:
+                    raise ValueError(f"meta 集合计数不匹配: {name}")
     for name, collection in collections.items():
         _scan_sensitive(collection)
         items = collection.get("products" if name == "products" else "releases" if name == "releases" else "events" if name == "timeline" else "faqs" if name == "faqs" else "")
@@ -431,7 +445,11 @@ def _validate_meta(meta: Mapping[str, Any]) -> None:
     if meta.get("schemaVersion") != 1:
         raise ValueError("meta schemaVersion 必须为 1")
     generated = meta.get("generatedAt")
-    if not isinstance(generated, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", generated):
+    try:
+        parsed = datetime.fromisoformat(str(generated).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        parsed = None
+    if parsed is None or parsed.tzinfo is None or parsed.utcoffset() != timedelta(0):
         raise ValueError("meta generatedAt 必须为 UTC ISO 8601")
     if not isinstance(meta.get("dataVersion"), str) or not meta["dataVersion"].strip():
         raise ValueError("meta dataVersion 不能为空")
