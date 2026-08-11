@@ -107,7 +107,13 @@ class Release:
 
 
 def _asset_target(name: str) -> tuple[str, str]:
-    """从附件名称推断平台和架构，无法判断时返回 ``unknown``。"""
+    """从附件名称推断平台和架构。
+
+    Args:
+        name: 附件名称。
+    Returns:
+        平台和架构二元组。
+    """
     lower = name.lower()
     platform = "windows" if any(x in lower for x in ("win", ".exe", ".msi")) else "macos" if any(x in lower for x in ("darwin", "macos", ".dmg")) else "linux" if any(x in lower for x in ("linux", ".deb", ".rpm", ".appimage")) else "unknown"
     architecture = "arm64" if any(x in lower for x in ("arm64", "aarch64")) else "x86_64" if any(x in lower for x in ("x86_64", "amd64", "x64")) else "unknown"
@@ -115,22 +121,12 @@ def _asset_target(name: str) -> tuple[str, str]:
 
 
 class GitHubClient:
-    """GitHub REST 客户端，仅访问 catalog 中登记的仓库。"""
+    """GitHub REST 客户端。"""
 
     def __init__(self, token: str | None = None, *, session: requests.Session | Any | None = None,
                  api_root: str = API_ROOT, timeout: float = 30.0, max_retries: int = 3,
                  backoff_factor: float = 1.0, sleep: Callable[[float], None] = time.sleep) -> None:
-        """初始化客户端。
-
-        Args:
-            token: GitHub App 安装令牌；为空时不发送 Authorization。
-            session: 可注入的 requests 兼容会话。
-            api_root: GitHub API 根地址。
-            timeout: 单次请求超时时间（秒）。
-            max_retries: 可重试状态的最大重试次数。
-            backoff_factor: 指数退避基数。
-            sleep: 退避等待函数。
-        """
+        """初始化客户端。\n\nArgs:\n    token: 只读安装令牌。\n    session: requests 兼容会话。\n    api_root: API 根地址。\n    timeout: 请求超时秒数。\n    max_retries: 最大重试次数。\n    backoff_factor: 退避基数。\n    sleep: 等待函数。\nReturns:\n    无。"""
         self.token = token
         self.session = session if session is not None else requests.Session()
         self.api_root = api_root.rstrip("/")
@@ -140,7 +136,12 @@ class GitHubClient:
         self.sleep = sleep
 
     def _headers(self) -> dict[str, str]:
-        """构造不泄露令牌的请求头。"""
+        """构造请求头。
+
+Args:
+    无。
+Returns:
+    请求头映射。"""
         headers = {"Accept": "application/vnd.github+json", "User-Agent": USER_AGENT}
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
@@ -206,7 +207,13 @@ class GitHubClient:
         raise AssertionError("unreachable")
 
     def _retry_delay(self, response: requests.Response, attempt: int) -> float:
-        """根据响应头计算下一次重试等待时间。"""
+        """计算重试等待时间。
+
+Args:
+    response: HTTP 响应。
+    attempt: 重试序号。
+Returns:
+    等待秒数。"""
         headers = {str(k).lower(): str(v) for k, v in getattr(response, "headers", {}).items()}
         retry_after = headers.get("retry-after")
         if retry_after:
@@ -226,7 +233,12 @@ class GitHubClient:
         return self.backoff_factor * (2 ** attempt)
 
     def _json(self, path: str) -> Any:
-        """请求并解析 JSON。"""
+        """请求并解析 JSON。
+
+Args:
+    path: API 路径。
+Returns:
+    JSON 值。"""
         response = self._request(path)
         try:
             return response.json()
@@ -235,7 +247,12 @@ class GitHubClient:
 
     @staticmethod
     def _next_link(value: str | None) -> str | None:
-        """解析 Link 响应头中的下一页 URL。"""
+        """解析分页 Link。
+
+Args:
+    value: Link 响应头。
+Returns:
+    下一页 URL 或 None。"""
         if not value:
             return None
         for part in value.split(","):
@@ -246,7 +263,12 @@ class GitHubClient:
         return None
 
     def _paginate(self, path: str) -> list[dict[str, Any]]:
-        """读取所有分页并确保每页均为列表。"""
+        """读取并校验全部分页。
+
+Args:
+    path: 首页 API 路径。
+Returns:
+    对象列表。"""
         result: list[dict[str, Any]] = []
         next_path: str | None = path
         while next_path:
@@ -268,7 +290,13 @@ class GitHubClient:
 
     @staticmethod
     def _check_repository(repository: str, catalog: Catalog) -> Product:
-        """在 catalog allowlist 中解析仓库。"""
+        """检查仓库是否在 allowlist。
+
+Args:
+    repository: owner/name 仓库名。
+    catalog: 产品注册表。
+Returns:
+    对应产品。"""
         for product in catalog.products:
             if product.repository.casefold() == repository.casefold():
                 return product
@@ -309,19 +337,36 @@ class GitHubClient:
         return commits
 
     def list_commit_pull_requests(self, repository: str, sha: str, *, catalog: Catalog | None = None) -> list[PullRequest]:
-        """读取一个提交的关联 PR；无关联时返回空列表。"""
+        """读取提交关联 PR。
+
+Args:
+    repository: owner/name 仓库名。
+    sha: 提交 SHA。
+    catalog: 产品注册表。
+Returns:
+    PR 列表。"""
         self._check_repository(repository, catalog or load_catalog(CATALOG_PATH))
         items = self._paginate(f"/repos/{repository}/commits/{sha}/pulls")
         return [PullRequest(number=int(item.get("number", 0)), title=str(item.get("title") or ""), body=str(item.get("body") or ""), url=item.get("html_url")) for item in items]
 
     def collect_catalog(self, catalog: Catalog | None = None) -> dict[str, dict[str, list[Any]]]:
-        """仅采集 catalog 六个仓库的 Release 和 Commit 数据。"""
+        """采集 catalog 六仓库。
+
+Args:
+    catalog: 产品注册表。
+Returns:
+    按产品分组的数据。"""
         current = catalog or load_catalog(CATALOG_PATH)
         return {product.product_id: {"releases": self.list_releases(product.repository, catalog=current), "commits": self.list_commits(product.repository, catalog=current)} for product in current.products}
 
     @staticmethod
     def normalize_release(item: dict[str, Any]) -> Release:
-        """归一化 GitHub Release 响应。"""
+        """归一化 Release。
+
+Args:
+    item: GitHub JSON 对象。
+Returns:
+    Release 数据类。"""
         assets = []
         for raw in item.get("assets") or []:
             name = str(raw.get("name") or "")
@@ -331,7 +376,13 @@ class GitHubClient:
 
     @staticmethod
     def normalize_commit(item: dict[str, Any], pull_requests: Iterable[PullRequest] = ()) -> Commit:
-        """归一化 GitHub Commit 响应。"""
+        """归一化 Commit。
+
+Args:
+    item: GitHub JSON 对象。
+    pull_requests: 关联 PR。
+Returns:
+    Commit 数据类。"""
         details = item.get("commit") or {}
         message = str(details.get("message") or item.get("message") or "")
         message = message.splitlines()[0] if message.splitlines() else ""
@@ -339,113 +390,5 @@ class GitHubClient:
         occurred_at = author.get("date") or (details.get("committer") or {}).get("date")
         return Commit(sha=str(item.get("sha") or ""), occurred_at=occurred_at, message=message, pull_requests=tuple(pull_requests))
 
-
-GitHubError.__init__.__doc__ = """初始化结构化异常。
-
-Args:
-    message: 错误说明。
-    status: HTTP 状态码。
-    method: HTTP 方法。
-    path: 请求路径。
-    body: 脱敏后的响应正文。
-    retryable: 是否可重试。
-Returns:
-    无。
-"""
-_asset_target.__doc__ = """从附件名称推断平台和架构。
-
-Args:
-    name: 附件名称。
-Returns:
-    平台和架构二元组。
-"""
-GitHubClient.__init__.__doc__ = """初始化客户端。
-
-Args:
-    token: 只读安装令牌。
-    session: requests 兼容会话。
-    api_root: API 根地址。
-    timeout: 请求超时秒数。
-    max_retries: 最大重试次数。
-    backoff_factor: 退避基数。
-    sleep: 等待函数。
-Returns:
-    无。
-"""
-GitHubClient._headers.__doc__ = """构造请求头。
-
-Args:
-    无。
-Returns:
-    请求头映射。
-"""
-GitHubClient._retry_delay.__doc__ = """计算重试等待时间。
-
-Args:
-    response: HTTP 响应。
-    attempt: 重试序号。
-Returns:
-    等待秒数。
-"""
-GitHubClient._json.__doc__ = """请求并解析 JSON。
-
-Args:
-    path: API 路径。
-Returns:
-    JSON 值。
-"""
-GitHubClient._next_link.__doc__ = """解析分页 Link。
-
-Args:
-    value: Link 响应头。
-Returns:
-    下一页 URL 或 None。
-"""
-GitHubClient._paginate.__doc__ = """读取并校验全部分页。
-
-Args:
-    path: 首页 API 路径。
-Returns:
-    对象列表。
-"""
-GitHubClient._check_repository.__doc__ = """检查仓库是否在 allowlist。
-
-Args:
-    repository: owner/name 仓库名。
-    catalog: 产品注册表。
-Returns:
-    对应产品。
-"""
-GitHubClient.list_commit_pull_requests.__doc__ = """读取提交关联 PR。
-
-Args:
-    repository: owner/name 仓库名。
-    sha: 提交 SHA。
-    catalog: 产品注册表。
-Returns:
-    PR 列表。
-"""
-GitHubClient.collect_catalog.__doc__ = """采集 catalog 六仓库。
-
-Args:
-    catalog: 产品注册表。
-Returns:
-    按产品分组的数据。
-"""
-GitHubClient.normalize_release.__doc__ = """归一化 Release。
-
-Args:
-    item: GitHub JSON 对象。
-Returns:
-    Release 数据类。
-"""
-GitHubClient.normalize_commit.__doc__ = """归一化 Commit。
-
-Args:
-    item: GitHub JSON 对象。
-    pull_requests: 关联 PR。
-Returns:
-    Commit 数据类。
-"""
 
 __all__ = ["GitHubClient", "GitHubError", "Release", "ReleaseAsset", "Commit", "PullRequest"]
