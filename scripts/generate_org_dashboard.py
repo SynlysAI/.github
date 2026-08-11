@@ -224,7 +224,13 @@ def collect_org_analytics(
         max_pages=4,
     )
     normalized_org = org.casefold()
-    repo_allowlist_normalized = {name.casefold() for name in repo_allowlist}
+    catalog_allowlist = catalog_repository_allowlist()
+    requested_allowlist = {name.casefold() for name in repo_allowlist}
+    effective_allowlist = {
+        name for name in catalog_allowlist
+        if not requested_allowlist or name.casefold() in requested_allowlist
+    }
+    repo_allowlist_normalized = {name.casefold() for name in effective_allowlist}
     skipped_repos = Counter()
     filtered_repos = []
     for repo in repos_payload:
@@ -446,7 +452,7 @@ def collect_org_analytics(
             "hide_private_repo_names": hide_private_repo_names,
             "owner": org,
             "include_forks": include_forks,
-            "repo_allowlist": sorted(repo_allowlist),
+            "repo_allowlist": sorted(effective_allowlist),
             "skipped_repos": dict(skipped_repos),
         },
     }

@@ -55,7 +55,7 @@ def test_dashboard_allowlist_is_loaded_from_catalog_and_excludes_internal_reposi
         repo_visibility="all",
         hide_private_repo_names=True,
         include_forks=False,
-        repo_allowlist=allowlist,
+        repo_allowlist=allowlist | {"InternalResearch"},
     )
 
     assert [repo.name for repo in data["repos"]] == ["AI4MS"]
