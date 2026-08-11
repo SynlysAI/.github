@@ -19,7 +19,7 @@ class Product:
     category: str
     logo: str | None
     default_branch: str
-    ai_policy: str = "metadata-only"
+    ai_policy: str
 
     @property
     def productId(self) -> str:  # noqa: N802
@@ -48,18 +48,32 @@ class Product:
 
     @classmethod
     def from_mapping(cls, value: dict[str, Any]) -> "Product":
-        """从 YAML 映射构造产品模型，兼容 camelCase 与 snake_case 字段。"""
+        """从 YAML 映射构造产品模型。
+
+        Args:
+            value: 产品字段映射。
+
+        Returns:
+            类型化的产品模型。
+
+        Raises:
+            ValueError: 输入不是映射或缺少必填字段。
+        """
+        if not isinstance(value, dict):
+            raise ValueError("产品配置必须是映射")
+        required = {"productId", "repository", "entryType", "webUrl", "name", "tagline", "category", "defaultBranch", "aiPolicy"}
+        missing = required - set(value)
+        if missing:
+            raise ValueError(f"产品缺少必填字段: {', '.join(sorted(missing))}")
+        if not isinstance(value["name"], dict) or not isinstance(value["tagline"], dict):
+            raise ValueError("name 和 tagline 必须是双语映射")
         return cls(
-            product_id=value.get("productId", value.get("product_id", "")),
-            repository=value.get("repository", ""),
-            entry_type=value.get("entryType", value.get("entry_type", "")),
-            web_url=value.get("webUrl", value.get("web_url")),
-            name=dict(value.get("name", {})),
-            tagline=dict(value.get("tagline", value.get("positioning", {}))),
-            category=value.get("category", ""),
+            product_id=value["productId"], repository=value["repository"],
+            entry_type=value["entryType"], web_url=value["webUrl"],
+            name=dict(value["name"]), tagline=dict(value["tagline"]),
+            category=value["category"],
             logo=value.get("logo"),
-            default_branch=value.get("defaultBranch", value.get("default_branch", "main")),
-            ai_policy=value.get("aiPolicy", value.get("ai_policy", "metadata-only")),
+            default_branch=value["defaultBranch"], ai_policy=value["aiPolicy"],
         )
 
 
@@ -72,6 +86,25 @@ class Catalog:
 
     @classmethod
     def from_mapping(cls, value: dict[str, Any]) -> "Catalog":
-        """从 YAML 根映射构造注册表。"""
-        products = tuple(Product.from_mapping(item) for item in value.get("products", []))
-        return cls(schema_version=int(value.get("schemaVersion", value.get("schema_version", 1))), products=products)
+        """从 YAML 根映射构造注册表。
+
+        Args:
+            value: 注册表根映射。
+
+        Returns:
+            类型化的注册表模型。
+
+        Raises:
+            ValueError: 根节点或产品列表类型错误，或缺少必填字段。
+        """
+        if not isinstance(value, dict):
+            raise ValueError("catalog 配置必须是映射")
+        missing = {"schemaVersion", "products"} - set(value)
+        if missing:
+            raise ValueError(f"catalog 缺少必填字段: {', '.join(sorted(missing))}")
+        if not isinstance(value["products"], list):
+            raise ValueError("products 必须是列表")
+        products = tuple(Product.from_mapping(item) for item in value["products"])
+        if not isinstance(value["schemaVersion"], int):
+            raise ValueError("schemaVersion 必须是整数")
+        return cls(schema_version=value["schemaVersion"], products=products)

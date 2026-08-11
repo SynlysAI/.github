@@ -14,7 +14,7 @@
         "required": ["id", "productId", "question", "answer", "order"],
         "properties": {
           "id": {"type": "string"},
-          "productId": {"type": ["string", "null"]},
+          "productId": {"anyOf": [{"enum": ["ai4ms", "spec-agent", "poly-agent", "speclabos", "ragportal", "smartaccess"]}, {"type": "null"}]},
           "question": {"$ref": "#/$defs/bilingual"},
           "answer": {"$ref": "#/$defs/bilingual"},
           "order": {"type": "integer", "minimum": 0}

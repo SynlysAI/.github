@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 
 import pytest
+import yaml
+from jsonschema import Draft202012Validator
 
 from scripts.release_portal.config import effective_logo, load_catalog, validate_catalog
 from scripts.release_portal.models import Catalog
@@ -54,12 +56,12 @@ def test_catalog_allowlist_is_fixed() -> None:
 
 def test_catalog_rejects_invalid_entry_and_required_fields() -> None:
     """错误入口、URL 和双语必填字段必须失败。"""
-    raw = {"schemaVersion": 1, "products": [p.__dict__ for p in load_catalog().products]}
-    raw["products"][-1]["web_url"] = "https://wrong.example/"
+    raw = yaml.safe_load(Path("release-portal/catalog.yml").read_text(encoding="utf-8"))
+    raw["products"][-1]["webUrl"] = "https://wrong.example/"
     with pytest.raises(ValueError):
         validate_catalog(raw)
 
-    raw = {"schemaVersion": 1, "products": [p.__dict__ for p in load_catalog().products]}
+    raw = yaml.safe_load(Path("release-portal/catalog.yml").read_text(encoding="utf-8"))
     raw["products"][0]["name"] = {"en": "AI4MS"}
     with pytest.raises(ValueError):
         validate_catalog(raw)
@@ -76,6 +78,59 @@ def test_schemas_are_closed_and_timeline_uses_short_sha() -> None:
     assert pattern == "^[0-9a-f]{7}$"
 
 
+def test_missing_catalog_or_product_required_fields_are_rejected() -> None:
+    """schemaVersion、defaultBranch、aiPolicy 缺失时必须失败。"""
+    raw = yaml.safe_load(Path("release-portal/catalog.yml").read_text(encoding="utf-8"))
+    for key in ("schemaVersion",):
+        invalid = dict(raw)
+        invalid.pop(key)
+        with pytest.raises(ValueError):
+            validate_catalog(invalid)
+    for key in ("defaultBranch", "aiPolicy"):
+        invalid = yaml.safe_load(Path("release-portal/catalog.yml").read_text(encoding="utf-8"))
+        invalid["products"][0].pop(key)
+        with pytest.raises(ValueError):
+            validate_catalog(invalid)
+
+
+def test_logo_null_uses_fallback() -> None:
+    """Logo 为 null 时仍可校验并使用品牌回退。"""
+    raw = yaml.safe_load(Path("release-portal/catalog.yml").read_text(encoding="utf-8"))
+    raw["products"][0]["logo"] = None
+    validate_catalog(raw)
+    product = load_catalog().products[0]
+    from scripts.release_portal.models import Product
+    fallback = Product(product.product_id, product.repository, product.entry_type, product.web_url, product.name, product.tagline, product.category, None, product.default_branch, product.ai_policy)
+    assert effective_logo(fallback)["src"] == "logo.png"
+
+
+def test_jsonschema_rejects_empty_catalog_extra_field_and_full_sha() -> None:
+    """JSON Schema 实际拒绝空列表、错误映射、未知字段和完整 SHA。"""
+    schema_dir = Path("release-portal/schemas")
+    product_schema = json.loads((schema_dir / "products.schema.json").read_text(encoding="utf-8-sig"))
+    validator = Draft202012Validator(product_schema)
+    raw = yaml.safe_load(Path("release-portal/catalog.yml").read_text(encoding="utf-8"))
+    valid = {"schemaVersion": 1, "products": raw["products"]}
+    assert not list(validator.iter_errors(valid))
+    assert list(validator.iter_errors({"schemaVersion": 1, "products": []}))
+    invalid = json.loads(json.dumps(valid))
+    invalid["products"][0]["webUrl"] = "http://insecure.example/"
+    assert list(validator.iter_errors(invalid))
+    invalid = json.loads(json.dumps(valid))
+    invalid["products"][0]["unexpected"] = True
+    assert list(validator.iter_errors(invalid))
+
+    timeline_schema = json.loads((schema_dir / "timeline.schema.json").read_text(encoding="utf-8-sig"))
+    timeline_validator = Draft202012Validator(timeline_schema)
+    event = {"schemaVersion": 1, "events": [{
+        "id": "x", "productId": "ai4ms", "level": "commit", "occurredAt": "2026-01-01T00:00:00Z",
+        "version": None, "changeType": "feature", "module": "general",
+        "title": {"zh": "标题", "en": "Title"}, "summary": {"zh": "摘要", "en": "Summary"},
+        "detailsMarkdown": {"zh": "", "en": ""}, "source": {"repository": "SynlysAI/AI4MS", "commitShas": ["a" * 40], "releaseUrl": None}, "pinned": False
+    }]}
+    assert list(timeline_validator.iter_errors(event))
+
+
 def test_missing_logo_uses_brand_icon_and_english_name() -> None:
     """缺少 Logo 时只使用品牌图标和产品英文名。"""
     product = load_catalog().products[0]
@@ -89,6 +144,7 @@ def test_missing_logo_uses_brand_icon_and_english_name() -> None:
         category=product.category,
         logo=None,
         default_branch=product.default_branch,
+        ai_policy=product.ai_policy,
     )
     logo = effective_logo(product_without_logo)
     assert logo == {"src": "logo.png", "alt": product.name["en"]}

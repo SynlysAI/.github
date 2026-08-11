@@ -14,7 +14,7 @@
         "required": ["id", "productId", "level", "occurredAt", "version", "changeType", "module", "title", "summary", "detailsMarkdown", "source", "pinned"],
         "properties": {
           "id": {"type": "string"},
-          "productId": {"type": "string"},
+          "productId": {"enum": ["ai4ms", "spec-agent", "poly-agent", "speclabos", "ragportal", "smartaccess"]},
           "level": {"enum": ["release", "aggregate", "commit"]},
           "occurredAt": {"type": "string", "format": "date-time"},
           "version": {"type": ["string", "null"]},

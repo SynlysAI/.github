@@ -102,7 +102,7 @@ def validate_catalog(catalog: Catalog | dict[str, Any] | str | Path) -> None:
             raise ValueError(f"产品必须提供双语 name: {product.product_id}")
         if set(product.tagline) != {"zh", "en"} or not product.tagline.get("zh") or not product.tagline.get("en"):
             raise ValueError(f"产品必须提供双语 tagline: {product.product_id}")
-        if not product.category or not product.logo or not product.default_branch:
+        if not product.category or not product.default_branch:
             raise ValueError(f"产品必填字段缺失: {product.product_id}")
 
 

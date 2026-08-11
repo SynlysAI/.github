@@ -14,7 +14,7 @@
         "required": ["id", "productId", "version", "name", "body", "publishedAt", "releaseUrl", "prerelease", "draft", "assets"],
         "properties": {
           "id": {"type": "string"},
-          "productId": {"type": "string"},
+          "productId": {"enum": ["ai4ms", "spec-agent", "poly-agent", "speclabos", "ragportal", "smartaccess"]},
           "version": {"type": ["string", "null"]},
           "name": {"type": "string"},
           "body": {"type": "string"},

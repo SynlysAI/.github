@@ -8,6 +8,8 @@
     "schemaVersion": {"const": 1},
     "products": {
       "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -28,12 +30,12 @@
     }
   },
   "allOf": [
-    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "ai4ms"}}}}}}, "then": {}},
-    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "spec-agent"}}}}}}, "then": {}},
-    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "poly-agent"}}}}}}, "then": {}},
-    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "speclabos"}}}}}}, "then": {}},
-    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "ragportal"}}}}}}, "then": {}},
-    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "smartaccess"}}}}}}, "then": {}},
+    {"properties": {"products": {"contains": {"properties": {"productId": {"const": "ai4ms"}}, "required": ["productId"]}, "minContains": 1, "maxContains": 1}}},
+    {"properties": {"products": {"contains": {"properties": {"productId": {"const": "spec-agent"}}, "required": ["productId"]}, "minContains": 1, "maxContains": 1}}},
+    {"properties": {"products": {"contains": {"properties": {"productId": {"const": "poly-agent"}}, "required": ["productId"]}, "minContains": 1, "maxContains": 1}}},
+    {"properties": {"products": {"contains": {"properties": {"productId": {"const": "speclabos"}}, "required": ["productId"]}, "minContains": 1, "maxContains": 1}}},
+    {"properties": {"products": {"contains": {"properties": {"productId": {"const": "ragportal"}}, "required": ["productId"]}, "minContains": 1, "maxContains": 1}}},
+    {"properties": {"products": {"contains": {"properties": {"productId": {"const": "smartaccess"}}, "required": ["productId"]}, "minContains": 1, "maxContains": 1}}},
     {"properties": {"products": {"items": {"oneOf": [
       {"properties": {"productId": {"const": "ai4ms"}, "repository": {"const": "SynlysAI/AI4MS"}, "entryType": {"const": "web"}, "webUrl": {"const": "https://ai4ms.xmuzc.com/"}}},
       {"properties": {"productId": {"const": "spec-agent"}, "repository": {"const": "SynlysAI/Spec_Agent"}, "entryType": {"const": "web"}, "webUrl": {"const": "https://specagent.xmuzc.com/"}}},
