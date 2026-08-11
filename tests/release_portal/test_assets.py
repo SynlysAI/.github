@@ -288,6 +288,40 @@ def test_non_native_storage_retains_current_plus_two_private_history_versions(tm
     assert all(".release-portal-history/" in str(item) for item in history)
 
 
+def test_failed_non_native_replacement_preserves_current_and_history(tmp_path: Path):
+    class WrongCopy(InMemoryR2Client):
+        def __init__(self):
+            super().__init__(native_versioning=False)
+            self.fail_formal_copy = False
+
+        def copy_object(self, bucket, source_key, destination_key):
+            result = super().copy_object(bucket, source_key, destination_key)
+            if self.fail_formal_copy and destination_key.startswith("assets/"):
+                self.objects[(bucket, destination_key)] = b"wrong"
+            return result
+
+    client = WrongCopy()
+    uploader = AssetUploader(client, bucket="downloads")
+    path = _asset_file(tmp_path, b"one")
+    for content in (b"one", b"two", b"three", b"four"):
+        path.write_bytes(content)
+        uploader.upload_release_asset(path, product_id="ai4ms", version="v1", replace=content != b"one")
+    key = "assets/ai4ms/v1/SpecAgent-linux-amd64.tar.gz"
+    prefix = f".release-portal-history/{key}/"
+    before_current = client.get_object("downloads", key)
+    before_history = {item: client.get_object("downloads", item) for item in client.list_objects_v2("downloads", prefix)}
+    client.fail_formal_copy = True
+    path.write_bytes(b"five")
+
+    with pytest.raises(RuntimeError, match="SHA-256"):
+        uploader.upload_release_asset(path, product_id="ai4ms", version="v1", replace=True)
+
+    after_history = {item: client.get_object("downloads", item) for item in client.list_objects_v2("downloads", prefix)}
+    assert client.get_object("downloads", key) == before_current
+    assert after_history == before_history
+    assert len(after_history) == 2
+
+
 def test_temp_delete_failure_still_cleans_ephemeral_rollback_backup(tmp_path: Path):
     class TempDeleteFails(BotoStyleFake):
         def __init__(self):

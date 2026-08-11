@@ -719,16 +719,16 @@ class AssetUploader:
                 deletion_error = self._delete(key)
                 if deletion_error is not None:
                     cleanup_errors.append(deletion_error)
+            if rollback_key is not None:
+                backup_error = self._delete(rollback_key)
+                if backup_error is not None:
+                    cleanup_errors.append(backup_error)
             try:
                 self._prune_retention(key)
             except Exception as prune_error:
                 cleanup_errors.append(prune_error)
             if cleanup_errors and hasattr(exc, "add_note"):
                 exc.add_note("附件回滚清理未完全完成")
-            if rollback_key is not None:
-                backup_error = self._delete(rollback_key)
-                if backup_error is not None and hasattr(exc, "add_note"):
-                    exc.add_note("附件回滚备份清理未完全完成")
             raise
         else:
             cleanup_errors: list[Exception] = []
