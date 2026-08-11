@@ -63,6 +63,8 @@ def test_conflicting_overrides_are_rejected():
         validate_overrides([{"id": "x", "hide": True, "pin": True}])
     with pytest.raises(ValueError, match="冲突"):
         validate_overrides([{"id": "x", "changeType": "feature"}, {"id": "x", "changeType": "bugfix"}])
+    with pytest.raises(ValueError, match="合并冲突"):
+        validate_overrides([{"id": "a", "mergeInto": "b"}, {"id": "b", "mergeInto": "a"}])
 
 
 def test_sanitization_keeps_public_metadata_only():

@@ -101,6 +101,7 @@ def validate_overrides(overrides: Iterable[Mapping[str, Any]]) -> list[dict[str,
     """
     normalized: list[dict[str, Any]] = []
     seen: dict[str, dict[str, Any]] = {}
+    merge_graph: dict[str, str] = {}
     for index, raw in enumerate(overrides):
         if not isinstance(raw, Mapping):
             raise ValueError(f"覆盖规则[{index}]必须是映射")
@@ -126,6 +127,15 @@ def validate_overrides(overrides: Iterable[Mapping[str, Any]]) -> list[dict[str,
             raise ValueError(f"覆盖规则[{target}]包含非法 changeType")
         if "mergeInto" in operations and str(rule["mergeInto"]) == target:
             raise ValueError(f"覆盖规则[{target}]不能合并到自身")
+        if "mergeInto" in operations:
+            merge_graph[target] = str(rule["mergeInto"])
+            cursor = target
+            visited: set[str] = set()
+            while cursor in merge_graph:
+                if cursor in visited:
+                    raise ValueError(f"覆盖规则[{target}]存在合并冲突")
+                visited.add(cursor)
+                cursor = merge_graph[cursor]
         if "replaceText" in operations and not isinstance(rule["replaceText"], (Mapping, str)):
             raise ValueError(f"覆盖规则[{target}]的 replaceText 必须是映射或字符串")
         previous = seen.get(target)
