@@ -1,0 +1,87 @@
+name: Release Portal Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      product:
+        description: 要同步的产品；all 表示全部六个产品
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - ai4ms
+          - spec-agent
+          - poly-agent
+          - speclabos
+          - ragportal
+          - smartaccess
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-portal-candidates
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 检出配置仓库
+        uses: actions/checkout@v4
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安装运行依赖
+        run: python -m pip install -r requirements.txt
+
+      - name: 获取 GitHub App 安装令牌
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.SYNLYSAI_APP_ID }}
+          private-key: ${{ secrets.SYNLYSAI_APP_PRIVATE_KEY }}
+          owner: SynlysAI
+
+      - name: 同步正式 Release 与附件
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+        run: >-
+          python -m scripts.release_portal.cli sync
+          --product "${{ inputs.product || 'all' }}"
+
+      - name: 创建或更新候选审核 PR
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          if git diff --quiet -- release-portal/candidates; then
+            echo "没有新增候选数据"
+            exit 0
+          fi
+          git config user.name "synlysai-release-portal[bot]"
+          git config user.email "41898282+synlysai-release-portal[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin automation/release-portal-candidates >/dev/null 2>&1; then
+            git fetch origin automation/release-portal-candidates:refs/remotes/origin/automation/release-portal-candidates
+          fi
+          git checkout -B automation/release-portal-candidates
+          git add release-portal/candidates
+          git commit -m "chore: 同步 Release Portal 候选数据"
+          git push --force-with-lease=refs/heads/automation/release-portal-candidates origin HEAD:automation/release-portal-candidates
+          pr_number="$(gh pr list --head automation/release-portal-candidates --base main --state open --json number --jq '.[0].number')"
+          if [ -n "$pr_number" ]; then
+            gh pr edit "$pr_number" --title "chore: 审核 Release Portal 候选数据" --body "自动同步正式 Release 与待审核候选。"
+          else
+            gh pr create --base main --head automation/release-portal-candidates --title "chore: 审核 Release Portal 候选数据" --body "自动同步正式 Release 与待审核候选。"
+          fi
