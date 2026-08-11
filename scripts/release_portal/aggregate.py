@@ -133,7 +133,20 @@ def initial_backfill_state(repositories: Iterable[str]) -> dict[str, Any]:
     Returns:
         含游标、已处理 SHA、完成状态和水位的初始状态。
     """
-    return {"schemaVersion": 1, "repositories": {repo: {"cursor": None, "completed": False, "processed": 0, "processedShas": [], "watermark": {"sha": None, "publishedAt": None}} for repo in sorted(set(repositories))}}
+    return {
+        "schemaVersion": 1,
+        "repositories": {
+            repo: {
+                "cursor": None,
+                "page": 1,
+                "completed": False,
+                "processed": 0,
+                "processedShas": [],
+                "watermark": {"sha": None, "publishedAt": None},
+            }
+            for repo in sorted(set(repositories))
+        },
+    }
 
 
 def update_backfill_state(state: dict[str, Any], repository: str, commits: Iterable[Mapping[str, Any]], *, completed: bool = False, max_batch: int = MAX_BACKFILL_BATCH) -> dict[str, Any]:
@@ -150,7 +163,17 @@ def update_backfill_state(state: dict[str, Any], repository: str, commits: Itera
     """
     batch = [dict(item) for item in commits][:max(1, min(max_batch, MAX_BACKFILL_BATCH))]
     repositories = state.setdefault("repositories", {})
-    current = repositories.setdefault(repository, {"cursor": None, "completed": False, "processed": 0, "processedShas": [], "watermark": {"sha": None, "publishedAt": None}})
+    current = repositories.setdefault(
+        repository,
+        {
+            "cursor": None,
+            "page": 1,
+            "completed": False,
+            "processed": 0,
+            "processedShas": [],
+            "watermark": {"sha": None, "publishedAt": None},
+        },
+    )
     processed_shas = list(dict.fromkeys(str(sha) for sha in current.get("processedShas", []) if sha))
     current["processedShas"] = processed_shas
     known = set(processed_shas)

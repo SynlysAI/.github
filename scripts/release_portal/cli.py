@@ -29,6 +29,7 @@ from .classify import load_overrides as load_classification_overrides
 from .config import load_catalog
 from .github import GitHubClient
 from .publish import (
+    build_manifest,
     build_public_collections,
     load_candidate_events,
     load_overrides,
@@ -546,14 +547,24 @@ def _backfill(args: argparse.Namespace, *, github_client: Any | None = None) -> 
         for product in products:
             repository_state = state.setdefault("repositories", {}).setdefault(product.repository, {})
             known = {str(sha) for sha in repository_state.get("processedShas", [])}
-            all_commits: list[dict[str, Any]] = []
-            for commit in client.list_commits(product.repository):
+            try:
+                page = max(1, int(repository_state.get("page", 1)))
+            except (TypeError, ValueError):
+                page = 1
+            fetched_commits: list[dict[str, Any]] = []
+            for commit in client.list_commits(
+                product.repository,
+                max_items=limit,
+                page=page,
+                include_pull_requests=False,
+            ):
                 value = commit.to_dict() if hasattr(commit, "to_dict") else dict(commit)
                 value["repository"] = product.repository
-                all_commits.append(value)
-            batch = [item for item in all_commits if str(item.get("sha") or "") not in known][:limit]
-            completed = len([item for item in all_commits if str(item.get("sha") or "") not in known]) <= len(batch)
+                fetched_commits.append(value)
+            batch = [item for item in fetched_commits if str(item.get("sha") or "") not in known]
+            completed = len(fetched_commits) < limit
             update_backfill_state(state, product.repository, batch, completed=completed, max_batch=limit)
+            repository_state["page"] = page if completed else page + 1
             events = aggregate_commits(
                 product.product_id,
                 batch,
@@ -643,6 +654,41 @@ def _safe_public_prefix(value: str) -> str:
     return prefix
 
 
+def _canonical_json_bytes(value: Any) -> bytes:
+    """将 JSON 兼容值编码为稳定的 UTF-8 对象内容。
+
+    Args:
+        value: 待编码的 JSON 兼容值。
+
+    Returns:
+        带末尾换行的稳定 UTF-8 字节序列。
+    """
+    return (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
+
+
+def _generation_manifest(collections: dict[str, Any], generation_prefix: str) -> dict[str, Any]:
+    """构造指向不可变 generation 快照的公开根 manifest。
+
+    Args:
+        collections: 已通过公开契约校验的五个集合。
+        generation_prefix: 本次快照在 R2 中的不可变前缀。
+
+    Returns:
+        所有集合路径均指向 generation 前缀的 manifest 映射。
+    """
+    meta = collections.get("meta") or {}
+    manifest = build_manifest(
+        collections,
+        generated_at=meta.get("generatedAt"),
+        data_version=str(meta.get("dataVersion") or "1"),
+    )
+    for record in manifest["collections"].values():
+        record["path"] = f"{generation_prefix}/{record['path']}"
+    for record in manifest["files"]:
+        record["path"] = f"{generation_prefix}/{record['path']}"
+    return manifest
+
+
 def _publish(args: argparse.Namespace, *, object_store: Any | None = None) -> int:
     """校验候选、写入快照，并按 manifest 最后规则上传到 R2。
 
@@ -671,8 +717,21 @@ def _publish(args: argparse.Namespace, *, object_store: Any | None = None) -> in
             client = object_store if object_store is not None else build_object_store(args, require_remote=True)
             prefix = _safe_public_prefix(args.prefix)
             output = Path(args.output)
-            for filename in PUBLIC_COLLECTION_FILENAMES:
-                _put_public_object(client, args.bucket, f"{prefix}/{filename}", (output / filename).read_bytes())
+            generation_prefix = f"{prefix}/generations/{run_id}"
+            manifest = _generation_manifest(collections, generation_prefix)
+            for filename in PUBLIC_COLLECTION_FILENAMES[:-1]:
+                _put_public_object(
+                    client,
+                    args.bucket,
+                    f"{generation_prefix}/{filename}",
+                    (output / filename).read_bytes(),
+                )
+            _put_public_object(
+                client,
+                args.bucket,
+                f"{prefix}/manifest.json",
+                _canonical_json_bytes(manifest),
+            )
             count = len(PUBLIC_COLLECTION_FILENAMES)
     except Exception as exc:
         elapsed = int((time.perf_counter() - started) * 1000)

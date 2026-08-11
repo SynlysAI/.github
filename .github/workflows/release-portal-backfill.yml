@@ -8,14 +8,7 @@ on:
         required: true
         default: all
         type: choice
-        options:
-          - all
-          - ai4ms
-          - spec-agent
-          - poly-agent
-          - speclabos
-          - ragportal
-          - smartaccess
+        options: [all, ai4ms, spec-agent, poly-agent, speclabos, ragportal, smartaccess]
 
 permissions:
   contents: write
@@ -30,8 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: 检出配置仓库
+      - name: 检出受信任主分支
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
 
       - name: 配置 Python
         uses: actions/setup-python@v5
@@ -50,18 +46,26 @@ jobs:
           owner: SynlysAI
           repositories: AI4MS,Spec_Agent,Poly_Agent,SpecLabOS,RAGPortal,SmartAccess,.github
 
-      - name: 准备候选审核分支基线
+      - name: 仅恢复候选数据输入
         env:
           CANDIDATE_BRANCH: automation/release-portal-candidates
         run: |
+          git fetch origin main
+          git checkout --detach origin/main
+          printf '{"schemaVersion": 1, "events": []}\n' > "$RUNNER_TEMP/release-portal-before-timeline.json"
           if git ls-remote --exit-code --heads origin "$CANDIDATE_BRANCH" >/dev/null 2>&1; then
             git fetch origin "$CANDIDATE_BRANCH:refs/remotes/origin/$CANDIDATE_BRANCH"
-            git checkout -B "$CANDIDATE_BRANCH" "refs/remotes/origin/$CANDIDATE_BRANCH"
             echo "CANDIDATE_EXPECTED_SHA=$(git rev-parse "refs/remotes/origin/$CANDIDATE_BRANCH")" >> "$GITHUB_ENV"
+            for path in release-portal/candidates/timeline.json release-portal/candidates/releases.json release-portal/state/backfill.json; do
+              if git cat-file -e "refs/remotes/origin/$CANDIDATE_BRANCH:$path"; then
+                git checkout "refs/remotes/origin/$CANDIDATE_BRANCH" -- "$path"
+              fi
+            done
           else
-            git fetch origin main
-            git checkout -B "$CANDIDATE_BRANCH" origin/main
             echo "CANDIDATE_EXPECTED_SHA=0000000000000000000000000000000000000000" >> "$GITHUB_ENV"
+          fi
+          if [ -f release-portal/candidates/timeline.json ]; then
+            cp release-portal/candidates/timeline.json "$RUNNER_TEMP/release-portal-before-timeline.json"
           fi
 
       - name: 回填最多 500 条历史提交
@@ -70,11 +74,17 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ vars.AI_BASE_URL }}
           AI_MODEL: ${{ vars.AI_MODEL }}
-          AI_PRIVATE_ENDPOINT_ALLOWLIST: ${{ vars.AI_BASE_URL }}
         run: >-
           python -m scripts.release_portal.cli backfill
           --product "${{ inputs.product }}"
           --limit 500
+
+      - name: 用主分支代码生成审核摘要
+        run: >-
+          python -m scripts.release_portal.review_summary
+          --before "$RUNNER_TEMP/release-portal-before-timeline.json"
+          --after release-portal/candidates/timeline.json
+          --output "$RUNNER_TEMP/release-portal-pr-body.md"
 
       - name: 保存本次候选 artifact
         uses: actions/upload-artifact@v4
@@ -88,23 +98,39 @@ jobs:
       - name: 创建或更新候选审核 PR
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          CANDIDATE_BRANCH: automation/release-portal-candidates
         run: |
-          if git diff --quiet -- release-portal/candidates release-portal/state/backfill.json; then
+          previous_stash="$(git rev-parse -q --verify refs/stash || true)"
+          git stash push --include-untracked --message release-portal-candidates -- release-portal/candidates release-portal/state/backfill.json
+          stash_ref="$(git rev-parse -q --verify refs/stash || true)"
+          if [ -z "$stash_ref" ] || [ "$stash_ref" = "$previous_stash" ]; then
+            echo "本批没有可审核提交"
+            exit 0
+          fi
+          if [ "$CANDIDATE_EXPECTED_SHA" = "0000000000000000000000000000000000000000" ]; then
+            git checkout -B "$CANDIDATE_BRANCH" origin/main
+          else
+            git checkout -B "$CANDIDATE_BRANCH" "refs/remotes/origin/$CANDIDATE_BRANCH"
+          fi
+          for path in release-portal/candidates/timeline.json release-portal/candidates/releases.json release-portal/state/backfill.json; do
+            if git cat-file -e "$stash_ref:$path"; then
+              git checkout "$stash_ref" -- "$path"
+            fi
+          done
+          git add -A release-portal/candidates release-portal/state/backfill.json
+          if git diff --cached --quiet; then
+            git stash drop "$stash_ref"
             echo "本批没有可审核提交"
             exit 0
           fi
           git config user.name "synlysai-release-portal[bot]"
           git config user.email "41898282+synlysai-release-portal[bot]@users.noreply.github.com"
-          git add release-portal/candidates release-portal/state/backfill.json
-          if git diff --cached --quiet; then
-            echo "没有可提交的候选变更"
-            exit 0
-          fi
           git commit -m "chore: 回填 Release Portal 候选数据"
-          git push --force-with-lease=refs/heads/automation/release-portal-candidates:$CANDIDATE_EXPECTED_SHA origin HEAD:automation/release-portal-candidates
-          pr_number="$(gh pr list --head automation/release-portal-candidates --base main --state open --json number --jq '.[0].number')"
+          git push --force-with-lease=refs/heads/$CANDIDATE_BRANCH:$CANDIDATE_EXPECTED_SHA origin HEAD:$CANDIDATE_BRANCH
+          git stash drop "$stash_ref"
+          pr_number="$(gh pr list --head "$CANDIDATE_BRANCH" --base main --state open --json number --jq '.[0].number')"
           if [ -n "$pr_number" ]; then
-            gh pr edit "$pr_number" --title "chore: 审核 Release Portal 候选数据" --body "自动回填历史提交，单次每仓库最多 500 条。"
+            gh pr edit "$pr_number" --title "chore: 审核 Release Portal 候选数据" --body-file "$RUNNER_TEMP/release-portal-pr-body.md"
           else
-            gh pr create --base main --head automation/release-portal-candidates --title "chore: 审核 Release Portal 候选数据" --body "自动回填历史提交，单次每仓库最多 500 条。"
+            gh pr create --base main --head "$CANDIDATE_BRANCH" --title "chore: 审核 Release Portal 候选数据" --body-file "$RUNNER_TEMP/release-portal-pr-body.md"
           fi

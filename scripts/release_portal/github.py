@@ -306,17 +306,33 @@ Returns:
                     return match.group(1)
         return None
 
-    def _paginate(self, path: str) -> list[dict[str, Any]]:
-        """读取并校验全部分页。
+    def _paginate(
+        self,
+        path: str,
+        *,
+        max_items: int | None = None,
+        max_pages: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """读取受上限约束的 GitHub 分页结果。
 
-Args:
-    path: 首页 API 路径。
-Returns:
-    对象列表。"""
+        Args:
+            path: 首页 API 路径。
+            max_items: 最多返回的记录数；``None`` 表示不设记录数上限。
+            max_pages: 最多请求的页数；``None`` 表示不设页数上限。
+
+        Returns:
+            不超过上限的对象列表。
+        """
+        if max_items is not None and max_items <= 0:
+            return []
+        if max_pages is not None and max_pages <= 0:
+            return []
         result: list[dict[str, Any]] = []
         next_path: str | None = path
-        while next_path:
+        pages = 0
+        while next_path and (max_pages is None or pages < max_pages):
             response = self._request(next_path)
+            pages += 1
             try:
                 payload = response.json()
             except (ValueError, TypeError) as exc:
@@ -327,6 +343,8 @@ Returns:
                 if not isinstance(item, dict):
                     raise GitHubError(f"GitHub page item must be an object: index={index}", status=response.status_code, method="GET", path=next_path, body=self._safe_body(getattr(response, "text", "")))
                 result.append(item)
+                if max_items is not None and len(result) >= max_items:
+                    return result
             next_path = self._next_link(response.headers.get("Link") or response.headers.get("link"))
             if next_path:
                 next_path = self._validate_url(next_path, path)
@@ -359,39 +377,84 @@ Returns:
         raw = self._paginate(f"/repos/{repository}/releases?per_page=100")
         return [self.normalize_release(item) for item in raw]
 
-    def list_commits(self, repository: str, *, catalog: Catalog | None = None) -> list[Commit]:
-        """读取仓库提交并补充存在关联 PR 的标题与正文。
+    def list_commits(
+        self,
+        repository: str,
+        *,
+        catalog: Catalog | None = None,
+        max_items: int | None = None,
+        page: int = 1,
+        include_pull_requests: bool = True,
+    ) -> list[Commit]:
+        """读取一个受限提交批次，并补充关联 PR 标题与正文。
 
         Args:
             repository: ``owner/name`` 仓库名。
             catalog: 可选产品注册表，默认读取正式 catalog。
+            max_items: 本次最多读取的提交数；缺省读取全部分页。
+            page: GitHub REST 起始页号，从 1 开始。
+            include_pull_requests: 是否读取关联 PR；批量回填可关闭以限制请求量。
         Returns:
             归一化 Commit 列表。
         """
         self._check_repository(repository, catalog or load_catalog(CATALOG_PATH))
-        items = self._paginate(f"/repos/{repository}/commits?per_page=100")
+        try:
+            normalized_page = int(page)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("提交页号必须为正整数") from exc
+        if normalized_page < 1:
+            raise ValueError("提交页号必须从 1 开始")
+        normalized_limit = None if max_items is None else max(0, int(max_items))
+        max_pages = None if normalized_limit is None else max(1, (normalized_limit + 99) // 100)
+        items = self._paginate(
+            f"/repos/{repository}/commits?per_page=100&page={normalized_page}",
+            max_items=normalized_limit,
+            max_pages=max_pages,
+        )
         commits: list[Commit] = []
         for item in items:
             sha = str(item.get("sha") or "")
             if not sha:
                 continue
-            prs = self.list_commit_pull_requests(repository, sha)
+            prs = self.list_commit_pull_requests(repository, sha, max_items=1) if include_pull_requests else []
             commit = self.normalize_commit(item, prs)
             commits.append(commit)
         return commits
 
-    def list_commit_pull_requests(self, repository: str, sha: str, *, catalog: Catalog | None = None) -> list[PullRequest]:
-        """读取提交关联 PR。
+    def list_commit_pull_requests(
+        self,
+        repository: str,
+        sha: str,
+        *,
+        catalog: Catalog | None = None,
+        max_items: int | None = 1,
+    ) -> list[PullRequest]:
+        """读取提交关联 PR，默认只保留首个关联项。
 
-Args:
-    repository: owner/name 仓库名。
-    sha: 提交 SHA。
-    catalog: 产品注册表。
-Returns:
-    PR 列表。"""
+        Args:
+            repository: owner/name 仓库名。
+            sha: 提交 SHA。
+            catalog: 产品注册表。
+            max_items: 最多读取的关联 PR 数；默认 1。
+
+        Returns:
+            PR 列表。
+        """
         self._check_repository(repository, catalog or load_catalog(CATALOG_PATH))
-        items = self._paginate(f"/repos/{repository}/commits/{sha}/pulls")
-        return [PullRequest(number=int(item.get("number", 0)), title=str(item.get("title") or ""), body=str(item.get("body") or ""), url=item.get("html_url")) for item in items]
+        items = self._paginate(
+            f"/repos/{repository}/commits/{sha}/pulls",
+            max_items=max_items,
+            max_pages=1,
+        )
+        return [
+            PullRequest(
+                number=int(item.get("number", 0)),
+                title=str(item.get("title") or ""),
+                body=str(item.get("body") or ""),
+                url=item.get("html_url"),
+            )
+            for item in items
+        ]
 
     def collect_catalog(self, catalog: Catalog | None = None) -> dict[str, dict[str, list[Any]]]:
         """采集 catalog 六仓库。

@@ -72,6 +72,33 @@ def test_commit_and_associated_pr_are_normalized():
     assert commits[0].pull_requests[0].title == "Add parser"
 
 
+def test_commit_batch_stops_at_limit_without_per_commit_pr_requests():
+    """历史回填批次应受记录和分页上限约束，不为每条提交读取 PR。"""
+    payload = [
+        {"sha": character * 40, "commit": {"message": f"feat: {character}", "author": {"date": "2026-08-10T00:00:00Z"}}}
+        for character in ("a", "b", "c")
+    ]
+    session = FakeSession([
+        FakeResponse(
+            payload=payload,
+            headers={"Link": '<https://api.test/repos/SynlysAI/AI4MS/commits?per_page=100&page=2>; rel="next"'},
+        )
+    ])
+    client = GitHubClient(session=session, api_root="https://api.test", sleep=lambda _: None)
+
+    commits = client.list_commits(
+        "SynlysAI/AI4MS",
+        max_items=2,
+        page=1,
+        include_pull_requests=False,
+    )
+
+    assert [commit.sha for commit in commits] == ["a" * 40, "b" * 40]
+    assert len(session.calls) == 1
+    assert len(session.calls) <= 2
+    assert "page=1" in session.calls[0][0]
+
+
 def test_rate_limit_retry_after_and_unrecoverable_error():
     session = FakeSession([FakeResponse(status=429, payload={"message": "rate"}, headers={"Retry-After": "2"}), FakeResponse(payload=[])])
     waits = []

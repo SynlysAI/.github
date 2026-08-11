@@ -1,5 +1,6 @@
 """Release Portal GitHub Actions 工作流结构测试。"""
 
+import json
 from pathlib import Path
 
 from scripts.release_portal import cli
@@ -36,8 +37,9 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
     assert "automation/release-portal-candidates" in workflow
     assert "python -m scripts.release_portal.cli sync" in workflow
     assert "cancel-in-progress: true" in workflow
-    assert "git ls-files --others" in workflow
-    _assert_candidate_baseline_precedes_cli(workflow, "sync")
+    assert "scripts.release_portal.review_summary" in workflow
+    assert "--body-file" in workflow
+    _assert_trusted_main_runs_cli(workflow, "sync")
 
 
 def test_backfill_workflow_is_manual_and_limits_each_product_batch():
@@ -51,8 +53,10 @@ def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     assert "--limit 500" in workflow
     assert "actions/upload-artifact@v4" in workflow
     assert "automation/release-portal-candidates" in workflow
-    assert "AI_PRIVATE_ENDPOINT_ALLOWLIST" in workflow
-    _assert_candidate_baseline_precedes_cli(workflow, "backfill")
+    assert "AI_PRIVATE_ENDPOINT_ALLOWLIST" not in workflow
+    assert "scripts.release_portal.review_summary" in workflow
+    assert "--body-file" in workflow
+    _assert_trusted_main_runs_cli(workflow, "backfill")
 
 
 def test_publish_workflow_validates_before_manifest_last_upload():
@@ -79,8 +83,8 @@ def test_dependabot_covers_actions_and_python_dependencies():
     assert 'directory: "/"' in content
 
 
-def _assert_candidate_baseline_precedes_cli(workflow: str, command: str) -> None:
-    """确认候选分支基线在 CLI 前准备，CLI 后不再切换分支。
+def _assert_trusted_main_runs_cli(workflow: str, command: str) -> None:
+    """确认带密钥 CLI 使用主分支代码，只读取候选数据文件。
 
     Args:
         workflow: 工作流 YAML 文本。
@@ -89,11 +93,17 @@ def _assert_candidate_baseline_precedes_cli(workflow: str, command: str) -> None
     Returns:
         无返回值。
     """
-    baseline = workflow.index("准备候选审核分支基线")
+    trusted_checkout = workflow.index("检出受信任主分支")
+    restore = workflow.index("仅恢复候选数据输入")
     cli = workflow.index(f"python -m scripts.release_portal.cli {command}")
-    assert baseline < cli
-    assert "git checkout -B" in workflow[baseline:cli]
-    assert "git checkout -B" not in workflow[cli:]
+    assert trusted_checkout < restore < cli
+    assert "ref: main" in workflow[trusted_checkout:restore]
+    assert "git checkout --detach origin/main" in workflow[restore:cli]
+    assert "release-portal/candidates/timeline.json" in workflow[restore:cli]
+    assert "release-portal/candidates/releases.json" in workflow[restore:cli]
+    assert "release-portal/state/backfill.json" in workflow[restore:cli]
+    assert "git checkout -B" not in workflow[restore:cli]
+    assert "git checkout -B" in workflow[cli:]
 
 
 def test_sync_command_uploads_formal_asset_with_original_name(tmp_path: Path, monkeypatch, capsys):
@@ -147,7 +157,7 @@ def test_sync_command_uploads_formal_asset_with_original_name(tmp_path: Path, mo
 
 
 def test_publish_command_uploads_manifest_after_all_other_collections(tmp_path: Path):
-    """发布命令应在其余五个对象成功上传后才写入 manifest。"""
+    """发布命令应先写唯一 generation，再最后更新根 manifest 指针。"""
     candidate = tmp_path / "timeline.json"
     releases = tmp_path / "releases.json"
     state = tmp_path / "backfill.json"
@@ -161,12 +171,14 @@ def test_publish_command_uploads_manifest_after_all_other_collections(tmp_path: 
         def __init__(self):
             """初始化上传 key 记录。"""
             self.keys: list[str] = []
+            self.bodies: dict[str, bytes] = {}
 
         def put_object(self, *, Bucket, Key, Body, **_kwargs):  # noqa: N803
             """记录公开对象上传。"""
             assert Bucket == "downloads"
             assert isinstance(Body, bytes)
             self.keys.append(Key)
+            self.bodies[Key] = Body
 
     store = RecordingStore()
     result = cli.main(
@@ -187,11 +199,145 @@ def test_publish_command_uploads_manifest_after_all_other_collections(tmp_path: 
     )
 
     assert result == 0
-    assert store.keys == [
-        "portal/v1/products.json",
-        "portal/v1/releases.json",
-        "portal/v1/timeline.json",
-        "portal/v1/faqs.json",
-        "portal/v1/meta.json",
-        "portal/v1/manifest.json",
+    assert store.keys[-1] == "portal/v1/manifest.json"
+    generation_prefix = store.keys[0].rsplit("/", 1)[0]
+    assert generation_prefix.startswith("portal/v1/generations/")
+    assert store.keys[:-1] == [
+        f"{generation_prefix}/products.json",
+        f"{generation_prefix}/releases.json",
+        f"{generation_prefix}/timeline.json",
+        f"{generation_prefix}/faqs.json",
+        f"{generation_prefix}/meta.json",
     ]
+    pointer = json.loads(store.bodies["portal/v1/manifest.json"])
+    assert all(item["path"].startswith(f"{generation_prefix}/") for item in pointer["collections"].values())
+    assert all(item["path"].startswith(f"{generation_prefix}/") for item in pointer["files"])
+
+
+def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_path: Path):
+    """generation 中途上传失败时，官网继续引用上一份完整快照。"""
+    candidate = tmp_path / "timeline.json"
+    releases = tmp_path / "releases.json"
+    state = tmp_path / "backfill.json"
+    candidate.write_text('{"schemaVersion": 1, "events": []}\n', encoding="utf-8")
+    releases.write_text('{"schemaVersion": 1, "releases": []}\n', encoding="utf-8")
+    state.write_text('{"schemaVersion": 1, "repositories": {}}\n', encoding="utf-8")
+
+    class FailingStore:
+        """在第三次 generation 上传时失败的对象存储替身。"""
+
+        def __init__(self):
+            """初始化旧根 manifest 和旧 generation 快照。"""
+            self.calls = 0
+            self.objects = {
+                "portal/v1/manifest.json": b'{"generation":"old"}\n',
+                "portal/v1/generations/old/products.json": b"old-products\n",
+            }
+
+        def put_object(self, *, Bucket, Key, Body, **_kwargs):  # noqa: N803
+            """记录写入，并在第三次 generation 写入时抛出错误。"""
+            assert Bucket == "downloads"
+            self.calls += 1
+            if self.calls == 3:
+                raise RuntimeError("generation upload failed")
+            self.objects[Key] = Body
+
+    store = FailingStore()
+    old_manifest = store.objects["portal/v1/manifest.json"]
+    old_products = store.objects["portal/v1/generations/old/products.json"]
+    result = cli.main(
+        [
+            "publish",
+            "--bucket",
+            "downloads",
+            "--candidates",
+            str(candidate),
+            "--releases",
+            str(releases),
+            "--state",
+            str(state),
+            "--output",
+            str(tmp_path / "published"),
+        ],
+        object_store=store,
+    )
+
+    assert result == 1
+    assert store.objects["portal/v1/manifest.json"] == old_manifest
+    assert store.objects["portal/v1/generations/old/products.json"] == old_products
+    assert not any(key == "portal/v1/products.json" for key in store.objects)
+
+
+def test_backfill_uses_bounded_page_and_advances_checkpoint(tmp_path: Path, monkeypatch):
+    """回填每次只请求指定上限，并利用 state.page 推进下一批。"""
+    state_path = tmp_path / "backfill.json"
+    candidate_path = tmp_path / "timeline.json"
+    state_path.write_text(
+        """{
+  "schemaVersion": 1,
+  "repositories": {
+    "SynlysAI/AI4MS": {
+      "cursor": null,
+      "page": 1,
+      "completed": false,
+      "processed": 0,
+      "processedShas": [],
+      "watermark": {"sha": null, "publishedAt": null}
+    }
+  }
+}
+""",
+        encoding="utf-8",
+    )
+    candidate_path.write_text('{"schemaVersion": 1, "events": []}\n', encoding="utf-8")
+
+    class BatchedClient:
+        """按页返回有限提交的 GitHub 客户端替身。"""
+
+        def __init__(self):
+            """初始化调用记录。"""
+            self.calls: list[tuple[str, int, int, bool]] = []
+
+        def list_commits(self, repository, *, max_items, page, include_pull_requests):
+            """返回当前页的至多两条提交。"""
+            self.calls.append((repository, max_items, page, include_pull_requests))
+            records = {
+                1: [
+                    {"sha": "a" * 40, "message": "feat(core): one", "occurred_at": "2026-08-10T00:00:00Z"},
+                    {"sha": "b" * 40, "message": "feat(core): two", "occurred_at": "2026-08-10T00:00:00Z"},
+                ],
+                2: [
+                    {"sha": "c" * 40, "message": "fix(core): three", "occurred_at": "2026-08-10T00:00:00Z"},
+                ],
+            }
+            return records[page][:max_items]
+
+    monkeypatch.delenv("AI_API_KEY", raising=False)
+    client = BatchedClient()
+    args = cli._parser().parse_args(
+        [
+            "backfill",
+            "--product",
+            "ai4ms",
+            "--limit",
+            "2",
+            "--state",
+            str(state_path),
+            "--candidates",
+            str(candidate_path),
+        ]
+    )
+
+    assert cli._backfill(args, github_client=client) == 0
+    first_state = json.loads(state_path.read_text(encoding="utf-8"))
+    assert first_state["repositories"]["SynlysAI/AI4MS"]["page"] == 2
+    assert cli._backfill(args, github_client=client) == 0
+    second_state = json.loads(state_path.read_text(encoding="utf-8"))
+    repository_state = second_state["repositories"]["SynlysAI/AI4MS"]
+    assert repository_state["completed"] is True
+    assert repository_state["processed"] == 3
+    assert client.calls == [
+        ("SynlysAI/AI4MS", 2, 1, False),
+        ("SynlysAI/AI4MS", 2, 2, False),
+    ]
+    assert all(call[1] <= 2 for call in client.calls)
