@@ -9,6 +9,7 @@ from scripts.release_portal.github import Release, ReleaseAsset
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / ".github" / "workflows"
+OPERATIONS_DOCUMENT = ROOT / "docs" / "release-portal-operations.md"
 
 
 def _workflow(name: str) -> str:
@@ -87,6 +88,16 @@ def test_dependabot_covers_actions_and_python_dependencies():
     assert 'directory: "/"' in content
 
 
+def test_operations_document_reserves_protected_private_ai_allowlist():
+    """运维说明应将私有 AI 白名单定义为独立的受保护 Environment 配置。"""
+    content = OPERATIONS_DOCUMENT.read_text(encoding="utf-8")
+
+    assert "AI_PRIVATE_ENDPOINT_ALLOWLIST" in content
+    assert "release-portal-private-ai" in content
+    assert "required reviewers" in content
+    assert "不得由 AI_BASE_URL 填充" in content
+
+
 def _assert_trusted_main_runs_cli(workflow: str, command: str) -> None:
     """确认带密钥 CLI 使用主分支代码，只读取候选数据文件。
 
@@ -148,10 +159,11 @@ def test_sync_command_uploads_formal_asset_with_original_name(tmp_path: Path, mo
             ]
 
         @staticmethod
-        def list_commits(_repository, *, include_pull_requests, stop_at_sha, max_items):
+        def list_commits(_repository, *, include_pull_requests, stop_at_sha, max_items, page):
             """同步测试不产生新的提交。"""
             assert include_pull_requests is True
             assert max_items == 500
+            assert page == 1
             assert stop_at_sha is None
             return []
 
@@ -542,9 +554,9 @@ def test_sync_adds_only_commits_newer_than_watermark(tmp_path: Path, monkeypatch
             """本测试不产生正式 Release。"""
             return []
 
-        def list_commits(self, repository, *, include_pull_requests, stop_at_sha, max_items):
+        def list_commits(self, repository, *, include_pull_requests, stop_at_sha, max_items, page):
             """返回客户端已在旧水位前截断的新提交。"""
-            self.calls.append((repository, include_pull_requests, stop_at_sha, max_items))
+            self.calls.append((repository, include_pull_requests, stop_at_sha, max_items, page))
             assert max_items == 500
             return [
                 {
@@ -592,7 +604,98 @@ def test_sync_adds_only_commits_newer_than_watermark(tmp_path: Path, monkeypatch
     assert cli._sync(args, object_store=InMemoryR2Client(), github_client=client) == 0
     timeline = json.loads(timeline_path.read_text(encoding="utf-8"))
     updated_state = json.loads(state_path.read_text(encoding="utf-8"))
-    assert client.calls == [("SynlysAI/AI4MS", True, old_sha, 500)]
+    assert client.calls == [("SynlysAI/AI4MS", True, old_sha, 500, 1)]
     assert [sha for event in timeline["events"] for sha in event["source"]["commitShas"]] == [new_sha[:7]]
     assert updated_state["repositories"]["SynlysAI/AI4MS"]["watermark"]["sha"] == new_sha
     assert seen_prs == [{"title": "Incremental PR", "body": "PR body"}]
+
+
+def test_sync_continues_after_full_batch_without_losing_or_repeating_commits(tmp_path: Path, monkeypatch):
+    """600 条新提交应分两轮处理，第二轮从第六页续读且不重复候选。"""
+    releases_path = tmp_path / "releases.json"
+    timeline_path = tmp_path / "timeline.json"
+    state_path = tmp_path / "backfill.json"
+    old_sha = "a" * 40
+    new_shas = [f"{index + 1:07x}" + "0" * 33 for index in range(600)]
+    releases_path.write_text('{"schemaVersion": 1, "releases": []}\n', encoding="utf-8")
+    timeline_path.write_text('{"schemaVersion": 1, "events": []}\n', encoding="utf-8")
+    state_path.write_text(
+        json.dumps(
+            {
+                "schemaVersion": 1,
+                "repositories": {
+                    "SynlysAI/AI4MS": {
+                        "page": 1,
+                        "processed": 1,
+                        "processedShas": [old_sha],
+                        "watermark": {"sha": old_sha, "publishedAt": "2026-08-01T00:00:00Z"},
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    class PaginatedIncrementalClient:
+        """按 GitHub 页号模拟水位前的 600 条新提交。"""
+
+        def __init__(self):
+            """初始化调用记录。"""
+            self.calls: list[tuple[int, str | None]] = []
+
+        @staticmethod
+        def list_releases(_repository):
+            """本测试不生成 Release。"""
+            return []
+
+        def list_commits(self, _repository, *, max_items, page, include_pull_requests, stop_at_sha):
+            """第 1 页请求返回五页结果，第 6 页请求返回剩余 100 条。"""
+            assert max_items == 500
+            assert include_pull_requests is True
+            self.calls.append((page, stop_at_sha))
+            selected = new_shas[:500] if page == 1 else new_shas[500:]
+            return [
+                {
+                    "sha": sha,
+                    "message": "feat(core): incremental batch",
+                    "occurred_at": (
+                        f"2026-08-10T{23 - index // 60:02d}:{59 - index % 60:02d}:00Z"
+                    ),
+                    "pull_requests": [],
+                }
+                for index, sha in enumerate(selected)
+            ]
+
+    monkeypatch.delenv("AI_API_KEY", raising=False)
+    args = cli._parser().parse_args(
+        [
+            "sync",
+            "--product",
+            "ai4ms",
+            "--candidates",
+            str(releases_path),
+            "--timeline",
+            str(timeline_path),
+            "--state",
+            str(state_path),
+        ]
+    )
+    client = PaginatedIncrementalClient()
+
+    assert cli._sync(args, object_store=InMemoryR2Client(), github_client=client) == 0
+    partial_state = json.loads(state_path.read_text(encoding="utf-8"))
+    assert partial_state["repositories"]["SynlysAI/AI4MS"]["watermark"]["sha"] == new_shas[499]
+    assert cli._sync(args, object_store=InMemoryR2Client(), github_client=client) == 0
+    timeline = json.loads(timeline_path.read_text(encoding="utf-8"))
+    final_state = json.loads(state_path.read_text(encoding="utf-8"))
+    candidate_shas = [
+        sha
+        for event in timeline["events"]
+        for sha in event["source"]["commitShas"]
+    ]
+
+    assert client.calls == [(1, old_sha), (6, old_sha)]
+    assert len(candidate_shas) == 600
+    assert set(candidate_shas) == {sha[:7] for sha in new_shas}
+    assert final_state["repositories"]["SynlysAI/AI4MS"]["watermark"]["sha"] == new_shas[0]
+    assert "syncPending" not in final_state["repositories"]["SynlysAI/AI4MS"]

@@ -464,25 +464,41 @@ def _sync(args: argparse.Namespace, *, object_store: Any | None = None, github_c
                 synced += 1
             repository_state = state.setdefault("repositories", {}).setdefault(product.repository, {})
             watermark = str((repository_state.get("watermark") or {}).get("sha") or "")
+            pending = repository_state.get("syncPending")
+            if isinstance(pending, dict):
+                try:
+                    page = max(1, int(pending.get("nextPage", 1)))
+                except (TypeError, ValueError):
+                    page = 1
+                stop_watermark = dict(pending.get("stop") or {})
+                stop_at_sha = str(stop_watermark.get("sha") or "") or None
+            else:
+                page = 1
+                stop_watermark = dict(repository_state.get("watermark") or {})
+                stop_at_sha = watermark or None
             commits = []
             for commit in client.list_commits(
                 product.repository,
                 max_items=MAX_BACKFILL_BATCH,
+                page=page,
                 include_pull_requests=True,
-                stop_at_sha=watermark or None,
+                stop_at_sha=stop_at_sha,
             ):
                 value = commit.to_dict() if hasattr(commit, "to_dict") else dict(commit)
                 value["repository"] = product.repository
                 commits.append(value)
             known = {str(sha) for sha in repository_state.get("processedShas", [])}
             new_commits = [item for item in commits if str(item.get("sha") or "") not in known]
+            _update_incremental_state(
+                state,
+                product.repository,
+                commits,
+                completed=bool(repository_state.get("completed", False)),
+                page=page,
+                stop_watermark=stop_watermark,
+                max_items=MAX_BACKFILL_BATCH,
+            )
             if new_commits:
-                _update_incremental_state(
-                    state,
-                    product.repository,
-                    new_commits,
-                    completed=bool(repository_state.get("completed", False)),
-                )
                 events = aggregate_commits(
                     product.product_id,
                     new_commits,
@@ -511,14 +527,20 @@ def _update_incremental_state(
     commits: list[dict[str, Any]],
     *,
     completed: bool,
+    page: int,
+    stop_watermark: dict[str, Any],
+    max_items: int,
 ) -> None:
-    """记录同步批次的全部提交并将水位设为最新提交。
+    """记录同步批次，并在满批时保存续读游标。
 
     Args:
         state: 可变回填状态映射。
         repository: owner/name 仓库名。
         commits: 按 GitHub 返回顺序排列的增量提交。
         completed: 是否保留该仓库的完成状态。
+        page: 当前 GitHub REST 起始页号。
+        stop_watermark: 本轮遇到时停止的旧水位。
+        max_items: 本轮读取上限。
 
     Returns:
         无返回值。
@@ -538,6 +560,8 @@ def _update_incremental_state(
     processed_shas = list(dict.fromkeys(str(sha) for sha in current.get("processedShas", []) if sha))
     known = set(processed_shas)
     fresh = [item for item in commits if str(item.get("sha") or "") and str(item.get("sha")) not in known]
+    reached_limit = len(commits) >= max_items
+    pending = current.get("syncPending")
     if fresh:
         processed_shas.extend(str(item["sha"]) for item in fresh)
         processed_shas = list(dict.fromkeys(processed_shas))
@@ -560,7 +584,33 @@ def _update_incremental_state(
             or newest.get("published_at")
             or newest.get("publishedAt")
         )
-        current["watermark"] = {"sha": str(newest["sha"]), "publishedAt": occurred_at}
+        newest_watermark = {"sha": str(newest["sha"]), "publishedAt": occurred_at}
+        if reached_limit:
+            oldest = fresh[-1]
+            current["watermark"] = {
+                "sha": str(oldest["sha"]),
+                "publishedAt": (
+                    oldest.get("occurred_at")
+                    or oldest.get("occurredAt")
+                    or oldest.get("published_at")
+                    or oldest.get("publishedAt")
+                ),
+            }
+            previous_frontier = dict(pending.get("frontier") or {}) if isinstance(pending, dict) else newest_watermark
+            pages_used = max(1, (len(commits) + COMMIT_PAGE_SIZE - 1) // COMMIT_PAGE_SIZE)
+            current["syncPending"] = {
+                "frontier": previous_frontier,
+                "nextPage": page + pages_used,
+                "stop": dict(stop_watermark),
+            }
+        elif isinstance(pending, dict):
+            current["watermark"] = dict(pending.get("frontier") or newest_watermark)
+            current.pop("syncPending", None)
+        else:
+            current["watermark"] = newest_watermark
+    elif not reached_limit and isinstance(pending, dict):
+        current["watermark"] = dict(pending.get("frontier") or current.get("watermark") or {})
+        current.pop("syncPending", None)
     current["completed"] = bool(completed)
 
 
