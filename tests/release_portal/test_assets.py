@@ -8,6 +8,7 @@ import pytest
 from scripts.release_portal.assets import (
     AssetConflictError,
     AssetUploader,
+    FilesystemR2Client,
     InMemoryR2Client,
     StorageConfig,
     public_asset_metadata,
@@ -224,6 +225,25 @@ def test_storage_config_requires_versioning_and_retains_three_versions():
         StorageConfig.from_mapping({"versioning": True, "retainVersions": 2})
 
 
+def test_filesystem_store_writes_stream_in_chunks(tmp_path: Path):
+    class ChunkReader:
+        def __init__(self):
+            self.remaining = b"x" * (1024 * 1024 + 3)
+            self.calls = []
+
+        def read(self, size):
+            self.calls.append(size)
+            assert size == 1024 * 1024
+            value, self.remaining = self.remaining[:size], self.remaining[size:]
+            return value
+
+    client = FilesystemR2Client(tmp_path / "store")
+    reader = ChunkReader()
+    client.put_object("downloads", "assets/ai4ms/v1/app.bin", reader, content_type="application/octet-stream", content_disposition="attachment", metadata={"sha256": "a" * 64})
+    assert client.head_object("downloads", "assets/ai4ms/v1/app.bin")["ContentLength"] == 1024 * 1024 + 3
+    assert reader.calls == [1024 * 1024, 1024 * 1024, 1024 * 1024]
+
+
 def test_cli_upload_asset_requires_fields_and_writes_candidate(tmp_path: Path, monkeypatch, capsys):
     from scripts.release_portal import cli
 
@@ -259,3 +279,14 @@ def test_cli_uses_configured_r2_client_without_printing_credentials(monkeypatch)
     cli.build_object_store(args)
     assert calls["account_id"] == "account-id"
     assert calls["secret_access_key"] == "secret-value"
+
+
+def test_cli_rejects_partial_r2_configuration(tmp_path: Path, monkeypatch, capsys):
+    from scripts.release_portal import cli
+
+    monkeypatch.setenv("R2_ACCESS_KEY_ID", "partial-secret")
+    monkeypatch.delenv("R2_SECRET_ACCESS_KEY", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    exit_code = cli.main(["upload-asset", "--product", "ai4ms", "--version", "v1", "--channel", "manual", "--platform", "linux", "--file", str(_asset_file(tmp_path)), "--bucket", "downloads", "--store-root", str(tmp_path / "store")])
+    assert exit_code == 1
+    assert "partial-secret" not in capsys.readouterr().out

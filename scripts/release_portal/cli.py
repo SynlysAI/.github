@@ -51,6 +51,9 @@ def build_object_store(args: argparse.Namespace) -> Any:
     access_key = os.getenv("R2_ACCESS_KEY_ID")
     secret_key = os.getenv("R2_SECRET_ACCESS_KEY")
     account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID")
+    configured = (access_key, secret_key, account_id)
+    if any(configured) and not all(configured):
+        raise ValueError("R2 配置不完整")
     if access_key and secret_key and account_id:
         return Boto3R2Client(access_key_id=access_key, secret_access_key=secret_key, account_id=account_id)
     if args.store_root:
@@ -131,8 +134,8 @@ def _upload_asset(args: argparse.Namespace, *, object_store: Any | None = None) 
     """
     run_id = uuid.uuid4().hex
     started = time.perf_counter()
-    client = object_store if object_store is not None else build_object_store(args)
     try:
+        client = object_store if object_store is not None else build_object_store(args)
         uploader = AssetUploader(client, args.bucket, config=StorageConfig())
         result = uploader.upload_release_asset(
             args.file_path,

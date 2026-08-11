@@ -19,6 +19,8 @@ from pathlib import Path
 from typing import Any, BinaryIO, Mapping, Protocol
 from urllib.parse import quote
 
+CHUNK_SIZE = 1024 * 1024
+
 
 class AssetConflictError(FileExistsError):
     """同一对象 key 已存在但内容不同。"""
@@ -266,11 +268,10 @@ class Boto3R2Client:
             params["VersionId"] = kwargs["version_id"]
         return self.client.delete_object(**params)
 
-    def get_object(self, bucket: str, key: str) -> bytes:
+    def get_object(self, bucket: str, key: str) -> Any:
         """读取对象内容用于完整性校验和失败恢复。"""
         response = self.client.get_object(Bucket=bucket, Key=key)
-        body = response.get("Body") if isinstance(response, Mapping) else None
-        return body.read() if hasattr(body, "read") else bytes(body or b"")
+        return response.get("Body") if isinstance(response, Mapping) else response
 
     def list_object_versions(self, bucket: str, key: str) -> list[Mapping[str, Any]]:
         """列出指定对象版本。"""
@@ -341,8 +342,14 @@ class FilesystemR2Client:
         """写入本地对象及元数据。"""
         target = self._path(bucket, key)
         target.parent.mkdir(parents=True, exist_ok=True)
-        data = body.read() if hasattr(body, "read") else bytes(body)
-        target.write_bytes(data)
+        temporary = target.with_name(f".{target.name}.{uuid.uuid4().hex}.tmp")
+        with temporary.open("wb") as output:
+            if hasattr(body, "read"):
+                while chunk := body.read(1024 * 1024):
+                    output.write(chunk)
+            else:
+                output.write(bytes(body))
+        os.replace(temporary, target)
         metadata = dict(kwargs.get("metadata") or kwargs.get("Metadata") or {})
         metadata["ContentType"] = kwargs.get("content_type", kwargs.get("ContentType", metadata.get("ContentType")))
         metadata["ContentDisposition"] = kwargs.get("content_disposition", kwargs.get("ContentDisposition", metadata.get("ContentDisposition")))
@@ -369,9 +376,9 @@ class FilesystemR2Client:
         target.with_name(target.name + ".metadata.json").unlink(missing_ok=True)
         return {}
 
-    def get_object(self, bucket: str, key: str) -> bytes:
+    def get_object(self, bucket: str, key: str) -> BinaryIO:
         """读取本地对象内容。"""
-        return self._path(bucket, key).read_bytes()
+        return self._path(bucket, key).open("rb")
 
     def get_bucket_versioning(self, bucket: str) -> Mapping[str, Any]:
         """返回本地离线存储视作已启用版本控制。"""
@@ -466,7 +473,7 @@ def asset_key(product_id: str, version: str, asset_name: str) -> str:
     return posixpath.join("assets", product, release, name)
 
 
-def _stream_digest(path: Path, chunk_size: int = 1024 * 1024) -> tuple[str, int]:
+def _stream_digest(path: Path, chunk_size: int = CHUNK_SIZE) -> tuple[str, int]:
     """以流式方式计算本地文件 SHA-256 和字节数。
 
     Args:
@@ -601,14 +608,18 @@ class AssetUploader:
         resolved_type = content_type or _guess_content_type(name)
         disposition = f'attachment; filename="{name}"'
         temp_key = f"{key}.tmp-{uuid.uuid4().hex}"
+        backup_key: str | None = None
         metadata = {"sha256": sha256, "platform": resolved_platform, "architecture": resolved_architecture}
         formal_written = False
         try:
+            if existing is not None and previous is None:
+                backup_key = f"{key}.rollback-{uuid.uuid4().hex}"
+                self._copy(key, backup_key)
             with path.open("rb") as stream:
                 self._put(temp_key, stream, resolved_type, disposition, metadata)
             uploaded = self._head(temp_key)
-            uploaded_body = self._read_object(temp_key)
-            if uploaded_body is not None and hashlib.sha256(uploaded_body).hexdigest() != sha256:
+            uploaded_digest = self._object_digest(temp_key)
+            if uploaded_digest is not None and uploaded_digest != (sha256, size):
                 raise RuntimeError("临时对象 SHA-256 校验失败")
             if uploaded is None or str(_metadata_value(uploaded, "sha256") or "") != sha256:
                 raise RuntimeError("临时对象 SHA-256 校验失败")
@@ -617,8 +628,8 @@ class AssetUploader:
             self._copy(temp_key, key)
             formal_written = True
             final = self._head(key)
-            final_body = self._read_object(key)
-            if final_body is not None and hashlib.sha256(final_body).hexdigest() != sha256:
+            final_digest = self._object_digest(key)
+            if final_digest is not None and final_digest != (sha256, size):
                 raise RuntimeError("正式对象 SHA-256 校验失败")
             if final is None or str(_metadata_value(final, "sha256") or "") != sha256:
                 raise RuntimeError("正式对象 SHA-256 校验失败")
@@ -631,6 +642,11 @@ class AssetUploader:
                 restore_error = self._restore(key, previous)
                 if restore_error is not None:
                     cleanup_errors.append(restore_error)
+            elif backup_key is not None:
+                try:
+                    self._copy(backup_key, key)
+                except Exception as restore_error:
+                    cleanup_errors.append(restore_error)
             elif formal_written or existing is None:
                 deletion_error = self._delete(key)
                 if deletion_error is not None:
@@ -641,11 +657,19 @@ class AssetUploader:
                 cleanup_errors.append(prune_error)
             if cleanup_errors and hasattr(exc, "add_note"):
                 exc.add_note("附件回滚清理未完全完成")
+            if backup_key is not None:
+                backup_error = self._delete(backup_key)
+                if backup_error is not None and hasattr(exc, "add_note"):
+                    exc.add_note("附件回滚备份清理未完全完成")
             raise
         else:
             temporary_error = self._delete(temp_key)
             if temporary_error is not None:
                 raise RuntimeError("临时对象清理失败") from temporary_error
+            if backup_key is not None:
+                backup_error = self._delete(backup_key)
+                if backup_error is not None:
+                    raise RuntimeError("回滚备份清理失败") from backup_error
         self._prune_versions(key)
         return self._public_result(key, name, size, sha256, resolved_platform, resolved_architecture)
 
@@ -763,6 +787,50 @@ class AssetUploader:
             return body.read()
         return bytes(body) if isinstance(body, (bytes, bytearray)) else None
 
+    def _object_digest(self, key: str) -> tuple[str, int] | None:
+        """以固定块读取对象并计算 SHA-256 与大小。
+
+        Args:
+            key: 对象 key。
+
+        Returns:
+            ``(sha256, size)``；客户端不支持读取时返回 ``None``。
+        """
+        getter = getattr(self.client, "get_object", None)
+        if not callable(getter):
+            return None
+        try:
+            try:
+                result = getter(Bucket=self.bucket, Key=key)
+            except TypeError:
+                result = getter(self.bucket, key)
+        except (KeyError, FileNotFoundError):
+            return None
+        except Exception as exc:
+            if _is_not_found_error(exc):
+                return None
+            raise
+        body = result.get("Body") if isinstance(result, Mapping) else result
+        digest = hashlib.sha256()
+        size = 0
+        try:
+            if isinstance(body, (bytes, bytearray)):
+                for offset in range(0, len(body), CHUNK_SIZE):
+                    chunk = body[offset:offset + CHUNK_SIZE]
+                    digest.update(chunk)
+                    size += len(chunk)
+            elif hasattr(body, "read"):
+                while chunk := body.read(CHUNK_SIZE):
+                    digest.update(chunk)
+                    size += len(chunk)
+            else:
+                return None
+        finally:
+            closer = getattr(body, "close", None)
+            if callable(closer):
+                closer()
+        return digest.hexdigest(), size
+
     def _prune_versions(self, key: str) -> None:
         """调用客户端抽象保留最近三个对象版本。
 
@@ -810,10 +878,6 @@ class AssetUploader:
             identity = (self.bucket, key)
             if identity in objects:
                 return bytes(objects[identity]), dict(metadata.get(identity, {}))
-        body = self._read_object(key)
-        current = self._head(key)
-        if body is not None and current is not None:
-            return body, dict(current)
         return None
 
     def _restore(self, key: str, snapshot: tuple[bytes, dict[str, Any]] | None) -> Exception | None:
