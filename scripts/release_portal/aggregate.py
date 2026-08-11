@@ -51,7 +51,7 @@ def _as_dict(commit: ClassifiedCommit | Mapping[str, Any]) -> dict[str, Any]:
     return dict(commit)
 
 
-def aggregate_commits(product_id: str, commits: Iterable[Any], *, releases: Iterable[Mapping[str, Any]] | None = None, overrides: Iterable[Mapping[str, Any]] = ()) -> list[dict[str, Any]]:
+def aggregate_commits(product_id: str, commits: Iterable[Any], *, releases: Iterable[Mapping[str, Any]] | None = None, overrides: Iterable[Mapping[str, Any]] = (), repository: str | None = None) -> list[dict[str, Any]]:
     """按产品、ISO 周、模块和变更类型生成确定性事件。
 
     Args:
@@ -59,6 +59,7 @@ def aggregate_commits(product_id: str, commits: Iterable[Any], *, releases: Iter
         commits: Commit 对象或映射的迭代器。
         releases: 可选 Release 元数据（用于保留来源，不参与分组）。
         overrides: 显式隐藏、置顶或改类规则。
+        repository: 可选公开仓库名；缺省回退为提交中的仓库或 product_id。
     Returns:
         按事件 ID 排序的公开候选事件列表。
     """
@@ -84,6 +85,7 @@ def aggregate_commits(product_id: str, commits: Iterable[Any], *, releases: Iter
             ),
             None,
         )
+        source_repository = repository or source_repository or product_id
         events.append({
             "id": event_id,
             "productId": product,
@@ -120,11 +122,24 @@ def update_backfill_state(state: dict[str, Any], repository: str, commits: Itera
     """
     batch = [dict(item) for item in commits][:max(1, min(max_batch, MAX_BACKFILL_BATCH))]
     repositories = state.setdefault("repositories", {})
-    current = repositories.setdefault(repository, {"cursor": None, "completed": False, "processed": 0, "watermark": {"sha": None, "publishedAt": None}})
-    if batch:
-        current["cursor"] = str(batch[-1].get("sha") or current.get("cursor") or "") or None
-        current["processed"] = int(current.get("processed") or 0) + len(batch)
-        newest = max(batch, key=lambda item: _parse_datetime(item.get("occurred_at") or item.get("occurredAt") or item.get("published_at") or item.get("publishedAt")))
+    current = repositories.setdefault(repository, {"cursor": None, "completed": False, "processed": 0, "processedShas": [], "watermark": {"sha": None, "publishedAt": None}})
+    processed_shas = list(dict.fromkeys(str(sha) for sha in current.get("processedShas", []) if sha))
+    known = set(processed_shas)
+    new_batch: list[dict[str, Any]] = []
+    for item in batch:
+        sha = str(item.get("sha") or "")
+        if not sha or sha in known:
+            continue
+        known.add(sha)
+        new_batch.append(item)
+        if len(new_batch) >= MAX_BACKFILL_BATCH:
+            break
+    if new_batch:
+        processed_shas.extend(str(item["sha"]) for item in new_batch)
+        current["processedShas"] = processed_shas
+        current["cursor"] = str(new_batch[-1].get("sha") or current.get("cursor") or "") or None
+        current["processed"] = len(processed_shas)
+        newest = max(new_batch, key=lambda item: _parse_datetime(item.get("occurred_at") or item.get("occurredAt") or item.get("published_at") or item.get("publishedAt")))
         current["watermark"] = {"sha": str(newest.get("sha") or "") or None, "publishedAt": newest.get("published_at") or newest.get("publishedAt") or newest.get("occurred_at") or newest.get("occurredAt")}
     current["completed"] = bool(completed)
     return state

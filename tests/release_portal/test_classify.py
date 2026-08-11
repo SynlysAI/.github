@@ -35,6 +35,14 @@ def test_overrides_can_restore_hide_change_type_and_pin():
     assert changed.change_type == "algorithm" and changed.module == "core" and changed.pinned is True
 
 
+def test_override_can_restore_non_conventional_merge_message():
+    restored = classify_commit(
+        {"sha": "merge", "message": "Merge pull request #1 from branch"},
+        overrides=[{"sha": "merge", "restore": True, "changeType": "feature"}],
+    )
+    assert restored is not None and restored.change_type == "feature"
+
+
 def test_classify_commits_is_sorted_and_deduplicated():
     values = classify_commits([
         {"sha": "b", "message": "feat: b", "occurred_at": "2026-01-02T00:00:00Z"},

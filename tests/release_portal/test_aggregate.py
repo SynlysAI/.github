@@ -1,5 +1,10 @@
 """Commit 聚合与回填状态测试。"""
 
+import json
+from pathlib import Path
+
+from jsonschema import validate
+
 from scripts.release_portal.aggregate import aggregate_commits, update_backfill_state
 
 
@@ -34,3 +39,25 @@ def test_pinned_override_is_propagated_and_backfill_checkpoint_is_resumable():
     assert state["repositories"]["repo"]["cursor"] == "a"
     update_backfill_state(state, "repo", [], completed=True)
     assert state["repositories"]["repo"]["completed"] is True
+
+
+def test_source_repository_is_non_empty_and_can_be_overridden():
+    event = aggregate_commits("spec-agent", [_commit("a", "2026-01-05T00:00:00Z", "r1")])[0]
+    assert event["source"]["repository"] == "spec-agent"
+    event = aggregate_commits("spec-agent", [_commit("a", "2026-01-05T00:00:00Z", "r1")], repository="SynlysAI/Spec_Agent")[0]
+    assert event["source"]["repository"] == "SynlysAI/Spec_Agent"
+
+
+def test_timeline_event_source_passes_schema_with_fallback_repository():
+    event = aggregate_commits("spec-agent", [_commit("abcdef1234567890", "2026-01-05T00:00:00Z", "r1")])[0]
+    schema = json.loads((Path(__file__).parents[2] / "release-portal" / "schemas" / "timeline.schema.json").read_text(encoding="utf-8"))
+    validate({"schemaVersion": 1, "events": [{**event, "productId": "spec-agent"}]}, schema)
+
+
+def test_backfill_checkpoint_is_idempotent_for_repeated_shas():
+    state = {"schemaVersion": 1, "repositories": {}}
+    batch = [{"sha": "a", "occurred_at": "2026-01-05T00:00:00Z"}, {"sha": "a", "occurred_at": "2026-01-05T00:00:00Z"}, {"sha": "b", "occurred_at": "2026-01-06T00:00:00Z"}]
+    update_backfill_state(state, "repo", batch)
+    update_backfill_state(state, "repo", batch)
+    assert state["repositories"]["repo"]["processed"] == 2
+    assert state["repositories"]["repo"]["processedShas"] == ["a", "b"]

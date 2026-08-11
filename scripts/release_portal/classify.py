@@ -135,11 +135,15 @@ def classify_commit(commit: Any, *, product_id: str | None = None, overrides: It
         replacement = override["replaceText"]
         message = str(replacement.get("en") if isinstance(replacement, Mapping) else replacement)
     match = _CONVENTIONAL.match(message)
-    if not match:
-        return None
-    kind, scope, subject = match.group("kind").casefold(), match.group("scope"), match.group("subject").strip()
     # hide: false、restore/show 或显式改类都表示人工恢复该候选。
     restored = bool(override.get("restore") or override.get("show") or override.get("hide") is False or override.get("changeType"))
+    if not match:
+        # 非 Conventional 标题只有人工明确改类/恢复时才允许进入候选。
+        if not restored or not override.get("changeType"):
+            return None
+        kind, scope, subject = "", None, message
+    else:
+        kind, scope, subject = match.group("kind").casefold(), match.group("scope"), match.group("subject").strip()
     if not restored and _is_noise(kind, subject, message, value):
         return None
     change_type = str(override.get("changeType") or "").strip() or TYPE_MAP.get(kind, "")
