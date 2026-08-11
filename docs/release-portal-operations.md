@@ -67,17 +67,22 @@ python -m scripts.release_portal.cli publish --validate-only
 python -m scripts.release_portal.cli publish --bucket "$R2_BUCKET"
 ```
 
-发布先上传五个集合和 `meta.json`，最后更新 `portal/v1/manifest.json`。若中途失败，根 manifest 仍指向上一份完整快照。R2 启用对象版本控制并保留最近三个版本；需要回滚时先查看版本，再把已知正常版本复制回同一对象：
+发布先上传五个集合和 `meta.json`，最后更新 `portal/v1/manifest.json`。若中途失败，根 manifest 仍指向上一份完整快照。
+
+资源上传器不调用 Cloudflare R2 的原生 `list-object-versions`/`VersionId` API。生产 Boto3 R2 适配器和本地 Filesystem 适配器都使用应用层私有前缀 `.release-portal-history/`：正式对象之外保留最近两份历史副本，因此当前对象加两份历史共三份可恢复版本；测试内存适配器则模拟原生版本列表。历史前缀不会出现在公开 `downloadPath` 或 manifest 中。
+
+需要回滚资源时，先列出指定 key 的私有历史对象，再把选定副本复制回正式 key。以下命令使用 R2 支持的 S3 兼容 `ls/cp`，不会调用 R2 不支持的版本 API：
 
 ```bash
 export R2_ENDPOINT="https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com"
-aws s3api list-object-versions --bucket "$R2_BUCKET" --prefix portal/v1/manifest.json --endpoint-url "$R2_ENDPOINT"
-aws s3api copy-object --bucket "$R2_BUCKET" \
-  --copy-source "$R2_BUCKET/portal/v1/manifest.json?versionId=$KNOWN_GOOD_VERSION" \
-  --key portal/v1/manifest.json --endpoint-url "$R2_ENDPOINT"
+export ASSET_KEY="assets/smartaccess/v1.0.0/SmartAccess-linux-amd64.tar.gz"
+aws s3 ls "s3://$R2_BUCKET/.release-portal-history/$ASSET_KEY/" --endpoint-url "$R2_ENDPOINT"
+aws s3 cp \
+  "s3://$R2_BUCKET/.release-portal-history/$ASSET_KEY/$HISTORY_OBJECT" \
+  "s3://$R2_BUCKET/$ASSET_KEY" --endpoint-url "$R2_ENDPOINT"
 ```
 
-安装包对象不删除；若某个版本有问题，只从公开 `releases.json` 下架对应记录，并保留 R2 对象以便审计。
+若需回滚公开快照，则从已知正常的 `portal/v1/generations/<runId>/` 复制五个集合和 `meta.json`，最后复制该 generation 的 `manifest.json` 到 `portal/v1/manifest.json`；不要删除旧 generation。安装包对象不删除；若某个版本有问题，只从公开 `releases.json` 下架对应记录，并保留 R2 对象以便审计。
 
 ## AI 失败处理
 
