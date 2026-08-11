@@ -61,7 +61,7 @@ class Product:
         """
         if not isinstance(value, dict):
             raise ValueError("产品配置必须是映射")
-        required = {"productId", "repository", "entryType", "webUrl", "name", "tagline", "category", "defaultBranch", "aiPolicy"}
+        required = {"productId", "repository", "entryType", "webUrl", "name", "tagline", "category", "logo", "defaultBranch", "aiPolicy"}
         missing = required - set(value)
         if missing:
             raise ValueError(f"产品缺少必填字段: {', '.join(sorted(missing))}")

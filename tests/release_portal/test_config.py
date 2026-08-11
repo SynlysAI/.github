@@ -91,6 +91,17 @@ def test_missing_catalog_or_product_required_fields_are_rejected() -> None:
         invalid["products"][0].pop(key)
         with pytest.raises(ValueError):
             validate_catalog(invalid)
+    invalid = yaml.safe_load(Path("release-portal/catalog.yml").read_text(encoding="utf-8"))
+    invalid["products"][0].pop("logo")
+    with pytest.raises(ValueError):
+        validate_catalog(invalid)
+
+
+def test_invalid_catalog_roots_raise_value_error() -> None:
+    """非法根节点和 products 类型统一抛出 ValueError。"""
+    for value in (None, 1, [], {"schemaVersion": 1, "products": None}):
+        with pytest.raises(ValueError):
+            validate_catalog(value)
 
 
 def test_logo_null_uses_fallback() -> None:

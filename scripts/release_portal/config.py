@@ -47,7 +47,14 @@ def load_yaml(path: str | Path) -> dict[str, Any]:
 
 
 def load_catalog(path: str | Path = CATALOG_PATH) -> Catalog:
-    """加载产品注册表并返回类型化模型。"""
+    """加载产品注册表并返回类型化模型。
+
+    Args:
+        path: catalog.yml 文件路径。
+
+    Returns:
+        类型化的产品注册表。
+    """
     catalog = Catalog.from_mapping(load_yaml(path))
     validate_catalog(catalog)
     return catalog
@@ -69,6 +76,8 @@ def validate_catalog(catalog: Catalog | dict[str, Any] | str | Path) -> None:
     elif isinstance(catalog, dict):
         _validate_unknown_keys(catalog, CATALOG_KEYS, "catalog")
         catalog = Catalog.from_mapping(catalog)
+    elif not isinstance(catalog, Catalog):
+        raise ValueError("catalog 必须是 Catalog、映射或文件路径")
     products = catalog.products
     if catalog.schema_version != 1:
         raise ValueError("仅支持 schemaVersion: 1")
@@ -112,12 +121,22 @@ def _validate_unknown_keys(value: dict[str, Any], allowed: set[str], context: st
     if unknown:
         raise ValueError(f"{context} 包含未知字段: {', '.join(sorted(unknown))}")
     if context == "catalog":
-        for index, product in enumerate(value.get("products", [])):
+        products = value.get("products")
+        if not isinstance(products, list):
+            raise ValueError("products 必须是列表")
+        for index, product in enumerate(products):
             if not isinstance(product, dict):
                 raise ValueError(f"products[{index}] 必须是映射")
             _validate_unknown_keys(product, PRODUCT_KEYS, f"products[{index}]")
 
 
 def effective_logo(product: Product) -> dict[str, str]:
-    """返回可公开展示的 Logo 信息，缺少产品 Logo 时使用品牌图标和英文名。"""
+    """返回可公开展示的 Logo 信息，缺少产品 Logo 时使用品牌图标和英文名。
+
+    Args:
+        product: 产品模型。
+
+    Returns:
+        包含 Logo 路径和英文替代文本的映射。
+    """
     return {"src": product.logo or "logo.png", "alt": product.name["en"]}
