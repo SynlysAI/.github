@@ -35,6 +35,11 @@ class FakeSession:
         return value
 
 
+class FalseySession(FakeSession):
+    def __bool__(self):
+        return False
+
+
 def fixture(name):
     return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
 
@@ -132,3 +137,29 @@ def test_commit_author_date_falls_back_to_committer_date():
         "commit": {"message": "fix: x", "author": {"date": None}, "committer": {"date": "2026-02-01T00:00:00Z"}},
     })
     assert commit.occurred_at == "2026-02-01T00:00:00Z"
+
+
+def test_external_pagination_link_is_rejected_without_second_request():
+    session = FakeSession([FakeResponse(payload=[], headers={"Link": '<https://evil.example/next>; rel="next"'})])
+    client = GitHubClient(token="secret-token", session=session, api_root="https://api.test", sleep=lambda _: None)
+    with pytest.raises(GitHubError) as error:
+        client.list_releases("SynlysAI/AI4MS")
+    assert error.value.status is None and "secret-token" not in str(error.value)
+    assert len(session.calls) == 1
+
+
+def test_empty_commit_message_normalizes_to_empty_and_falsey_session_is_kept():
+    session = FalseySession([FakeResponse(payload=[])])
+    client = GitHubClient(session=session, api_root="https://api.test", sleep=lambda _: None)
+    assert client.session is session
+    assert GitHubClient.normalize_commit({"sha": "c" * 40, "commit": {"message": ""}}).message == ""
+
+
+def test_error_body_redacts_token():
+    token = "secret-token"
+    response = FakeResponse(status=404, payload={}, text=f"authorization={token}")
+    client = GitHubClient(token=token, session=FakeSession([response]), api_root="https://api.test", sleep=lambda _: None)
+    with pytest.raises(GitHubError) as error:
+        client.list_releases("SynlysAI/AI4MS")
+    assert token not in str(error.value)
+    assert token not in str(error.value.to_dict())

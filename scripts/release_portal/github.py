@@ -8,6 +8,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from typing import Any, Callable, Iterable
+from urllib.parse import urlparse
 
 import requests
 
@@ -131,7 +132,7 @@ class GitHubClient:
             sleep: 退避等待函数。
         """
         self.token = token
-        self.session = session or requests.Session()
+        self.session = session if session is not None else requests.Session()
         self.api_root = api_root.rstrip("/")
         self.timeout = timeout
         self.max_retries = max_retries
@@ -145,6 +146,34 @@ class GitHubClient:
             headers["Authorization"] = f"Bearer {self.token}"
         return headers
 
+    def _safe_body(self, body: Any) -> str:
+        """脱敏异常正文中的当前访问令牌。
+
+        Args:
+            body: 原始响应正文。
+        Returns:
+            截断并脱敏后的正文。
+        """
+        value = str(body or "")[:1000]
+        return value.replace(self.token, "[REDACTED]") if self.token else value
+
+    def _validate_url(self, url: str, path: str) -> str:
+        """确保分页 URL 与 API 根地址同源。
+
+        Args:
+            url: 待访问 URL。
+            path: 原始 API 路径。
+        Returns:
+            通过校验的 URL。
+        Raises:
+            GitHubError: URL 指向外部主机。
+        """
+        root = urlparse(self.api_root)
+        target = urlparse(url)
+        if target.scheme != root.scheme or target.netloc != root.netloc:
+            raise GitHubError("GitHub 分页 URL 不在 API 同源范围内", method="GET", path=path, body=self._safe_body(url))
+        return url
+
     def _request(self, path: str) -> requests.Response:
         """请求 JSON 接口并处理限流及服务端暂时性错误。
 
@@ -156,12 +185,13 @@ class GitHubClient:
             GitHubError: 请求失败且无法恢复时抛出。
         """
         url = path if path.startswith("http") else f"{self.api_root}{path}"
+        self._validate_url(url, path)
         for attempt in range(self.max_retries + 1):
             try:
                 response = self.session.get(url, headers=self._headers(), timeout=self.timeout)
             except requests.RequestException as exc:
                 if attempt >= self.max_retries:
-                    raise GitHubError("GitHub 网络请求失败", method="GET", path=path, body=str(exc), retryable=True) from exc
+                    raise GitHubError("GitHub 网络请求失败", method="GET", path=path, body=self._safe_body(exc), retryable=True) from exc
                 self.sleep(self.backoff_factor * (2 ** attempt))
                 continue
             status = int(response.status_code)
@@ -171,8 +201,8 @@ class GitHubClient:
             if retryable and attempt < self.max_retries:
                 self.sleep(self._retry_delay(response, attempt))
                 continue
-            body = getattr(response, "text", "")
-            raise GitHubError(f"GitHub API 请求失败: HTTP {status}", status=status, method="GET", path=path, body=body[:1000], retryable=retryable)
+            body = self._safe_body(getattr(response, "text", ""))
+            raise GitHubError(f"GitHub API 请求失败: HTTP {status}", status=status, method="GET", path=path, body=body, retryable=retryable)
         raise AssertionError("unreachable")
 
     def _retry_delay(self, response: requests.Response, attempt: int) -> float:
@@ -201,7 +231,7 @@ class GitHubClient:
         try:
             return response.json()
         except (ValueError, TypeError) as exc:
-            raise GitHubError("GitHub 返回了无效 JSON", status=response.status_code, method="GET", path=path, body=getattr(response, "text", "")) from exc
+            raise GitHubError("GitHub 返回了无效 JSON", status=response.status_code, method="GET", path=path, body=self._safe_body(getattr(response, "text", ""))) from exc
 
     @staticmethod
     def _next_link(value: str | None) -> str | None:
@@ -224,15 +254,16 @@ class GitHubClient:
             try:
                 payload = response.json()
             except (ValueError, TypeError) as exc:
-                raise GitHubError("GitHub page returned invalid JSON", status=response.status_code, method="GET", path=next_path, body=getattr(response, "text", "")) from exc
+                raise GitHubError("GitHub page returned invalid JSON", status=response.status_code, method="GET", path=next_path, body=self._safe_body(getattr(response, "text", ""))) from exc
             if not isinstance(payload, list):
-                raise GitHubError("GitHub page response must be an array", status=response.status_code, method="GET", path=next_path, body=getattr(response, "text", ""))
-                raise GitHubError("GitHub 分页响应必须是数组", status=response.status_code, method="GET", path=next_path)
+                raise GitHubError("GitHub page response must be an array", status=response.status_code, method="GET", path=next_path, body=self._safe_body(getattr(response, "text", "")))
             for index, item in enumerate(payload):
                 if not isinstance(item, dict):
-                    raise GitHubError(f"GitHub page item must be an object: index={index}", status=response.status_code, method="GET", path=next_path, body=getattr(response, "text", ""))
+                    raise GitHubError(f"GitHub page item must be an object: index={index}", status=response.status_code, method="GET", path=next_path, body=self._safe_body(getattr(response, "text", "")))
                 result.append(item)
             next_path = self._next_link(response.headers.get("Link") or response.headers.get("link"))
+            if next_path:
+                next_path = self._validate_url(next_path, path)
         return result
 
     @staticmethod
@@ -302,24 +333,119 @@ class GitHubClient:
     def normalize_commit(item: dict[str, Any], pull_requests: Iterable[PullRequest] = ()) -> Commit:
         """归一化 GitHub Commit 响应。"""
         details = item.get("commit") or {}
-        message = str(details.get("message") or item.get("message") or "").splitlines()[0]
+        message = str(details.get("message") or item.get("message") or "")
+        message = message.splitlines()[0] if message.splitlines() else ""
         author = details.get("author") or {}
         occurred_at = author.get("date") or (details.get("committer") or {}).get("date")
         return Commit(sha=str(item.get("sha") or ""), occurred_at=occurred_at, message=message, pull_requests=tuple(pull_requests))
 
 
-_DOC_ARGS = "\nArgs:\n    参数: 调用方输入。\nReturns:\n    归一化结果。"
-for _function in (
-    GitHubError.__init__, _asset_target, GitHubClient.__init__, GitHubClient._headers,
-    GitHubClient._retry_delay, GitHubClient._json, GitHubClient._next_link,
-    GitHubClient._paginate, GitHubClient._check_repository,
-    GitHubClient.list_commit_pull_requests, GitHubClient.collect_catalog,
-    GitHubClient.normalize_release, GitHubClient.normalize_commit,
-):
-    if not _function.__doc__:
-        _function.__doc__ = _DOC_ARGS
-    elif "Args:" not in _function.__doc__ or "Returns:" not in _function.__doc__:
-        _function.__doc__ += _DOC_ARGS
+GitHubError.__init__.__doc__ = """初始化结构化异常。
 
+Args:
+    message: 错误说明。
+    status: HTTP 状态码。
+    method: HTTP 方法。
+    path: 请求路径。
+    body: 脱敏后的响应正文。
+    retryable: 是否可重试。
+Returns:
+    无。
+"""
+_asset_target.__doc__ = """从附件名称推断平台和架构。
+
+Args:
+    name: 附件名称。
+Returns:
+    平台和架构二元组。
+"""
+GitHubClient.__init__.__doc__ = """初始化客户端。
+
+Args:
+    token: 只读安装令牌。
+    session: requests 兼容会话。
+    api_root: API 根地址。
+    timeout: 请求超时秒数。
+    max_retries: 最大重试次数。
+    backoff_factor: 退避基数。
+    sleep: 等待函数。
+Returns:
+    无。
+"""
+GitHubClient._headers.__doc__ = """构造请求头。
+
+Args:
+    无。
+Returns:
+    请求头映射。
+"""
+GitHubClient._retry_delay.__doc__ = """计算重试等待时间。
+
+Args:
+    response: HTTP 响应。
+    attempt: 重试序号。
+Returns:
+    等待秒数。
+"""
+GitHubClient._json.__doc__ = """请求并解析 JSON。
+
+Args:
+    path: API 路径。
+Returns:
+    JSON 值。
+"""
+GitHubClient._next_link.__doc__ = """解析分页 Link。
+
+Args:
+    value: Link 响应头。
+Returns:
+    下一页 URL 或 None。
+"""
+GitHubClient._paginate.__doc__ = """读取并校验全部分页。
+
+Args:
+    path: 首页 API 路径。
+Returns:
+    对象列表。
+"""
+GitHubClient._check_repository.__doc__ = """检查仓库是否在 allowlist。
+
+Args:
+    repository: owner/name 仓库名。
+    catalog: 产品注册表。
+Returns:
+    对应产品。
+"""
+GitHubClient.list_commit_pull_requests.__doc__ = """读取提交关联 PR。
+
+Args:
+    repository: owner/name 仓库名。
+    sha: 提交 SHA。
+    catalog: 产品注册表。
+Returns:
+    PR 列表。
+"""
+GitHubClient.collect_catalog.__doc__ = """采集 catalog 六仓库。
+
+Args:
+    catalog: 产品注册表。
+Returns:
+    按产品分组的数据。
+"""
+GitHubClient.normalize_release.__doc__ = """归一化 Release。
+
+Args:
+    item: GitHub JSON 对象。
+Returns:
+    Release 数据类。
+"""
+GitHubClient.normalize_commit.__doc__ = """归一化 Commit。
+
+Args:
+    item: GitHub JSON 对象。
+    pull_requests: 关联 PR。
+Returns:
+    Commit 数据类。
+"""
 
 __all__ = ["GitHubClient", "GitHubError", "Release", "ReleaseAsset", "Commit", "PullRequest"]
