@@ -27,6 +27,22 @@
       }
     }
   },
+  "allOf": [
+    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "ai4ms"}}}}}}, "then": {}},
+    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "spec-agent"}}}}}}, "then": {}},
+    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "poly-agent"}}}}}}, "then": {}},
+    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "speclabos"}}}}}}, "then": {}},
+    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "ragportal"}}}}}}, "then": {}},
+    {"if": {"properties": {"products": {"contains": {"properties": {"productId": {"const": "smartaccess"}}}}}}, "then": {}},
+    {"properties": {"products": {"items": {"oneOf": [
+      {"properties": {"productId": {"const": "ai4ms"}, "repository": {"const": "SynlysAI/AI4MS"}, "entryType": {"const": "web"}, "webUrl": {"const": "https://ai4ms.xmuzc.com/"}}},
+      {"properties": {"productId": {"const": "spec-agent"}, "repository": {"const": "SynlysAI/Spec_Agent"}, "entryType": {"const": "web"}, "webUrl": {"const": "https://specagent.xmuzc.com/"}}},
+      {"properties": {"productId": {"const": "poly-agent"}, "repository": {"const": "SynlysAI/Poly_Agent"}, "entryType": {"const": "web"}, "webUrl": {"const": "https://specpoly.xmuzc.com/"}}},
+      {"properties": {"productId": {"const": "speclabos"}, "repository": {"const": "SynlysAI/SpecLabOS"}, "entryType": {"const": "web"}, "webUrl": {"const": "https://speclabos.xmuzc.com/"}}},
+      {"properties": {"productId": {"const": "ragportal"}, "repository": {"const": "SynlysAI/RAGPortal"}, "entryType": {"const": "web"}, "webUrl": {"const": "https://rag.xmuzc.com/"}}},
+      {"properties": {"productId": {"const": "smartaccess"}, "repository": {"const": "SynlysAI/SmartAccess"}, "entryType": {"const": "download"}, "webUrl": {"const": null}}}
+    ]}}}}
+  ],
   "$defs": {
     "bilingual": {
       "type": "object",

@@ -12,6 +12,19 @@ from .models import Catalog, Product
 
 ROOT = Path(__file__).resolve().parents[2]
 CATALOG_PATH = ROOT / "release-portal" / "catalog.yml"
+EXPECTED_PRODUCTS = {
+    "ai4ms": ("SynlysAI/AI4MS", "web", "https://ai4ms.xmuzc.com/"),
+    "spec-agent": ("SynlysAI/Spec_Agent", "web", "https://specagent.xmuzc.com/"),
+    "poly-agent": ("SynlysAI/Poly_Agent", "web", "https://specpoly.xmuzc.com/"),
+    "speclabos": ("SynlysAI/SpecLabOS", "web", "https://speclabos.xmuzc.com/"),
+    "ragportal": ("SynlysAI/RAGPortal", "web", "https://rag.xmuzc.com/"),
+    "smartaccess": ("SynlysAI/SmartAccess", "download", None),
+}
+CATALOG_KEYS = {"schemaVersion", "products"}
+PRODUCT_KEYS = {
+    "productId", "repository", "entryType", "webUrl", "name", "tagline",
+    "category", "logo", "defaultBranch", "aiPolicy",
+}
 
 
 def load_yaml(path: str | Path) -> dict[str, Any]:
@@ -50,21 +63,27 @@ def validate_catalog(catalog: Catalog | dict[str, Any] | str | Path) -> None:
         ValueError: 注册表违反契约时抛出。
     """
     if isinstance(catalog, (str, Path)):
-        catalog = Catalog.from_mapping(load_yaml(catalog))
+        raw = load_yaml(catalog)
+        _validate_unknown_keys(raw, CATALOG_KEYS, "catalog")
+        catalog = Catalog.from_mapping(raw)
     elif isinstance(catalog, dict):
+        _validate_unknown_keys(catalog, CATALOG_KEYS, "catalog")
         catalog = Catalog.from_mapping(catalog)
     products = catalog.products
     if catalog.schema_version != 1:
         raise ValueError("仅支持 schemaVersion: 1")
-    if len(products) != 6:
+    if len(products) != len(EXPECTED_PRODUCTS):
         raise ValueError(f"产品数量必须为 6，实际为 {len(products)}")
     product_ids = [product.product_id for product in products]
-    if len(set(product_ids)) != len(product_ids):
+    if set(product_ids) != set(EXPECTED_PRODUCTS) or len(set(product_ids)) != len(product_ids):
         raise ValueError("productId 必须唯一")
     repositories = [product.repository for product in products]
     if len(set(repositories)) != len(repositories):
         raise ValueError("repository 必须唯一")
     for product in products:
+        expected = EXPECTED_PRODUCTS.get(product.product_id)
+        if expected is None or (product.repository, product.entry_type, product.web_url) != expected:
+            raise ValueError(f"产品入口映射不符合固定 allowlist: {product.product_id}")
         if not product.product_id or not product.repository:
             raise ValueError("productId 和 repository 不能为空")
         if product.entry_type not in {"web", "download"}:
@@ -79,8 +98,24 @@ def validate_catalog(catalog: Catalog | dict[str, Any] | str | Path) -> None:
             raise ValueError("SmartAccess 仅允许下载入口")
         if product.ai_policy != "metadata-only":
             raise ValueError(f"aiPolicy 必须为 metadata-only: {product.product_id}")
-        if not product.name.get("en"):
-            raise ValueError(f"产品必须提供英文名: {product.product_id}")
+        if set(product.name) != {"zh", "en"} or not product.name.get("zh") or not product.name.get("en"):
+            raise ValueError(f"产品必须提供双语 name: {product.product_id}")
+        if set(product.tagline) != {"zh", "en"} or not product.tagline.get("zh") or not product.tagline.get("en"):
+            raise ValueError(f"产品必须提供双语 tagline: {product.product_id}")
+        if not product.category or not product.logo or not product.default_branch:
+            raise ValueError(f"产品必填字段缺失: {product.product_id}")
+
+
+def _validate_unknown_keys(value: dict[str, Any], allowed: set[str], context: str) -> None:
+    """拒绝配置中的未声明字段，避免内部数据进入公开契约。"""
+    unknown = set(value) - allowed
+    if unknown:
+        raise ValueError(f"{context} 包含未知字段: {', '.join(sorted(unknown))}")
+    if context == "catalog":
+        for index, product in enumerate(value.get("products", [])):
+            if not isinstance(product, dict):
+                raise ValueError(f"products[{index}] 必须是映射")
+            _validate_unknown_keys(product, PRODUCT_KEYS, f"products[{index}]")
 
 
 def effective_logo(product: Product) -> dict[str, str]:

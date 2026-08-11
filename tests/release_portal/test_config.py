@@ -1,5 +1,6 @@
 """Release Portal 产品注册表配置测试。"""
 
+import json
 from pathlib import Path
 
 import pytest
@@ -34,6 +35,45 @@ def test_catalog_rejects_duplicate_product_ids() -> None:
     duplicate[-1] = duplicate[0]
     with pytest.raises(ValueError, match="productId"):
         validate_catalog(Catalog(schema_version=1, products=tuple(duplicate)))
+
+
+def test_catalog_allowlist_is_fixed() -> None:
+    """产品入口必须匹配计划中的固定 allowlist。"""
+    catalog = load_catalog()
+    assert {
+        (p.product_id, p.repository, p.entry_type, p.web_url) for p in catalog.products
+    } == {
+        ("ai4ms", "SynlysAI/AI4MS", "web", "https://ai4ms.xmuzc.com/"),
+        ("spec-agent", "SynlysAI/Spec_Agent", "web", "https://specagent.xmuzc.com/"),
+        ("poly-agent", "SynlysAI/Poly_Agent", "web", "https://specpoly.xmuzc.com/"),
+        ("speclabos", "SynlysAI/SpecLabOS", "web", "https://speclabos.xmuzc.com/"),
+        ("ragportal", "SynlysAI/RAGPortal", "web", "https://rag.xmuzc.com/"),
+        ("smartaccess", "SynlysAI/SmartAccess", "download", None),
+    }
+
+
+def test_catalog_rejects_invalid_entry_and_required_fields() -> None:
+    """错误入口、URL 和双语必填字段必须失败。"""
+    raw = {"schemaVersion": 1, "products": [p.__dict__ for p in load_catalog().products]}
+    raw["products"][-1]["web_url"] = "https://wrong.example/"
+    with pytest.raises(ValueError):
+        validate_catalog(raw)
+
+    raw = {"schemaVersion": 1, "products": [p.__dict__ for p in load_catalog().products]}
+    raw["products"][0]["name"] = {"en": "AI4MS"}
+    with pytest.raises(ValueError):
+        validate_catalog(raw)
+
+
+def test_schemas_are_closed_and_timeline_uses_short_sha() -> None:
+    """公开 Schema 关闭未知字段，时间线只允许七位短 SHA。"""
+    schema_dir = Path("release-portal/schemas")
+    for path in schema_dir.glob("*.schema.json"):
+        schema = json.loads(path.read_text(encoding="utf-8-sig"))
+        assert schema["additionalProperties"] is False
+    timeline = json.loads((schema_dir / "timeline.schema.json").read_text(encoding="utf-8-sig"))
+    pattern = timeline["$defs"]["source"]["properties"]["commitShas"]["items"]["pattern"]
+    assert pattern == "^[0-9a-f]{7}$"
 
 
 def test_missing_logo_uses_brand_icon_and_english_name() -> None:

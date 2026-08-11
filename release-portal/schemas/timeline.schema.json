@@ -31,6 +31,6 @@
   },
   "$defs": {
     "bilingual": {"type": "object", "additionalProperties": false, "required": ["zh", "en"], "properties": {"zh": {"type": "string"}, "en": {"type": "string"}}},
-    "source": {"type": "object", "additionalProperties": false, "required": ["repository", "commitShas", "releaseUrl"], "properties": {"repository": {"type": "string"}, "commitShas": {"type": "array", "items": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"}}, "releaseUrl": {"type": ["string", "null"], "format": "uri"}}}
+    "source": {"type": "object", "additionalProperties": false, "required": ["repository", "commitShas", "releaseUrl"], "properties": {"repository": {"type": "string"}, "commitShas": {"type": "array", "items": {"type": "string", "pattern": "^[0-9a-f]{7}$"}}, "releaseUrl": {"type": ["string", "null"], "format": "uri"}}}
   }
 }

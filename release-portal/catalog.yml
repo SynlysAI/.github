@@ -35,7 +35,7 @@ products:
     entryType: web
     webUrl: https://speclabos.xmuzc.com/
     name: {zh: 光谱实验室操作系统, en: SpecLabOS}
-    tagline: {zh: 连接仪器、数据与工作流的实验室系统, en: Lab system connecting instruments, data, and workflows}
+    tagline: {zh: 连接仪器、数据与工作流的实验室系统, en: "Lab system connecting instruments, data, and workflows"}
     category: laboratory-platform
     logo: logo.png
     defaultBranch: main
