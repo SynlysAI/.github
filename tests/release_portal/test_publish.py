@@ -1,6 +1,7 @@
 """Release Portal 候选审核和公开发布测试。"""
 
 import json
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -72,6 +73,17 @@ def test_sanitization_keeps_public_metadata_only():
     assert "reviewReason" not in public
 
 
+def test_sanitization_rejects_unknown_repository_and_private_release_url():
+    event = _event("internal")
+    event["source"]["repository"] = "Internal/Secret"
+    with pytest.raises(ValueError, match="来源仓库"):
+        sanitize_public_event(event)
+    event = _event("private-url")
+    event["source"]["releaseUrl"] = "https://github.com/SynlysAI/Other/releases/tag/v1"
+    public = sanitize_public_event(event)
+    assert public["source"]["releaseUrl"] is None
+
+
 def test_sensitive_pattern_is_rejected():
     event = _event("secret")
     event["summary"]["en"] = "token ghp_abcdefghijklmnopqrstuvwxyz"
@@ -114,7 +126,35 @@ def test_meta_and_manifest_hashes_are_deterministic(tmp_path: Path):
     manifest = build_manifest(collections, generated_at="2026-08-10T00:00:00Z")
     assert manifest["collections"]["meta"]["sha256"]
     write_publication_snapshot(collections, tmp_path)
-    assert json.loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))["schemaVersion"] == 1
+    manifest = json.loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["schemaVersion"] == 1
+    for name, entry in manifest["collections"].items():
+        content = (tmp_path / entry["path"]).read_bytes()
+        assert len(content) == entry["bytes"]
+        assert hashlib.sha256(content).hexdigest() == entry["sha256"]
+
+
+def test_meta_requires_strict_fields_and_collection_hashes():
+    with pytest.raises(ValueError, match="meta"):
+        validate_public_collections({"meta": {}}, require_all=False)
+
+
+def test_products_bilingual_fields_cannot_be_empty():
+    products = {"schemaVersion": 1, "products": [{
+        "productId": product.product_id,
+        "repository": product.repository,
+        "entryType": product.entry_type,
+        "webUrl": product.web_url,
+        "name": product.name,
+        "tagline": product.tagline,
+        "category": product.category,
+        "logo": product.logo,
+        "defaultBranch": product.default_branch,
+        "aiPolicy": product.ai_policy,
+    } for product in load_catalog().products]}
+    products["products"][0]["name"]["en"] = ""
+    with pytest.raises(ValueError, match="双语"):
+        validate_public_collections({"products": products}, require_all=False)
 
 
 def test_summary_does_not_echo_private_body():

@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 import yaml
 from jsonschema import Draft202012Validator, FormatChecker
 
-from .config import CATALOG_PATH, load_catalog
+from .config import EXPECTED_PRODUCTS, load_catalog
 
 ROOT = Path(__file__).resolve().parents[2]
 PORTAL_ROOT = ROOT / "release-portal"
@@ -57,7 +57,7 @@ def _canonical_bytes(value: Any) -> bytes:
     Returns:
         排序键且无多余空白的 UTF-8 字节序列。
     """
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode("utf-8")
 
 
 def _sha256(value: Any) -> str:
@@ -272,14 +272,20 @@ def sanitize_public_event(event: Mapping[str, Any]) -> dict[str, Any]:
     public = {key: copy.deepcopy(event[key]) for key in PUBLIC_EVENT_FIELDS if key in event}
     source = dict(public.get("source") or {})
     public_source: dict[str, Any] = {}
-    if source.get("repository"):
-        public_source["repository"] = str(source["repository"])
-    shas = [_short_sha(value) for value in source.get("commitShas") or source.get("sha") or []]
+    repository = str(source.get("repository") or "")
+    if repository not in {value[0] for value in EXPECTED_PRODUCTS.values()}:
+        raise ValueError("敏感或未知来源仓库不能公开")
+    public_source["repository"] = repository
+    raw_shas = source.get("commitShas") or source.get("sha") or source.get("commitSha") or []
+    if isinstance(raw_shas, str):
+        raw_shas = [raw_shas]
+    shas = [_short_sha(value) for value in raw_shas]
     public_source["commitShas"] = [value for value in shas if value]
     release_url = source.get("releaseUrl")
     if isinstance(release_url, str):
         parsed = urlparse(release_url)
-        if parsed.scheme == "https" and parsed.netloc.casefold() in {"github.com", "www.github.com"} and "/releases" in parsed.path:
+        expected_prefix = f"/{repository}/releases"
+        if parsed.scheme == "https" and parsed.netloc.casefold() in {"github.com", "www.github.com"} and parsed.path.casefold().startswith(expected_prefix.casefold()):
             public_source["releaseUrl"] = release_url
         else:
             public_source["releaseUrl"] = None
@@ -357,6 +363,8 @@ def validate_public_collections(collections: Mapping[str, Mapping[str, Any]], *,
         errors = sorted(Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(collections[name]), key=lambda error: list(error.path))
         if errors:
             raise ValueError(f"Schema 校验失败 ({name}): {errors[0].message}")
+    if "meta" in collections:
+        _validate_meta(collections["meta"])
     for name, collection in collections.items():
         _scan_sensitive(collection)
         items = collection.get("products" if name == "products" else "releases" if name == "releases" else "events" if name == "timeline" else "faqs" if name == "faqs" else "")
@@ -366,8 +374,9 @@ def validate_public_collections(collections: Mapping[str, Mapping[str, Any]], *,
         if len(ids) != len(set(ids)):
             raise ValueError(f"{name} 存在重复 ID")
         for item in items:
-            for field in ("title", "summary") if name == "timeline" else ("question", "answer") if name == "faqs" else ():
-                _check_bilingual(item.get(field), f"{name}.{item.get('id')}.{field}")
+            fields = ("name", "tagline") if name == "products" else ("title", "summary") if name == "timeline" else ("question", "answer") if name == "faqs" else ()
+            for field in fields:
+                _check_bilingual(item.get(field), f"{name}.{item.get('id') or item.get('productId')}.{field}")
     for name, key in (("timeline", "occurredAt"), ("releases", "publishedAt")):
         if name not in collections:
             continue
@@ -375,6 +384,43 @@ def validate_public_collections(collections: Mapping[str, Mapping[str, Any]], *,
         dates = [item.get(key) for item in items if item.get(key)]
         if dates != sorted(dates, reverse=True):
             raise ValueError(f"{name} 时间倒序校验失败")
+
+
+def _validate_meta(meta: Mapping[str, Any]) -> None:
+    """严格校验 meta.json 的发布契约。
+
+    Args:
+        meta: meta.json 映射。
+
+    Returns:
+        无返回值。
+
+    Raises:
+        ValueError: meta 缺少字段或字段类型、格式不正确。
+    """
+    if not isinstance(meta, Mapping) or set(meta) != {"schemaVersion", "generatedAt", "dataVersion", "sourceWatermarks", "collections"}:
+        raise ValueError("meta 字段不完整")
+    if meta.get("schemaVersion") != 1:
+        raise ValueError("meta schemaVersion 必须为 1")
+    generated = meta.get("generatedAt")
+    if not isinstance(generated, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", generated):
+        raise ValueError("meta generatedAt 必须为 UTC ISO 8601")
+    if not isinstance(meta.get("dataVersion"), str) or not meta["dataVersion"].strip():
+        raise ValueError("meta dataVersion 不能为空")
+    if not isinstance(meta.get("sourceWatermarks"), Mapping):
+        raise ValueError("meta sourceWatermarks 必须是映射")
+    records = meta.get("collections")
+    required = {"products", "releases", "timeline", "faqs"}
+    if not isinstance(records, Mapping) or set(records) != required:
+        raise ValueError("meta collections 必须包含四个基础集合")
+    for name in required:
+        item = records[name]
+        if not isinstance(item, Mapping) or set(item) != {"sha256", "count"}:
+            raise ValueError(f"meta collections.{name} 字段不完整")
+        if not isinstance(item.get("sha256"), str) or not re.fullmatch(r"[0-9a-f]{64}", item["sha256"]):
+            raise ValueError(f"meta collections.{name}.sha256 非法")
+        if not isinstance(item.get("count"), int) or isinstance(item.get("count"), bool) or item["count"] < 0:
+            raise ValueError(f"meta collections.{name}.count 非法")
 
 
 def build_meta(collections: Mapping[str, Mapping[str, Any]], *, watermarks: Mapping[str, Any] | None = None, generated_at: str | None = None, data_version: str = "1") -> dict[str, Any]:
@@ -460,8 +506,8 @@ def write_publication_snapshot(collections: Mapping[str, Mapping[str, Any]], out
     try:
         for name, filename in COLLECTION_FILES.items():
             payload = manifest if name == "manifest" else data[name]
-            (temporary / filename).write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        (temporary / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            (temporary / filename).write_bytes(_canonical_bytes(payload))
+        (temporary / "manifest.json").write_bytes(_canonical_bytes(manifest))
         for name, filename in COLLECTION_FILES.items():
             os.replace(temporary / filename, target / filename)
         os.replace(temporary / "manifest.json", target / "manifest.json")
