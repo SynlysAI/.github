@@ -32,8 +32,14 @@ _TOKEN_PATTERN = re.compile(
     re.IGNORECASE,
 )
 _CODE_BLOCK_PATTERN = re.compile(r"```.*?```", re.DOTALL)
-_DIFF_BLOCK_PATTERN = re.compile(r"^diff --git .+?(?=^diff --git |\Z)", re.MULTILINE | re.DOTALL)
-_DIFF_LINE_PATTERN = re.compile(r"^(?:diff --git|index [0-9a-f]|--- |\+\+\+ |@@ ).*$", re.MULTILINE)
+_DIFF_BLOCK_PATTERN = re.compile(
+    r"^diff --git a/[^ ]+ b/[^ ]+.*?(?=^diff --git a/[^ ]+ b/|\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+_DIFF_LINE_PATTERN = re.compile(
+    r"^(?:diff --git a/[^ ]+ b/[^ ]+|index [0-9a-f]+\.\.[0-9a-f]+(?: \d+)?|--- a/[^ ]+|\+\+\+ b/[^ ]+|@@ -\d+(?:,\d+)? \+\d+(?:,\d+)? @@).*$",
+    re.MULTILINE,
+)
 _RETRYABLE_STATUS_CODES = frozenset({408, 409, 425, 429})
 _BILINGUAL_KEYS = frozenset({"zh", "en"})
 _RESULT_KEYS = frozenset(
@@ -113,7 +119,7 @@ def build_ai_request(
         ValueError: 变更类型或模块不符合确定性候选约束。
     """
     if change_type not in ALLOWED_CHANGE_TYPES:
-        raise ValueError(f"不支持的 changeType: {change_type}")
+        raise ValueError("不支持的 changeType")
     safe_module = redact_text(module, max_length=MAX_MODULE_LENGTH)
     if not safe_module:
         raise ValueError("module 不能为空")
@@ -307,7 +313,7 @@ class AIClient:
         if not self.base_url or not self.model or not self.api_key:
             raise AIConfigurationError("AI_BASE_URL、AI_MODEL 和 AI_API_KEY 均为必填配置")
         endpoint = self._normalized_endpoint(self.base_url)
-        if repository_private and endpoint not in self.private_endpoint_allowlist:
+        if repository_private is not False and endpoint not in self.private_endpoint_allowlist:
             raise AIConfigurationError("私有仓库只能使用组织批准的 AI endpoint")
 
     def _headers(self) -> dict[str, str]:
@@ -398,7 +404,10 @@ class AIClient:
         Returns:
             可恢复网络异常时返回 ``True``。
         """
-        return isinstance(exc, requests.RequestException) or "connection" in exc.__class__.__name__.casefold()
+        if isinstance(exc, requests.RequestException):
+            return True
+        name = exc.__class__.__name__.casefold()
+        return any(token in name for token in ("connect", "connection", "network", "transport", "timeout"))
 
     def _retry_delay(self, attempt: int, response: Any | None = None) -> float:
         """计算注入式测试可控的指数退避等待时间。

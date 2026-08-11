@@ -10,6 +10,7 @@ from scripts.release_portal.ai import (
     AIClient,
     AIResponseError,
     AITimeoutError,
+    redact_text,
     validate_ai_result,
 )
 
@@ -201,6 +202,54 @@ def test_repository_visibility_defaults_to_fail_closed():
     client = _client(FakeSession([]))
     with pytest.raises(ValueError):
         client.generate(product_name="AI4MS", change_type="feature", module="parser")
+    with pytest.raises(ValueError):
+        client.generate(
+            product_name="AI4MS",
+            change_type="feature",
+            module="parser",
+            repository_private=None,
+        )
+
+
+@pytest.mark.parametrize("error_name", ["ConnectError", "NetworkError", "TransportError"])
+def test_httpx_style_transport_errors_are_retried(error_name):
+    error_type = type(error_name, (Exception,), {})
+    session = FakeSession([error_type("temporary"), FakeResponse(_model_response())])
+    result = _client(session, max_retries=1).generate(
+        product_name="AI4MS",
+        change_type="feature",
+        module="parser",
+        repository_private=False,
+    )
+    assert result["module"] == "parser"
+    assert len(session.calls) == 2
+
+
+def test_invalid_change_type_error_does_not_echo_raw_value():
+    with pytest.raises(ValueError) as error:
+        from scripts.release_portal.ai import build_ai_request
+
+        build_ai_request(
+            "AI4MS", change_type="secret-token-value", module="parser"
+        )
+    assert "secret-token-value" not in str(error.value)
+
+
+def test_diff_redaction_does_not_remove_similar_markdown_prose():
+    prose = "diff --git is mentioned in prose\n--- ordinary release note\n+++ another note\n@@ no hunk"
+    assert redact_text(prose) == prose
+
+
+def test_diff_redaction_removes_complete_patch_block():
+    patch = (
+        "diff --git a/secret.py b/secret.py\n"
+        "index 1234567..89abcde 100644\n"
+        "--- a/secret.py\n+++ b/secret.py\n"
+        "@@ -1 +1 @@\n+TOP_SECRET\n"
+    )
+    redacted = redact_text(patch)
+    assert "TOP_SECRET" not in redacted
+    assert "secret.py" not in redacted
 
 
 def test_validate_ai_result_rejects_overlong_text():
