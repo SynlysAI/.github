@@ -57,6 +57,7 @@ def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     assert "AI_PRIVATE_ENDPOINT_ALLOWLIST: ${{ vars.AI_PRIVATE_ENDPOINT_ALLOWLIST }}" in workflow
     assert "AI_PRIVATE_ENDPOINT_ALLOWLIST: ${{ vars.AI_BASE_URL }}" not in workflow
     assert "受保护审批配置" in workflow
+    assert "不得从其填充" in workflow
     assert "scripts.release_portal.review_summary" in workflow
     assert "--body-file" in workflow
     _assert_trusted_main_runs_cli(workflow, "backfill")
@@ -147,9 +148,10 @@ def test_sync_command_uploads_formal_asset_with_original_name(tmp_path: Path, mo
             ]
 
         @staticmethod
-        def list_commits(_repository, *, include_pull_requests, stop_at_sha):
+        def list_commits(_repository, *, include_pull_requests, stop_at_sha, max_items):
             """同步测试不产生新的提交。"""
-            assert include_pull_requests is False
+            assert include_pull_requests is True
+            assert max_items == 500
             assert stop_at_sha is None
             return []
 
@@ -232,19 +234,20 @@ def test_publish_command_uploads_manifest_after_all_other_collections(tmp_path: 
         f"{generation_prefix}/timeline.json",
         f"{generation_prefix}/faqs.json",
         f"{generation_prefix}/meta.json",
-        "portal/v1/manifest.json",
         "portal/v1/products.json",
         "portal/v1/releases.json",
         "portal/v1/timeline.json",
         "portal/v1/faqs.json",
         "portal/v1/meta.json",
+        "portal/v1/manifest.json",
     ]
-    assert store.keys[5] == "portal/v1/manifest.json"
+    assert store.keys[-1] == "portal/v1/manifest.json"
     pointer = json.loads(store.bodies["portal/v1/manifest.json"])
     assert all(item["path"].startswith(f"{generation_prefix}/") for item in pointer["collections"].values())
     assert all(item["path"].startswith(f"{generation_prefix}/") for item in pointer["files"])
     for filename in ("products.json", "releases.json", "timeline.json", "faqs.json", "meta.json"):
         assert store.bodies[f"portal/v1/{filename}"] == store.bodies[f"{generation_prefix}/{filename}"]
+        assert (tmp_path / "published" / filename).is_file()
 
 
 def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_path: Path):
@@ -316,6 +319,60 @@ def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_pa
     } == old_snapshot
     assert store.objects["portal/v1/products.json"] == b"old-products\n"
     assert store.objects["portal/v1/meta.json"] == b"old-meta\n"
+
+
+def test_publish_compatibility_failure_keeps_old_manifest(tmp_path: Path):
+    """稳定根兼容副本失败时，旧 generation manifest 指针保持不变。"""
+    candidate = tmp_path / "timeline.json"
+    releases = tmp_path / "releases.json"
+    state = tmp_path / "backfill.json"
+    candidate.write_text('{"schemaVersion": 1, "events": []}\n', encoding="utf-8")
+    releases.write_text('{"schemaVersion": 1, "releases": []}\n', encoding="utf-8")
+    state.write_text('{"schemaVersion": 1, "repositories": {}}\n', encoding="utf-8")
+
+    class CompatibilityFailingStore:
+        """在第二个稳定根副本写入时失败。"""
+
+        def __init__(self):
+            """初始化旧 manifest 和旧 generation。"""
+            self.calls = 0
+            self.objects = {
+                "portal/v1/manifest.json": b'{"generation":"old"}\n',
+                **{
+                    f"portal/v1/generations/old/{filename}": f"old-{filename}\n".encode()
+                    for filename in ("products.json", "releases.json", "timeline.json", "faqs.json", "meta.json")
+                },
+            }
+
+        def put_object(self, *, Bucket, Key, Body, **_kwargs):  # noqa: N803
+            """记录上传并在第二个根兼容副本失败。"""
+            assert Bucket == "downloads"
+            self.calls += 1
+            if self.calls == 7:
+                raise RuntimeError("compatibility upload failed")
+            self.objects[Key] = Body
+
+    store = CompatibilityFailingStore()
+    old_manifest = store.objects["portal/v1/manifest.json"]
+    result = cli.main(
+        [
+            "publish",
+            "--bucket",
+            "downloads",
+            "--candidates",
+            str(candidate),
+            "--releases",
+            str(releases),
+            "--state",
+            str(state),
+            "--output",
+            str(tmp_path / "published"),
+        ],
+        object_store=store,
+    )
+
+    assert result == 1
+    assert store.objects["portal/v1/manifest.json"] == old_manifest
 
 
 def test_backfill_uses_bounded_page_and_advances_checkpoint(tmp_path: Path, monkeypatch):
@@ -478,25 +535,45 @@ def test_sync_adds_only_commits_newer_than_watermark(tmp_path: Path, monkeypatch
 
         def __init__(self):
             """初始化水位调用记录。"""
-            self.calls: list[tuple[str, bool, str | None]] = []
+            self.calls: list[tuple[str, bool, str | None, int]] = []
 
         @staticmethod
         def list_releases(_repository):
             """本测试不产生正式 Release。"""
             return []
 
-        def list_commits(self, repository, *, include_pull_requests, stop_at_sha):
+        def list_commits(self, repository, *, include_pull_requests, stop_at_sha, max_items):
             """返回客户端已在旧水位前截断的新提交。"""
-            self.calls.append((repository, include_pull_requests, stop_at_sha))
+            self.calls.append((repository, include_pull_requests, stop_at_sha, max_items))
+            assert max_items == 500
             return [
                 {
                     "sha": new_sha,
                     "message": "feat(core): new incremental change",
                     "occurred_at": "2026-08-10T00:00:00Z",
+                    "pull_requests": [{"title": "Incremental PR", "body": "PR body"}],
                 }
             ]
 
-    monkeypatch.delenv("AI_API_KEY", raising=False)
+    seen_prs: list[dict[str, str]] = []
+
+    class RecordingAI:
+        """记录 sync 传给 AI 的关联 PR。"""
+
+        @classmethod
+        def from_environment(cls):
+            """返回记录客户端。"""
+            return cls()
+
+        @staticmethod
+        def enrich_candidate(event, *, product_name, commit_messages, pull_requests, repository_private):
+            """保留候选并记录 PR 参数。"""
+            del product_name, commit_messages, repository_private
+            seen_prs.extend(pull_requests)
+            return event
+
+    monkeypatch.setenv("AI_API_KEY", "test-key")
+    monkeypatch.setattr(cli, "AIClient", RecordingAI)
     args = cli._parser().parse_args(
         [
             "sync",
@@ -515,6 +592,7 @@ def test_sync_adds_only_commits_newer_than_watermark(tmp_path: Path, monkeypatch
     assert cli._sync(args, object_store=InMemoryR2Client(), github_client=client) == 0
     timeline = json.loads(timeline_path.read_text(encoding="utf-8"))
     updated_state = json.loads(state_path.read_text(encoding="utf-8"))
-    assert client.calls == [("SynlysAI/AI4MS", False, old_sha)]
+    assert client.calls == [("SynlysAI/AI4MS", True, old_sha, 500)]
     assert [sha for event in timeline["events"] for sha in event["source"]["commitShas"]] == [new_sha[:7]]
     assert updated_state["repositories"]["SynlysAI/AI4MS"]["watermark"]["sha"] == new_sha
+    assert seen_prs == [{"title": "Incremental PR", "body": "PR body"}]

@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   backfill:
-    # 该 Environment 需在仓库设置中启用 required reviewers，白名单由受保护审批配置维护。
+    # 该 Environment 需启用 required reviewers；白名单由受保护审批配置维护，独立于 AI_BASE_URL，不得从其填充。
     environment: release-portal-private-ai
     runs-on: ubuntu-latest
     timeout-minutes: 45

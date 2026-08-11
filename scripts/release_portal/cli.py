@@ -467,7 +467,8 @@ def _sync(args: argparse.Namespace, *, object_store: Any | None = None, github_c
             commits = []
             for commit in client.list_commits(
                 product.repository,
-                include_pull_requests=False,
+                max_items=MAX_BACKFILL_BATCH,
+                include_pull_requests=True,
                 stop_at_sha=watermark or None,
             ):
                 value = commit.to_dict() if hasattr(commit, "to_dict") else dict(commit)
@@ -488,7 +489,7 @@ def _sync(args: argparse.Namespace, *, object_store: Any | None = None, github_c
                     overrides=overrides,
                     repository=product.repository,
                 )
-                timeline_additions.extend(events)
+                timeline_additions.extend(_enrich_events(events, product, new_commits))
                 processed += len(new_commits)
         records.sort(key=lambda item: (str(item.get("publishedAt") or ""), str(item.get("id") or "")), reverse=True)
         _atomic_write_json(args.candidates, {"schemaVersion": 1, "releases": records})
@@ -824,13 +825,7 @@ def _publish(args: argparse.Namespace, *, object_store: Any | None = None) -> in
                     f"{generation_prefix}/{filename}",
                     (output / filename).read_bytes(),
                 )
-            _put_public_object(
-                client,
-                args.bucket,
-                f"{prefix}/manifest.json",
-                _canonical_json_bytes(manifest),
-            )
-            # 固定根路径仅为旧消费者保留；官网以 generation manifest 为权威读入口。
+            # output 下是固定名称的本地快照；R2 根 manifest 只指向不可变 generation。
             for filename in PUBLIC_COLLECTION_FILENAMES[:-1]:
                 _put_public_object(
                     client,
@@ -838,6 +833,13 @@ def _publish(args: argparse.Namespace, *, object_store: Any | None = None) -> in
                     f"{prefix}/{filename}",
                     (output / filename).read_bytes(),
                 )
+            # 兼容副本完整上传后，最后才替换 R2 根 manifest 指针。
+            _put_public_object(
+                client,
+                args.bucket,
+                f"{prefix}/manifest.json",
+                _canonical_json_bytes(manifest),
+            )
             count = len(PUBLIC_COLLECTION_FILENAMES[:-1]) * 2 + 1
     except Exception as exc:
         elapsed = int((time.perf_counter() - started) * 1000)
