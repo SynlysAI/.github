@@ -390,7 +390,7 @@ def validate_public_collections(collections: Mapping[str, Mapping[str, Any]], *,
         schema = json.loads(schema_path.read_text(encoding="utf-8-sig"))
         errors = sorted(Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(collections[name]), key=lambda error: list(error.path))
         if errors:
-            raise ValueError(f"Schema 校验失败 ({name}): {errors[0].message}")
+            raise ValueError(f"Schema 校验失败 ({name})，错误数: {len(errors)}")
     if "meta" in collections:
         _validate_meta(collections["meta"])
     for name, collection in collections.items():

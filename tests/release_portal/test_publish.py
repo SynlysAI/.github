@@ -163,6 +163,13 @@ def test_products_bilingual_fields_cannot_be_empty():
         validate_public_collections({"products": products}, require_all=False)
 
 
+def test_schema_errors_do_not_echo_private_input():
+    invalid = {"schemaVersion": 1, "events": [{"id": "PRIVATE-BODY", "unexpected": "PRIVATE-BODY"}]}
+    with pytest.raises(ValueError) as error:
+        validate_public_collections({"timeline": invalid}, require_all=False)
+    assert "PRIVATE-BODY" not in str(error.value)
+
+
 def test_summary_does_not_echo_private_body():
     summary = summarize_changes([_event("old")], [_event("new")])
     assert summary["added"] == 1
