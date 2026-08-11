@@ -455,6 +455,9 @@ def _validate_meta(meta: Mapping[str, Any]) -> None:
         raise ValueError("meta dataVersion 不能为空")
     if not isinstance(meta.get("sourceWatermarks"), Mapping):
         raise ValueError("meta sourceWatermarks 必须是映射")
+    allowed_repositories = {value[0] for value in EXPECTED_PRODUCTS.values()}
+    if set(meta["sourceWatermarks"]) - allowed_repositories:
+        raise ValueError("meta sourceWatermarks 包含未知仓库")
     records = meta.get("collections")
     required = {"products", "releases", "timeline", "faqs"}
     if not isinstance(records, Mapping) or set(records) != required:

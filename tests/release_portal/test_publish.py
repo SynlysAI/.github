@@ -191,6 +191,14 @@ def test_meta_watermarks_shorten_full_sha_and_remain_public():
     validate_public_collections(collections)
     with pytest.raises(ValueError, match="未知仓库"):
         build_meta({"products": {"schemaVersion": 1, "products": []}}, watermarks={"Internal/Secret": "c" * 40})
+    with pytest.raises(ValueError, match="未知仓库"):
+        validate_public_collections({"meta": {
+            "schemaVersion": 1,
+            "generatedAt": "2026-08-10T00:00:00Z",
+            "dataVersion": "1",
+            "sourceWatermarks": {"Internal/Secret": "aaaaaaa"},
+            "collections": {name: {"sha256": "0" * 64, "count": 0} for name in ("products", "releases", "timeline", "faqs")},
+        }}, require_all=False)
 
 
 def test_products_bilingual_fields_cannot_be_empty():
