@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Release Portal FAQs",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "faqs"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "faqs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "productId", "question", "answer", "order"],
+        "properties": {
+          "id": {"type": "string"},
+          "productId": {"type": ["string", "null"]},
+          "question": {"$ref": "#/$defs/bilingual"},
+          "answer": {"$ref": "#/$defs/bilingual"},
+          "order": {"type": "integer", "minimum": 0}
+        }
+      }
+    }
+  },
+  "$defs": {"bilingual": {"type": "object", "additionalProperties": false, "required": ["zh", "en"], "properties": {"zh": {"type": "string"}, "en": {"type": "string"}}}}
+}

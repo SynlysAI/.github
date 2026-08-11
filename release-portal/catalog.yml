@@ -1,0 +1,62 @@
+schemaVersion: 1
+products:
+  - productId: ai4ms
+    repository: SynlysAI/AI4MS
+    entryType: web
+    webUrl: https://ai4ms.xmuzc.com/
+    name: {zh: AI4MS, en: AI4MS}
+    tagline: {zh: AI 驱动的材料信息学平台, en: AI-powered materials informatics platform}
+    category: materials-informatics
+    logo: logo.png
+    defaultBranch: main
+    aiPolicy: metadata-only
+  - productId: spec-agent
+    repository: SynlysAI/Spec_Agent
+    entryType: web
+    webUrl: https://specagent.xmuzc.com/
+    name: {zh: 光谱智能体, en: Spec Agent}
+    tagline: {zh: 面向光谱分析的智能实验助手, en: Intelligent assistant for spectrum analysis}
+    category: spectroscopy
+    logo: logo.png
+    defaultBranch: main
+    aiPolicy: metadata-only
+  - productId: poly-agent
+    repository: SynlysAI/Poly_Agent
+    entryType: web
+    webUrl: https://specpoly.xmuzc.com/
+    name: {zh: 聚合物智能体, en: Poly Agent}
+    tagline: {zh: 聚合物设计与分析智能体, en: Agent for polymer design and analysis}
+    category: polymer-science
+    logo: logo.png
+    defaultBranch: main
+    aiPolicy: metadata-only
+  - productId: speclabos
+    repository: SynlysAI/SpecLabOS
+    entryType: web
+    webUrl: https://speclabos.xmuzc.com/
+    name: {zh: 光谱实验室操作系统, en: SpecLabOS}
+    tagline: {zh: 连接仪器、数据与工作流的实验室系统, en: Lab system connecting instruments, data, and workflows}
+    category: laboratory-platform
+    logo: logo.png
+    defaultBranch: main
+    aiPolicy: metadata-only
+  - productId: ragportal
+    repository: SynlysAI/RAGPortal
+    entryType: web
+    webUrl: https://rag.xmuzc.com/
+    name: {zh: RAG 知识门户, en: RAGPortal}
+    tagline: {zh: 面向科研知识检索与问答的门户, en: Portal for research knowledge retrieval and Q&A}
+    category: knowledge-retrieval
+    logo: logo.png
+    defaultBranch: main
+    aiPolicy: metadata-only
+  - productId: smartaccess
+    repository: SynlysAI/SmartAccess
+    entryType: download
+    webUrl: null
+    name: {zh: SmartAccess, en: SmartAccess}
+    tagline: {zh: 安全、可审计的软件分发入口, en: Secure and auditable software distribution}
+    category: developer-tools
+    logo: logo.png
+    defaultBranch: main
+    aiPolicy: metadata-only

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Release Portal products",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "products"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "products": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["productId", "repository", "entryType", "webUrl", "name", "tagline", "category", "logo", "defaultBranch", "aiPolicy"],
+        "properties": {
+          "productId": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+          "entryType": {"enum": ["web", "download"]},
+          "webUrl": {"type": ["string", "null"], "format": "uri"},
+          "name": {"$ref": "#/$defs/bilingual"},
+          "tagline": {"$ref": "#/$defs/bilingual"},
+          "category": {"type": "string", "minLength": 1},
+          "logo": {"type": ["string", "null"]},
+          "defaultBranch": {"type": "string", "minLength": 1},
+          "aiPolicy": {"const": "metadata-only"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "bilingual": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["zh", "en"],
+      "properties": {"zh": {"type": "string"}, "en": {"type": "string"}}
+    }
+  }
+}

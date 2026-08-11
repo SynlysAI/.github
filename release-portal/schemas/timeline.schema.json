@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Release Portal timeline",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "events"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "productId", "level", "occurredAt", "version", "changeType", "module", "title", "summary", "detailsMarkdown", "source", "pinned"],
+        "properties": {
+          "id": {"type": "string"},
+          "productId": {"type": "string"},
+          "level": {"enum": ["release", "aggregate", "commit"]},
+          "occurredAt": {"type": "string", "format": "date-time"},
+          "version": {"type": ["string", "null"]},
+          "changeType": {"enum": ["feature", "algorithm", "performance", "bugfix", "architecture"]},
+          "module": {"type": "string"},
+          "title": {"$ref": "#/$defs/bilingual"},
+          "summary": {"$ref": "#/$defs/bilingual"},
+          "detailsMarkdown": {"$ref": "#/$defs/bilingual"},
+          "source": {"$ref": "#/$defs/source"},
+          "pinned": {"type": "boolean"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "bilingual": {"type": "object", "additionalProperties": false, "required": ["zh", "en"], "properties": {"zh": {"type": "string"}, "en": {"type": "string"}}},
+    "source": {"type": "object", "additionalProperties": false, "required": ["repository", "commitShas", "releaseUrl"], "properties": {"repository": {"type": "string"}, "commitShas": {"type": "array", "items": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"}}, "releaseUrl": {"type": ["string", "null"], "format": "uri"}}}
+  }
+}
