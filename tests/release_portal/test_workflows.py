@@ -31,10 +31,13 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
     assert "actions/create-github-app-token@v1" in workflow
     assert "SYNLYSAI_APP_ID" in workflow
     assert "SYNLYSAI_APP_PRIVATE_KEY" in workflow
+    for repository in ("AI4MS", "Spec_Agent", "Poly_Agent", "SpecLabOS", "RAGPortal", "SmartAccess"):
+        assert repository in workflow
     assert "automation/release-portal-candidates" in workflow
     assert "python -m scripts.release_portal.cli sync" in workflow
     assert "cancel-in-progress: true" in workflow
     assert "git ls-files --others" in workflow
+    _assert_candidate_baseline_precedes_cli(workflow, "sync")
 
 
 def test_backfill_workflow_is_manual_and_limits_each_product_batch():
@@ -49,6 +52,7 @@ def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     assert "actions/upload-artifact@v4" in workflow
     assert "automation/release-portal-candidates" in workflow
     assert "AI_PRIVATE_ENDPOINT_ALLOWLIST" in workflow
+    _assert_candidate_baseline_precedes_cli(workflow, "backfill")
 
 
 def test_publish_workflow_validates_before_manifest_last_upload():
@@ -73,6 +77,23 @@ def test_dependabot_covers_actions_and_python_dependencies():
     assert 'package-ecosystem: "github-actions"' in content
     assert 'package-ecosystem: "pip"' in content
     assert 'directory: "/"' in content
+
+
+def _assert_candidate_baseline_precedes_cli(workflow: str, command: str) -> None:
+    """确认候选分支基线在 CLI 前准备，CLI 后不再切换分支。
+
+    Args:
+        workflow: 工作流 YAML 文本。
+        command: CLI 子命令名。
+
+    Returns:
+        无返回值。
+    """
+    baseline = workflow.index("准备候选审核分支基线")
+    cli = workflow.index(f"python -m scripts.release_portal.cli {command}")
+    assert baseline < cli
+    assert "git checkout -B" in workflow[baseline:cli]
+    assert "git checkout -B" not in workflow[cli:]
 
 
 def test_sync_command_uploads_formal_asset_with_original_name(tmp_path: Path, monkeypatch, capsys):

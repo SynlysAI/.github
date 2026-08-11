@@ -50,6 +50,21 @@ jobs:
           app-id: ${{ secrets.SYNLYSAI_APP_ID }}
           private-key: ${{ secrets.SYNLYSAI_APP_PRIVATE_KEY }}
           owner: SynlysAI
+          repositories: AI4MS,Spec_Agent,Poly_Agent,SpecLabOS,RAGPortal,SmartAccess,.github
+
+      - name: 准备候选审核分支基线
+        env:
+          CANDIDATE_BRANCH: automation/release-portal-candidates
+        run: |
+          if git ls-remote --exit-code --heads origin "$CANDIDATE_BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$CANDIDATE_BRANCH:refs/remotes/origin/$CANDIDATE_BRANCH"
+            git checkout -B "$CANDIDATE_BRANCH" "refs/remotes/origin/$CANDIDATE_BRANCH"
+            echo "CANDIDATE_EXPECTED_SHA=$(git rev-parse "refs/remotes/origin/$CANDIDATE_BRANCH")" >> "$GITHUB_ENV"
+          else
+            git fetch origin main
+            git checkout -B "$CANDIDATE_BRANCH" origin/main
+            echo "CANDIDATE_EXPECTED_SHA=0000000000000000000000000000000000000000" >> "$GITHUB_ENV"
+          fi
 
       - name: 同步正式 Release 与附件
         env:
@@ -72,13 +87,13 @@ jobs:
           fi
           git config user.name "synlysai-release-portal[bot]"
           git config user.email "41898282+synlysai-release-portal[bot]@users.noreply.github.com"
-          if git ls-remote --exit-code --heads origin automation/release-portal-candidates >/dev/null 2>&1; then
-            git fetch origin automation/release-portal-candidates:refs/remotes/origin/automation/release-portal-candidates
-          fi
-          git checkout -B automation/release-portal-candidates
           git add release-portal/candidates
+          if git diff --cached --quiet; then
+            echo "没有可提交的候选变更"
+            exit 0
+          fi
           git commit -m "chore: 同步 Release Portal 候选数据"
-          git push --force-with-lease=refs/heads/automation/release-portal-candidates origin HEAD:automation/release-portal-candidates
+          git push --force-with-lease=refs/heads/automation/release-portal-candidates:$CANDIDATE_EXPECTED_SHA origin HEAD:automation/release-portal-candidates
           pr_number="$(gh pr list --head automation/release-portal-candidates --base main --state open --json number --jq '.[0].number')"
           if [ -n "$pr_number" ]; then
             gh pr edit "$pr_number" --title "chore: 审核 Release Portal 候选数据" --body "自动同步正式 Release 与待审核候选。"
