@@ -48,7 +48,13 @@ class GitHubError(RuntimeError):
         self.retryable = retryable
 
     def to_dict(self) -> dict[str, Any]:
-        """将异常转换为可记录的字典。"""
+        """将异常转换为可记录的字典。
+
+        Args:
+            无。
+        Returns:
+            异常字段组成的 JSON 映射。
+        """
         return {"message": str(self), "status": self.status, "method": self.method,
                 "path": self.path, "body": self.body, "retryable": self.retryable}
 
@@ -65,7 +71,13 @@ class ReleaseAsset:
     architecture: str
 
     def to_dict(self) -> dict[str, Any]:
-        """返回 JSON 兼容的附件映射。"""
+        """返回 JSON 兼容的附件映射。
+
+        Args:
+            无。
+        Returns:
+            附件字段组成的 JSON 映射。
+        """
         return asdict(self)
 
 
@@ -79,7 +91,13 @@ class PullRequest:
     url: str | None
 
     def to_dict(self) -> dict[str, Any]:
-        """返回 JSON 兼容的 PR 映射。"""
+        """返回 JSON 兼容的 PR 映射。
+
+        Args:
+            无。
+        Returns:
+            Pull Request 字段组成的 JSON 映射。
+        """
         return asdict(self)
 
 
@@ -93,7 +111,13 @@ class Commit:
     pull_requests: tuple[PullRequest, ...] = field(default_factory=tuple)
 
     def to_dict(self) -> dict[str, Any]:
-        """返回 JSON 兼容的提交映射。"""
+        """返回 JSON 兼容的提交映射。
+
+        Args:
+            无。
+        Returns:
+            提交及其关联 Pull Request 字段组成的 JSON 映射。
+        """
         value = asdict(self)
         value["pull_requests"] = [item.to_dict() for item in self.pull_requests]
         return value
@@ -114,7 +138,13 @@ class Release:
     assets: tuple[ReleaseAsset, ...] = field(default_factory=tuple)
 
     def to_dict(self) -> dict[str, Any]:
-        """返回 JSON 兼容的 Release 映射。"""
+        """返回 JSON 兼容的 Release 映射。
+
+        Args:
+            无。
+        Returns:
+            Release 及其附件字段组成的 JSON 映射。
+        """
         value = asdict(self)
         value["assets"] = [asset.to_dict() for asset in self.assets]
         return value
