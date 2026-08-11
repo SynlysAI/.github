@@ -32,8 +32,11 @@ _TOKEN_PATTERN = re.compile(
     re.IGNORECASE,
 )
 _CODE_BLOCK_PATTERN = re.compile(r"```.*?```", re.DOTALL)
+_DIFF_PATH_A = r'(?:(?:"a/(?:\\.|[^"\\])+")|(?:a/(?:\\.|[^\s])+))'
+_DIFF_PATH_B = r'(?:(?:"b/(?:\\.|[^"\\])+")|(?:b/(?:\\.|[^\s])+))'
 _DIFF_BLOCK_PATTERN = re.compile(
-    r"^diff --git a/[^ ]+ b/[^ ]+.*?(?=^diff --git a/[^ ]+ b/|\Z)",
+    rf"^diff --git {_DIFF_PATH_A} {_DIFF_PATH_B}.*?"
+    rf"(?=^diff --git {_DIFF_PATH_A} {_DIFF_PATH_B}|\Z)",
     re.MULTILINE | re.DOTALL,
 )
 _DIFF_LINE_PATTERN = re.compile(
@@ -171,6 +174,8 @@ def validate_ai_result(value: Any) -> dict[str, Any]:
     if keys != _RESULT_KEYS:
         missing = ", ".join(sorted(_RESULT_KEYS - keys))
         unknown = ", ".join(sorted(keys - _RESULT_KEYS))
+        if unknown:
+            raise AIResponseError("AI 响应包含未知字段")
         detail = "; ".join(part for part in (
             f"缺少字段: {missing}" if missing else "",
             f"未知字段: {unknown}" if unknown else "",

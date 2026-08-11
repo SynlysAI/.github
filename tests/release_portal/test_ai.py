@@ -252,8 +252,30 @@ def test_diff_redaction_removes_complete_patch_block():
     assert "secret.py" not in redacted
 
 
+@pytest.mark.parametrize(
+    "header",
+    [
+        'diff --git "a/secret file.py" "b/secret file.py"',
+        r"diff --git a/secret\ file.py b/secret\ file.py",
+    ],
+)
+def test_diff_redaction_handles_quoted_and_escaped_paths(header):
+    patch = f"{header}\n@@ -1 +1 @@\n+TOP_SECRET\n"
+    redacted = redact_text(patch)
+    assert "TOP_SECRET" not in redacted
+    assert "secret file.py" not in redacted
+
+
 def test_validate_ai_result_rejects_overlong_text():
     value = json.loads(_model_response()["choices"][0]["message"]["content"])
     value["title"]["zh"] = "x" * 201
     with pytest.raises(AIResponseError):
         validate_ai_result(value)
+
+
+def test_unknown_response_field_name_is_not_echoed_in_error():
+    value = json.loads(_model_response()["choices"][0]["message"]["content"])
+    value["ghp_sensitive_token_value"] = "secret"
+    with pytest.raises(AIResponseError) as error:
+        validate_ai_result(value)
+    assert "ghp_sensitive_token_value" not in str(error.value)
