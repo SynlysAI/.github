@@ -47,6 +47,7 @@ def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     assert "--limit 500" in workflow
     assert "actions/upload-artifact@v4" in workflow
     assert "automation/release-portal-candidates" in workflow
+    assert "AI_PRIVATE_ENDPOINT_ALLOWLIST" in workflow
 
 
 def test_publish_workflow_validates_before_manifest_last_upload():
