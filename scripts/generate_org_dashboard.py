@@ -9,11 +9,13 @@ from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
+from pathlib import Path
 from typing import Any
 
 
 API_ROOT = "https://api.github.com"
 USER_AGENT = "synlysai-org-dashboard/2.0"
+CATALOG_PATH = Path(__file__).resolve().parents[1] / "release-portal" / "catalog.yml"
 
 
 def parse_iso8601(value: str | None) -> datetime | None:
@@ -61,10 +63,28 @@ def truncate(value: str, limit: int) -> str:
     return value[: limit - 1] + "..."
 
 
-def parse_csv_values(value: str | None) -> set[str]:
-    if not value:
-        return set()
-    return {item.strip() for item in value.split(",") if item.strip()}
+def catalog_repository_allowlist(path: str | Path = CATALOG_PATH) -> set[str]:
+    """从 Release Portal catalog 读取公开看板允许的仓库名。
+
+    Args:
+        path: 产品注册表路径，默认使用仓库内的 ``catalog.yml``。
+
+    Returns:
+        catalog 中登记的六个 GitHub 仓库名称集合。
+    """
+    try:
+        from scripts.release_portal.config import load_catalog
+    except ModuleNotFoundError:
+        from release_portal.config import load_catalog
+
+    catalog = load_catalog(path)
+    repositories: set[str] = set()
+    for product in catalog.products:
+        owner, separator, repository = product.repository.partition("/")
+        if not separator or not owner or not repository:
+            raise ValueError(f"catalog 仓库格式无效: {product.repository}")
+        repositories.add(repository)
+    return repositories
 
 
 def xml_escape(value: str) -> str:
@@ -739,7 +759,7 @@ def main() -> None:
         repo_visibility = "public"
     hide_private_repo_names = env_flag("HIDE_PRIVATE_REPO_NAMES", True)
     include_forks = env_flag("INCLUDE_FORKS", False)
-    repo_allowlist = parse_csv_values(os.getenv("REPO_ALLOWLIST"))
+    repo_allowlist = catalog_repository_allowlist()
 
     client = GitHubClient(token=token)
     data = collect_org_analytics(

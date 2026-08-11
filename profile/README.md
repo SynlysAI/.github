@@ -20,6 +20,12 @@ Our goal is not only to build useful software, but to help define a new research
 
 [![SynlysAI analytics dashboard](../github-analytics.svg)](https://github.com/SynlysAI/.github/actions/workflows/metrics.yml)
 
+## Release Portal
+
+[查看 SynlysAI Release Portal 公开快照](https://github.com/SynlysAI/.github/blob/main/release-portal/published/manifest.json)
+
+GitHub 仓库是 Release 元数据和附件的来源，官网 Release Portal 是经过审核的版本说明、时间线、FAQ 与下载的统一公开渠道。生产官网域名由部署配置注入，不在组织首页中写死。
+
 ## What We Are Building
 
 We are building an open technical foundation for AI4S research teams that need more than isolated models. That includes:

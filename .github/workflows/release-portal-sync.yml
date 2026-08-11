@@ -15,6 +15,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 concurrency:
   group: release-portal-candidates
@@ -47,6 +48,9 @@ jobs:
           private-key: ${{ secrets.SYNLYSAI_APP_PRIVATE_KEY }}
           owner: SynlysAI
           repositories: AI4MS,Spec_Agent,Poly_Agent,SpecLabOS,RAGPortal,SmartAccess,.github
+          permission-contents: write
+          permission-pull-requests: write
+          permission-issues: write
 
       - name: 仅恢复候选数据输入
         env:
@@ -71,6 +75,8 @@ jobs:
           fi
 
       - name: 同步正式 Release 与附件
+        id: sync
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -82,6 +88,34 @@ jobs:
           --product "${{ inputs.product || 'all' }}"
           --timeline release-portal/candidates/timeline.json
           --state release-portal/state/backfill.json
+
+      - name: 处理同步失败告警
+        if: always()
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          SYNC_OUTCOME: ${{ steps.sync.outcome }}
+        run: |
+          set -euo pipefail
+          issue_title="Release Portal 同步失败告警"
+          if [ "$SYNC_OUTCOME" = "failure" ]; then
+            previous_conclusion="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow release-portal-sync.yml --limit 20 --json databaseId,status,conclusion | jq -r --arg current "$GITHUB_RUN_ID" '[.[] | select((.databaseId | tostring) != $current and .status == "completed")][0].conclusion // ""')"
+            if [ "$previous_conclusion" = "failure" ]; then
+              gh label create release-portal --repo "$GITHUB_REPOSITORY" --color d73a4a --description "Release Portal automation" --force >/dev/null
+              existing_issue="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --label release-portal --search "$issue_title in:title" --json number --jq '.[0].number // ""')"
+              if [ -z "$existing_issue" ]; then
+                gh issue create --repo "$GITHUB_REPOSITORY" --label release-portal --title "$issue_title" --body "Release Portal 同步连续两次失败，请检查 Actions 运行状态与受保护配置。此 Issue 不包含私有仓库正文、令牌或附件地址。" >/dev/null
+              fi
+            fi
+            exit 1
+          fi
+
+          if [ "$SYNC_OUTCOME" = "success" ]; then
+            gh issue list --repo "$GITHUB_REPOSITORY" --state open --label release-portal --search "$issue_title in:title" --json number --jq '.[].number' | while IFS= read -r issue_number; do
+              if [ -n "$issue_number" ]; then
+                gh issue close "$issue_number" --repo "$GITHUB_REPOSITORY" --comment "Release Portal 同步已恢复。" >/dev/null
+              fi
+            done
+          fi
 
       - name: 用主分支代码生成审核摘要
         run: >-

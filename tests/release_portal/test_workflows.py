@@ -43,6 +43,21 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
     _assert_trusted_main_runs_cli(workflow, "sync")
 
 
+def test_sync_workflow_alerts_after_two_failures_and_closes_on_recovery():
+    """同步连续失败应创建告警 Issue，恢复后关闭既有告警。"""
+    workflow = _workflow("release-portal-sync.yml")
+
+    assert "issues: write" in workflow
+    assert "permission-issues: write" in workflow
+    assert "continue-on-error: true" in workflow
+    assert "gh run list" in workflow
+    assert "conclusion" in workflow
+    assert "gh issue create" in workflow
+    assert "--label release-portal" in workflow
+    assert "gh issue close" in workflow
+    assert "SYNC_OUTCOME" in workflow
+
+
 def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     """回填任务只能手动执行，且每次处理上限为 500 条提交。"""
     workflow = _workflow("release-portal-backfill.yml")
