@@ -67,7 +67,7 @@ python -m scripts.release_portal.cli publish --validate-only
 python -m scripts.release_portal.cli publish --bucket "$R2_BUCKET"
 ```
 
-发布先上传五个集合和 `meta.json`，最后更新 `portal/v1/manifest.json`。若中途失败，根 manifest 仍指向上一份完整快照。
+发布先上传 generation 中的五个集合和 `meta.json`，再写入该 generation 自己的 manifest；随后上传根兼容副本，最后更新 `portal/v1/manifest.json`。若任一步失败，根 manifest 仍指向上一份完整快照。
 
 资源上传器不调用 Cloudflare R2 的原生 `list-object-versions`/`VersionId` API。生产 Boto3 R2 适配器和本地 Filesystem 适配器都使用应用层私有前缀 `.release-portal-history/`：正式对象之外保留最近两份历史副本，因此当前对象加两份历史共三份可恢复版本；测试内存适配器则模拟原生版本列表。历史前缀不会出现在公开 `downloadPath` 或 manifest 中。
 
@@ -80,6 +80,7 @@ export AWS_ACCESS_KEY_ID="${R2_ACCESS_KEY_ID:?请先配置 R2_ACCESS_KEY_ID}"
 export AWS_SECRET_ACCESS_KEY="${R2_SECRET_ACCESS_KEY:?请先配置 R2_SECRET_ACCESS_KEY}"
 export ASSET_KEY="assets/smartaccess/v1.0.0/SmartAccess-linux-amd64.tar.gz"
 aws s3 ls "s3://$R2_BUCKET/.release-portal-history/$ASSET_KEY/" --endpoint-url "$R2_ENDPOINT"
+export HISTORY_OBJECT='<从上一步列表选择的对象名>'
 aws s3 cp \
   "s3://$R2_BUCKET/.release-portal-history/$ASSET_KEY/$HISTORY_OBJECT" \
   "s3://$R2_BUCKET/$ASSET_KEY" --endpoint-url "$R2_ENDPOINT"

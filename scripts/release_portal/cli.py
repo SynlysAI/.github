@@ -882,6 +882,13 @@ def _publish(args: argparse.Namespace, *, object_store: Any | None = None) -> in
                     f"{generation_prefix}/{filename}",
                     (output / filename).read_bytes(),
                 )
+            # generation 自身也必须带完整 manifest，才能在根指针故障时独立回滚。
+            _put_public_object(
+                client,
+                args.bucket,
+                f"{generation_prefix}/manifest.json",
+                _canonical_json_bytes(manifest),
+            )
             # output 下是固定名称的本地快照；R2 根 manifest 只指向不可变 generation。
             for filename in PUBLIC_COLLECTION_FILENAMES[:-1]:
                 _put_public_object(
@@ -897,7 +904,7 @@ def _publish(args: argparse.Namespace, *, object_store: Any | None = None) -> in
                 f"{prefix}/manifest.json",
                 _canonical_json_bytes(manifest),
             )
-            count = len(PUBLIC_COLLECTION_FILENAMES[:-1]) * 2 + 1
+            count = len(PUBLIC_COLLECTION_FILENAMES[:-1]) * 2 + 2
     except Exception as exc:
         elapsed = int((time.perf_counter() - started) * 1000)
         _log(run_id=run_id, product_id="all", stage="publish", count=0, duration_ms=elapsed, status="failed", error=type(exc).__name__)

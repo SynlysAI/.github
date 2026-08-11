@@ -39,14 +39,27 @@ jobs:
       - name: 安装运行依赖
         run: python -m pip install -r requirements.txt
 
-      - name: 获取 GitHub App 安装令牌
-        id: app-token
+      - name: 获取产品源读取令牌
+        id: source-token
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ secrets.SYNLYSAI_APP_ID }}
           private-key: ${{ secrets.SYNLYSAI_APP_PRIVATE_KEY }}
           owner: SynlysAI
-          repositories: AI4MS,Spec_Agent,Poly_Agent,SpecLabOS,RAGPortal,SmartAccess,.github
+          repositories: AI4MS,Spec_Agent,Poly_Agent,SpecLabOS,RAGPortal,SmartAccess
+          permission-contents: read
+          permission-pull-requests: read
+
+      - name: 获取门户写入令牌
+        id: portal-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.SYNLYSAI_APP_ID }}
+          private-key: ${{ secrets.SYNLYSAI_APP_PRIVATE_KEY }}
+          owner: SynlysAI
+          repositories: .github
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: 仅恢复候选数据输入
         env:
@@ -72,7 +85,7 @@ jobs:
 
       - name: 回填最多 500 条历史提交
         env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.source-token.outputs.token }}
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_BASE_URL: ${{ vars.AI_BASE_URL }}
           AI_MODEL: ${{ vars.AI_MODEL }}
@@ -102,7 +115,7 @@ jobs:
 
       - name: 创建或更新候选审核 PR
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ steps.portal-token.outputs.token }}
           CANDIDATE_BRANCH: automation/release-portal-candidates
         run: |
           previous_stash="$(git rev-parse -q --verify refs/stash || true)"

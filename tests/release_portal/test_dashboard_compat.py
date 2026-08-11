@@ -43,8 +43,27 @@ def test_dashboard_allowlist_is_loaded_from_catalog_and_excludes_internal_reposi
             del max_pages
             if path.startswith("/orgs/SynlysAI/repos"):
                 return [
-                    {"name": "AI4MS", "owner": {"login": "SynlysAI"}, "private": False},
-                    {"name": "InternalResearch", "owner": {"login": "SynlysAI"}, "private": True},
+                    {
+                        "name": "AI4MS",
+                        "owner": {"login": "SynlysAI"},
+                        "private": False,
+                        "description": "公开材料信息学平台",
+                        "default_branch": "main",
+                    },
+                    {
+                        "name": "InternalResearch",
+                        "owner": {"login": "SynlysAI"},
+                        "private": True,
+                        "description": "内部私有配方",
+                        "default_branch": "secret-release",
+                    },
+                    {
+                        "name": "SmartAccess",
+                        "owner": {"login": "SynlysAI"},
+                        "private": True,
+                        "description": "另一个内部私有配方",
+                        "default_branch": "private-main",
+                    },
                 ]
             return []
 
@@ -59,7 +78,10 @@ def test_dashboard_allowlist_is_loaded_from_catalog_and_excludes_internal_reposi
     )
 
     assert [repo.name for repo in data["repos"]] == ["AI4MS"]
-    assert "InternalResearch" not in dashboard.render_dashboard(data)
+    assert data["source_facts"]["skipped_repos"] == {"not_allowlisted": 1, "private": 1}
+    svg = dashboard.render_dashboard(data)
+    for sensitive_value in ("InternalResearch", "SmartAccess", "内部私有配方", "secret-release", "private-main"):
+        assert sensitive_value not in svg
 
 
 def test_backfill_cli_emits_json_log_without_private_error_text(tmp_path, monkeypatch, capsys):

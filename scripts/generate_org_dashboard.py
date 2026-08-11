@@ -248,6 +248,9 @@ def collect_org_analytics(
         if repo_allowlist_normalized and repo_name.casefold() not in repo_allowlist_normalized:
             skipped_repos["not_allowlisted"] += 1
             continue
+        if repo.get("private", False):
+            skipped_repos["private"] += 1
+            continue
         filtered_repos.append(repo)
     repos_payload = filtered_repos
 
@@ -487,7 +490,6 @@ def render_dashboard(data: dict[str, Any]) -> str:
     release_count = len(releases)
     roadmap_open = sum(1 for item in roadmap if item["state"] == "open")
     visibility_mode = data["source_facts"]["repo_visibility"]
-    private_mask = data["source_facts"]["hide_private_repo_names"]
     include_forks = data["source_facts"]["include_forks"]
     skipped_repos = data["source_facts"]["skipped_repos"]
     skipped_count = sum(skipped_repos.values())
@@ -570,7 +572,7 @@ def render_dashboard(data: dict[str, Any]) -> str:
     ])
 
     command_boxes = [
-        ("mission", f'{summary["repo_count"]} repos online', f'{summary["public_repo_count"]} public · {summary["private_repo_count"]} private'),
+        ("mission", f'{summary["repo_count"]} repos online', f'{summary["public_repo_count"]} public tracked'),
         ("signal", f'{fmt_number(summary["recent_commits_30d"])} / 30d', f'{fmt_number(total_weekly)} commits in rolling 12 weeks'),
         ("surface", f'{fmt_bytes(summary["total_code_bytes"])}', f'{summary["top_language"]} is the dominant language'),
         ("community", f'{fmt_number(summary["total_stars"])} stars', f'{fmt_number(summary["total_forks"])} forks · {fmt_number(summary["total_watchers"])} watchers'),
@@ -634,8 +636,6 @@ def render_dashboard(data: dict[str, Any]) -> str:
         chips = [f"issues:{'on' if repo.has_issues else 'off'}", f"projects:{'on' if repo.has_projects else 'off'}", f"wiki:{'on' if repo.has_wiki else 'off'}"]
         if repo.topics:
             chips.append(truncate(repo.topics[0], 14))
-        if repo.is_private and private_mask:
-            chips.append("masked")
         for chip in chips[:4]:
             chip_w = max(74, len(chip) * 7 + 18)
             parts.append(svg_rect(chip_x, by + 128, chip_w, 24, cls="badge-chip", rx=12))
@@ -734,7 +734,7 @@ def render_dashboard(data: dict[str, Any]) -> str:
         scope_note += f"; skipped {skipped_count} non-tracked repos"
     parts.append(svg_rect(52, 1640, 1336, 62, cls="panel-bright", rx=20))
     parts.append(svg_text(74, 1678, f"Telemetry source: GitHub REST API. {scope_note}. People panels reflect {member_label}.", cls="footer"))
-    parts.append(svg_text(1362, 1678, f"{'private names masked' if private_mask else 'private names visible'} · refreshed {generated_at.strftime('%Y-%m-%d %H:%M UTC')}", cls="footer", anchor="end"))
+    parts.append(svg_text(1362, 1678, f"private repositories excluded · refreshed {generated_at.strftime('%Y-%m-%d %H:%M UTC')}", cls="footer", anchor="end"))
     parts.append("</svg>")
     return "\n".join(parts)
 

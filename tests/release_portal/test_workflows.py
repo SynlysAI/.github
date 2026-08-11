@@ -31,6 +31,15 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
     assert "cron: \"17 */6 * * *\"" in workflow
     assert "workflow_dispatch:" in workflow
     assert "actions/create-github-app-token@v1" in workflow
+    assert "id: source-token" in workflow
+    assert "id: portal-token" in workflow
+    assert "repositories: AI4MS,Spec_Agent,Poly_Agent,SpecLabOS,RAGPortal,SmartAccess" in workflow
+    assert "repositories: .github" in workflow
+    assert "permission-contents: read" in workflow
+    assert "permission-pull-requests: read" in workflow
+    assert "permission-actions: read" in workflow
+    assert "GITHUB_TOKEN: ${{ steps.source-token.outputs.token }}" in workflow
+    assert "GH_TOKEN: ${{ steps.portal-token.outputs.token }}" in workflow
     assert "SYNLYSAI_APP_ID" in workflow
     assert "SYNLYSAI_APP_PRIVATE_KEY" in workflow
     for repository in ("AI4MS", "Spec_Agent", "Poly_Agent", "SpecLabOS", "RAGPortal", "SmartAccess"):
@@ -76,6 +85,14 @@ def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     assert "不得从其填充" in workflow
     assert "scripts.release_portal.review_summary" in workflow
     assert "--body-file" in workflow
+    assert "id: source-token" in workflow
+    assert "id: portal-token" in workflow
+    assert "repositories: AI4MS,Spec_Agent,Poly_Agent,SpecLabOS,RAGPortal,SmartAccess" in workflow
+    assert "repositories: .github" in workflow
+    assert "permission-contents: read" in workflow
+    assert "permission-pull-requests: read" in workflow
+    assert "GITHUB_TOKEN: ${{ steps.source-token.outputs.token }}" in workflow
+    assert "GH_TOKEN: ${{ steps.portal-token.outputs.token }}" in workflow
     _assert_trusted_main_runs_cli(workflow, "backfill")
 
 
@@ -261,6 +278,7 @@ def test_publish_command_uploads_manifest_after_all_other_collections(tmp_path: 
         f"{generation_prefix}/timeline.json",
         f"{generation_prefix}/faqs.json",
         f"{generation_prefix}/meta.json",
+        f"{generation_prefix}/manifest.json",
         "portal/v1/products.json",
         "portal/v1/releases.json",
         "portal/v1/timeline.json",
@@ -270,6 +288,7 @@ def test_publish_command_uploads_manifest_after_all_other_collections(tmp_path: 
     ]
     assert store.keys[-1] == "portal/v1/manifest.json"
     pointer = json.loads(store.bodies["portal/v1/manifest.json"])
+    assert store.bodies[f"{generation_prefix}/manifest.json"] == store.bodies["portal/v1/manifest.json"]
     assert all(item["path"].startswith(f"{generation_prefix}/") for item in pointer["collections"].values())
     assert all(item["path"].startswith(f"{generation_prefix}/") for item in pointer["files"])
     for filename in ("products.json", "releases.json", "timeline.json", "faqs.json", "meta.json"):
@@ -348,6 +367,57 @@ def test_publish_failure_does_not_replace_root_manifest_or_old_generation(tmp_pa
     assert store.objects["portal/v1/meta.json"] == b"old-meta\n"
 
 
+def test_generation_manifest_failure_does_not_replace_root_manifest(tmp_path: Path):
+    """generation manifest 写入失败时，根 manifest 必须继续指向旧快照。"""
+    candidate = tmp_path / "timeline.json"
+    releases = tmp_path / "releases.json"
+    state = tmp_path / "backfill.json"
+    candidate.write_text('{"schemaVersion": 1, "events": []}\n', encoding="utf-8")
+    releases.write_text('{"schemaVersion": 1, "releases": []}\n', encoding="utf-8")
+    state.write_text('{"schemaVersion": 1, "repositories": {}}\n', encoding="utf-8")
+
+    class GenerationManifestFailingStore:
+        """只在 generation manifest 写入时失败的存储替身。"""
+
+        def __init__(self):
+            """初始化旧根 manifest。"""
+            self.objects = {"portal/v1/manifest.json": b'{"generation":"old"}\n'}
+
+        def put_object(self, *, Bucket, Key, Body, **_kwargs):  # noqa: N803
+            """在 generation manifest 上传时模拟对象存储失败。"""
+            assert Bucket == "downloads"
+            if Key.startswith("portal/v1/generations/") and Key.endswith("/manifest.json"):
+                raise RuntimeError("generation manifest upload failed")
+            self.objects[Key] = Body
+
+    store = GenerationManifestFailingStore()
+    old_manifest = store.objects["portal/v1/manifest.json"]
+    result = cli.main(
+        [
+            "publish",
+            "--bucket",
+            "downloads",
+            "--candidates",
+            str(candidate),
+            "--releases",
+            str(releases),
+            "--state",
+            str(state),
+            "--output",
+            str(tmp_path / "published"),
+        ],
+        object_store=store,
+    )
+
+    assert result == 1
+    assert store.objects["portal/v1/manifest.json"] == old_manifest
+    assert not any(
+        key.startswith("portal/v1/") and not key.startswith("portal/v1/generations/")
+        for key in store.objects
+        if key != "portal/v1/manifest.json"
+    )
+
+
 def test_publish_compatibility_failure_keeps_old_manifest(tmp_path: Path):
     """稳定根兼容副本失败时，旧 generation manifest 指针保持不变。"""
     candidate = tmp_path / "timeline.json"
@@ -375,7 +445,7 @@ def test_publish_compatibility_failure_keeps_old_manifest(tmp_path: Path):
             """记录上传并在第二个根兼容副本失败。"""
             assert Bucket == "downloads"
             self.calls += 1
-            if self.calls == 7:
+            if self.calls == 8:
                 raise RuntimeError("compatibility upload failed")
             self.objects[Key] = Body
 
