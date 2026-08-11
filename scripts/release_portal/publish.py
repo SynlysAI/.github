@@ -469,6 +469,24 @@ def _validate_meta(meta: Mapping[str, Any]) -> None:
             raise ValueError(f"meta collections.{name}.count 非法")
 
 
+def _sanitize_watermark(value: Any) -> Any:
+    """递归移除水位映射中的完整 SHA。
+
+    Args:
+        value: 水位字段值。
+
+    Returns:
+        完整 SHA 被替换为七位前缀后的值。
+    """
+    if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{40}", value, re.IGNORECASE):
+        return value[:7].lower()
+    if isinstance(value, Mapping):
+        return {str(key): _sanitize_watermark(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_sanitize_watermark(item) for item in value]
+    return value
+
+
 def build_meta(collections: Mapping[str, Mapping[str, Any]], *, watermarks: Mapping[str, Any] | None = None, generated_at: str | None = None, data_version: str = "1") -> dict[str, Any]:
     """生成包含水位和集合哈希的 meta.json 内容。
 
@@ -483,7 +501,12 @@ def build_meta(collections: Mapping[str, Mapping[str, Any]], *, watermarks: Mapp
     """
     timestamp = generated_at or datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     records = {name: {"sha256": _sha256(value), "count": _collection_count(name, value)} for name, value in collections.items() if name != "meta"}
-    return {"schemaVersion": 1, "generatedAt": timestamp, "dataVersion": data_version, "sourceWatermarks": dict(watermarks or {}), "collections": records}
+    raw_watermarks = dict(watermarks or {})
+    allowed_repositories = {value[0] for value in EXPECTED_PRODUCTS.values()}
+    if set(raw_watermarks) - allowed_repositories:
+        raise ValueError("sourceWatermarks 包含未知仓库")
+    safe_watermarks = _sanitize_watermark(raw_watermarks)
+    return {"schemaVersion": 1, "generatedAt": timestamp, "dataVersion": data_version, "sourceWatermarks": safe_watermarks, "collections": records}
 
 
 def _collection_count(name: str, value: Mapping[str, Any]) -> int:

@@ -10,6 +10,7 @@ from scripts.release_portal.publish import (
     apply_overrides,
     build_manifest,
     build_meta,
+    build_public_collections,
     sanitize_public_event,
     summarize_changes,
     validate_public_collections,
@@ -181,6 +182,15 @@ def test_meta_generated_at_rejects_impossible_utc_date():
             "collections": {name: {"sha256": "0" * 64, "count": 0} for name in ("products", "releases", "timeline", "faqs")},
         }}, require_all=False)
     assert "2026-99" not in str(error.value)
+
+
+def test_meta_watermarks_shorten_full_sha_and_remain_public():
+    collections = build_public_collections([], watermarks={"SynlysAI/Spec_Agent": "a" * 40, "SynlysAI/AI4MS": {"SHA": "b" * 40, "publishedAt": "2026-08-10T00:00:00Z"}})
+    assert collections["meta"]["sourceWatermarks"]["SynlysAI/Spec_Agent"] == "aaaaaaa"
+    assert collections["meta"]["sourceWatermarks"]["SynlysAI/AI4MS"]["SHA"] == "bbbbbbb"
+    validate_public_collections(collections)
+    with pytest.raises(ValueError, match="未知仓库"):
+        build_meta({"products": {"schemaVersion": 1, "products": []}}, watermarks={"Internal/Secret": "c" * 40})
 
 
 def test_products_bilingual_fields_cannot_be_empty():
