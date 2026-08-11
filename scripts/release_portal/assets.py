@@ -84,6 +84,8 @@ class InMemoryR2Client:
         self.versions: dict[tuple[str, str], list[dict[str, Any]]] = {}
         self.put_calls: list[tuple[str, str]] = []
         self.versioning: dict[str, bool] = {}
+        self.supports_bucket_versioning = True
+        self.supports_object_versioning = True
 
     def head_object(self, bucket: str, key: str) -> Mapping[str, Any] | None:
         """读取当前对象元数据，不存在时返回 ``None``。
@@ -233,6 +235,8 @@ class Boto3R2Client:
         """
         if client is not None:
             self.client = client
+            self.supports_bucket_versioning = False
+            self.supports_object_versioning = False
             return
         try:
             import boto3
@@ -240,6 +244,8 @@ class Boto3R2Client:
             raise RuntimeError("使用 R2 需要安装 boto3") from exc
         endpoint = endpoint_url or f"https://{account_id}.r2.cloudflarestorage.com"
         self.client = boto3.client("s3", endpoint_url=endpoint, aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key)
+        self.supports_bucket_versioning = False
+        self.supports_object_versioning = False
 
     def head_object(self, bucket: str, key: str) -> Mapping[str, Any]:
         """读取对象元数据。"""
@@ -311,6 +317,8 @@ class FilesystemR2Client:
         """
         self.root = Path(root).resolve()
         self.root.mkdir(parents=True, exist_ok=True)
+        self.supports_bucket_versioning = True
+        self.supports_object_versioning = False
 
     def _path(self, bucket: str, key: str) -> Path:
         """解析并校验 bucket/key 在本地根目录内。"""
@@ -391,11 +399,12 @@ def validate_storage_config(client: Any, bucket: str, config: StorageConfig | Ma
         ValueError: 配置不符合版本控制和保留三版本要求。
     """
     resolved = config if isinstance(config, StorageConfig) else StorageConfig.from_mapping(config)
+    native_versioning = getattr(client, "supports_bucket_versioning", True)
     put_versioning = getattr(client, "put_bucket_versioning", None)
-    if callable(put_versioning):
+    if native_versioning and callable(put_versioning):
         put_versioning(bucket, status="Enabled")
     status_getter = getattr(client, "get_bucket_versioning", None)
-    if callable(status_getter):
+    if native_versioning and callable(status_getter):
         status = status_getter(bucket)
         if str(status.get("Status", "")).casefold() != "enabled":
             raise ValueError("R2 Object Versioning 未启用")
@@ -743,6 +752,10 @@ class AssetUploader:
                 result = getter(self.bucket, key)
         except (KeyError, FileNotFoundError):
             return None
+        except Exception as exc:
+            if _is_not_found_error(exc):
+                return None
+            raise
         if isinstance(result, (bytes, bytearray)):
             return bytes(result)
         body = result.get("Body") if isinstance(result, Mapping) else None
@@ -759,6 +772,8 @@ class AssetUploader:
         Returns:
             无返回值。
         """
+        if getattr(self.client, "supports_object_versioning", True) is False:
+            return
         pruner = getattr(self.client, "prune_versions", None)
         if callable(pruner):
             pruner(self.bucket, key, keep=self.config.retain_versions)

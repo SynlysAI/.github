@@ -1,4 +1,5 @@
 import hashlib
+import io
 import json
 from pathlib import Path
 
@@ -120,6 +121,24 @@ def test_boto_style_client_uses_keyword_parameters(tmp_path: Path):
     )
     assert ("downloads", result["downloadPath"]) in [(call[1], call[2]) for call in client.calls if call[0] == "head"]
     assert any(call[0] == "copy" and call[2]["Bucket"] == "downloads" for call in client.calls)
+
+
+def test_boto_style_missing_get_object_is_treated_as_no_snapshot(tmp_path: Path):
+    class ClientError(Exception):
+        response = {"Error": {"Code": "NoSuchKey"}}
+
+    class ReadableBoto(BotoStyleFake):
+        def get_object(self, *, Bucket, Key):
+            try:
+                body, _ = self.objects[(Bucket, Key)]
+            except KeyError as exc:
+                raise ClientError() from exc
+            return {"Body": io.BytesIO(body)}
+
+    result = AssetUploader(ReadableBoto(), bucket="downloads").upload_release_asset(
+        _asset_file(tmp_path), product_id="ai4ms", version="v1"
+    )
+    assert result["name"] == "SpecAgent-linux-amd64.tar.gz"
 
 
 def test_wrong_copy_without_old_object_deletes_formal_key(tmp_path: Path):
