@@ -13,6 +13,7 @@ import mimetypes
 import os
 import posixpath
 import shutil
+import time
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,6 +21,7 @@ from typing import Any, BinaryIO, Mapping, Protocol
 from urllib.parse import quote
 
 CHUNK_SIZE = 1024 * 1024
+APPLICATION_HISTORY_PREFIX = ".release-portal-history"
 
 
 class AssetConflictError(FileExistsError):
@@ -79,15 +81,15 @@ class StorageConfig:
 class InMemoryR2Client:
     """支持版本的内存对象存储，用于测试和离线运行。"""
 
-    def __init__(self) -> None:
+    def __init__(self, *, native_versioning: bool = True) -> None:
         """初始化空 bucket、对象版本和调用记录。"""
         self.objects: dict[tuple[str, str], bytes] = {}
         self.metadata: dict[tuple[str, str], dict[str, Any]] = {}
         self.versions: dict[tuple[str, str], list[dict[str, Any]]] = {}
         self.put_calls: list[tuple[str, str]] = []
         self.versioning: dict[str, bool] = {}
-        self.supports_bucket_versioning = True
-        self.supports_object_versioning = True
+        self.supports_bucket_versioning = native_versioning
+        self.supports_object_versioning = native_versioning
 
     def head_object(self, bucket: str, key: str) -> Mapping[str, Any] | None:
         """读取当前对象元数据，不存在时返回 ``None``。
@@ -196,6 +198,18 @@ class InMemoryR2Client:
         """
         return list(self.versions.get((bucket, key), []))
 
+    def list_objects_v2(self, bucket: str, prefix: str) -> list[str]:
+        """列出匹配前缀的当前对象 key。
+
+        Args:
+            bucket: bucket 名称。
+            prefix: 对象 key 前缀。
+
+        Returns:
+            按 key 排序的对象 key 列表。
+        """
+        return sorted(key for current_bucket, key in self.objects if current_bucket == bucket and key.startswith(prefix))
+
     def prune_versions(self, bucket: str, key: str, *, keep: int = 3) -> None:
         """显式裁剪对象版本，只保留最近 ``keep`` 个。
 
@@ -278,6 +292,30 @@ class Boto3R2Client:
         response = self.client.list_object_versions(Bucket=bucket, Prefix=key)
         return [item for item in response.get("Versions", []) if item.get("Key") == key]
 
+    def list_objects_v2(self, bucket: str, prefix: str) -> list[str]:
+        """分页列出指定前缀的对象 key。
+
+        Args:
+            bucket: bucket 名称。
+            prefix: 对象 key 前缀。
+
+        Returns:
+            按服务端返回顺序排列的对象 key 列表。
+        """
+        keys: list[str] = []
+        token: str | None = None
+        while True:
+            params: dict[str, Any] = {"Bucket": bucket, "Prefix": prefix}
+            if token:
+                params["ContinuationToken"] = token
+            response = self.client.list_objects_v2(**params)
+            keys.extend(str(item["Key"]) for item in response.get("Contents", []) if item.get("Key"))
+            if not response.get("IsTruncated"):
+                return keys
+            token = response.get("NextContinuationToken")
+            if not token:
+                return keys
+
     def prune_versions(self, bucket: str, key: str, *, keep: int = 3) -> None:
         """删除对象较旧版本，仅保留最近 ``keep`` 个。
 
@@ -343,13 +381,17 @@ class FilesystemR2Client:
         target = self._path(bucket, key)
         target.parent.mkdir(parents=True, exist_ok=True)
         temporary = target.with_name(f".{target.name}.{uuid.uuid4().hex}.tmp")
-        with temporary.open("wb") as output:
-            if hasattr(body, "read"):
-                while chunk := body.read(1024 * 1024):
-                    output.write(chunk)
-            else:
-                output.write(bytes(body))
-        os.replace(temporary, target)
+        try:
+            with temporary.open("wb") as output:
+                if hasattr(body, "read"):
+                    while chunk := body.read(CHUNK_SIZE):
+                        output.write(chunk)
+                else:
+                    output.write(bytes(body))
+            os.replace(temporary, target)
+        except Exception:
+            temporary.unlink(missing_ok=True)
+            raise
         metadata = dict(kwargs.get("metadata") or kwargs.get("Metadata") or {})
         metadata["ContentType"] = kwargs.get("content_type", kwargs.get("ContentType", metadata.get("ContentType")))
         metadata["ContentDisposition"] = kwargs.get("content_disposition", kwargs.get("ContentDisposition", metadata.get("ContentDisposition")))
@@ -379,6 +421,26 @@ class FilesystemR2Client:
     def get_object(self, bucket: str, key: str) -> BinaryIO:
         """读取本地对象内容。"""
         return self._path(bucket, key).open("rb")
+
+    def list_objects_v2(self, bucket: str, prefix: str) -> list[str]:
+        """列出本地存储中前缀匹配的对象 key。
+
+        Args:
+            bucket: bucket 名称。
+            prefix: 对象 key 前缀。
+
+        Returns:
+            按 key 排序的对象 key 列表。
+        """
+        bucket_root = self.root / _safe_segment(bucket, "bucket")
+        prefix_root = (bucket_root / prefix).resolve()
+        if not prefix_root.exists():
+            return []
+        return sorted(
+            path.relative_to(bucket_root).as_posix()
+            for path in prefix_root.rglob("*")
+            if path.is_file() and not path.name.endswith(".metadata.json")
+        )
 
     def get_bucket_versioning(self, bucket: str) -> Mapping[str, Any]:
         """返回本地离线存储视作已启用版本控制。"""
@@ -608,13 +670,19 @@ class AssetUploader:
         resolved_type = content_type or _guess_content_type(name)
         disposition = f'attachment; filename="{name}"'
         temp_key = f"{key}.tmp-{uuid.uuid4().hex}"
-        backup_key: str | None = None
+        rollback_key: str | None = None
+        history_key: str | None = None
         metadata = {"sha256": sha256, "platform": resolved_platform, "architecture": resolved_architecture}
         formal_written = False
         try:
-            if existing is not None and previous is None:
-                backup_key = f"{key}.rollback-{uuid.uuid4().hex}"
-                self._copy(key, backup_key)
+            if existing is not None:
+                if self._uses_application_history():
+                    history_key = self._new_history_key(key)
+                    rollback_key = history_key
+                    self._copy(key, history_key)
+                elif previous is None:
+                    rollback_key = f"{key}.rollback-{uuid.uuid4().hex}"
+                    self._copy(key, rollback_key)
             with path.open("rb") as stream:
                 self._put(temp_key, stream, resolved_type, disposition, metadata)
             uploaded = self._head(temp_key)
@@ -642,9 +710,9 @@ class AssetUploader:
                 restore_error = self._restore(key, previous)
                 if restore_error is not None:
                     cleanup_errors.append(restore_error)
-            elif backup_key is not None:
+            elif rollback_key is not None:
                 try:
-                    self._copy(backup_key, key)
+                    self._copy(rollback_key, key)
                 except Exception as restore_error:
                     cleanup_errors.append(restore_error)
             elif formal_written or existing is None:
@@ -652,25 +720,31 @@ class AssetUploader:
                 if deletion_error is not None:
                     cleanup_errors.append(deletion_error)
             try:
-                self._prune_versions(key)
+                self._prune_retention(key)
             except Exception as prune_error:
                 cleanup_errors.append(prune_error)
             if cleanup_errors and hasattr(exc, "add_note"):
                 exc.add_note("附件回滚清理未完全完成")
-            if backup_key is not None:
-                backup_error = self._delete(backup_key)
+            if rollback_key is not None:
+                backup_error = self._delete(rollback_key)
                 if backup_error is not None and hasattr(exc, "add_note"):
                     exc.add_note("附件回滚备份清理未完全完成")
             raise
         else:
+            cleanup_errors: list[Exception] = []
             temporary_error = self._delete(temp_key)
             if temporary_error is not None:
-                raise RuntimeError("临时对象清理失败") from temporary_error
-            if backup_key is not None:
-                backup_error = self._delete(backup_key)
+                cleanup_errors.append(temporary_error)
+            if rollback_key is not None and history_key is None:
+                backup_error = self._delete(rollback_key)
                 if backup_error is not None:
-                    raise RuntimeError("回滚备份清理失败") from backup_error
-        self._prune_versions(key)
+                    cleanup_errors.append(backup_error)
+            try:
+                self._prune_retention(key)
+            except Exception as prune_error:
+                cleanup_errors.append(prune_error)
+            if cleanup_errors:
+                raise RuntimeError("附件上传后清理失败") from cleanup_errors[0]
         return self._public_result(key, name, size, sha256, resolved_platform, resolved_architecture)
 
     def upload_file(self, file_path: str | Path, **kwargs: Any) -> dict[str, Any]:
@@ -830,6 +904,52 @@ class AssetUploader:
             if callable(closer):
                 closer()
         return digest.hexdigest(), size
+
+    def _uses_application_history(self) -> bool:
+        """判断客户端是否需要应用层版本保留。
+
+        Returns:
+            不支持原生对象版本时返回 ``True``。
+        """
+        return getattr(self.client, "supports_object_versioning", True) is False
+
+    @staticmethod
+    def _history_prefix(key: str) -> str:
+        """返回不公开的应用层历史对象前缀。"""
+        return f"{APPLICATION_HISTORY_PREFIX}/{key}/"
+
+    def _new_history_key(self, key: str) -> str:
+        """生成应用层历史对象 key。"""
+        return f"{self._history_prefix(key)}{time.time_ns()}-{uuid.uuid4().hex}"
+
+    def _list_keys(self, prefix: str) -> list[str]:
+        """调用客户端抽象列出前缀下的对象 key。"""
+        lister = getattr(self.client, "list_objects_v2", None)
+        if not callable(lister):
+            return []
+        try:
+            result = lister(self.bucket, prefix)
+        except TypeError:
+            result = lister(Bucket=self.bucket, Prefix=prefix)
+        if isinstance(result, Mapping):
+            return [str(item["Key"]) for item in result.get("Contents", []) if item.get("Key")]
+        return [str(key) for key in result]
+
+    def _prune_application_history(self, key: str) -> None:
+        """保留当前对象之外最近 ``retain_versions - 1`` 个私有历史副本。"""
+        keep_history = max(0, self.config.retain_versions - 1)
+        history_keys = sorted(self._list_keys(self._history_prefix(key)), reverse=True)
+        for obsolete_key in history_keys[keep_history:]:
+            error = self._delete(obsolete_key)
+            if error is not None:
+                raise error
+
+    def _prune_retention(self, key: str) -> None:
+        """按客户端能力保留原生或应用层最近版本。"""
+        if self._uses_application_history():
+            self._prune_application_history(key)
+            return
+        self._prune_versions(key)
 
     def _prune_versions(self, key: str) -> None:
         """调用客户端抽象保留最近三个对象版本。

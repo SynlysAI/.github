@@ -87,6 +87,7 @@ class BotoStyleFake:
         self.objects = {}
         self.calls = []
         self.wrong_copy = wrong_copy
+        self.supports_object_versioning = False
 
     def head_object(self, *, Bucket, Key):
         self.calls.append(("head", Bucket, Key))
@@ -113,6 +114,9 @@ class BotoStyleFake:
     def delete_object(self, *, Bucket, Key):
         self.calls.append(("delete", Bucket, Key))
         self.objects.pop((Bucket, Key), None)
+
+    def list_objects_v2(self, *, Bucket, Prefix):
+        return {"Contents": [{"Key": key} for current_bucket, key in self.objects if current_bucket == Bucket and key.startswith(Prefix)]}
 
 
 def test_boto_style_client_uses_keyword_parameters(tmp_path: Path):
@@ -242,6 +246,69 @@ def test_filesystem_store_writes_stream_in_chunks(tmp_path: Path):
     client.put_object("downloads", "assets/ai4ms/v1/app.bin", reader, content_type="application/octet-stream", content_disposition="attachment", metadata={"sha256": "a" * 64})
     assert client.head_object("downloads", "assets/ai4ms/v1/app.bin")["ContentLength"] == 1024 * 1024 + 3
     assert reader.calls == [1024 * 1024, 1024 * 1024, 1024 * 1024]
+
+
+def test_filesystem_store_removes_staging_file_after_stream_failure(tmp_path: Path):
+    class InterruptedReader:
+        def __init__(self):
+            self.calls = 0
+
+        def read(self, size):
+            self.calls += 1
+            if self.calls == 1:
+                return b"partial"
+            raise OSError("interrupted")
+
+    store_root = tmp_path / "store"
+    client = FilesystemR2Client(store_root)
+    with pytest.raises(OSError, match="interrupted"):
+        client.put_object("downloads", "assets/ai4ms/v1/app.bin", InterruptedReader())
+    assert not list(store_root.rglob("*.tmp"))
+
+
+@pytest.mark.parametrize("client_factory", [
+    lambda tmp_path: FilesystemR2Client(tmp_path / "store"),
+    lambda tmp_path: BotoStyleFake(),
+    lambda tmp_path: InMemoryR2Client(native_versioning=False),
+])
+def test_non_native_storage_retains_current_plus_two_private_history_versions(tmp_path: Path, client_factory):
+    client = client_factory(tmp_path)
+    uploader = AssetUploader(client, bucket="downloads")
+    path = _asset_file(tmp_path, b"one")
+    for content in (b"one", b"two", b"three", b"four"):
+        path.write_bytes(content)
+        uploader.upload_release_asset(path, product_id="ai4ms", version="v1", replace=content != b"one")
+    key = "assets/ai4ms/v1/SpecAgent-linux-amd64.tar.gz"
+    prefix = f".release-portal-history/{key}/"
+    if isinstance(client, (FilesystemR2Client, InMemoryR2Client)):
+        history = client.list_objects_v2("downloads", prefix)
+    else:
+        history = client.list_objects_v2(Bucket="downloads", Prefix=prefix)["Contents"]
+    assert len(history) == 2
+    assert all(".release-portal-history/" in str(item) for item in history)
+
+
+def test_temp_delete_failure_still_cleans_ephemeral_rollback_backup(tmp_path: Path):
+    class TempDeleteFails(BotoStyleFake):
+        def __init__(self):
+            super().__init__()
+            self.supports_object_versioning = True
+
+        def delete_object(self, *, Bucket, Key):
+            if ".tmp-" in Key:
+                raise OSError("temporary cleanup failed")
+            super().delete_object(Bucket=Bucket, Key=Key)
+
+    client = TempDeleteFails()
+    key = "assets/ai4ms/v1/SpecAgent-linux-amd64.tar.gz"
+    client.objects[("downloads", key)] = (
+        b"old",
+        {"ContentType": "application/gzip", "ContentDisposition": "attachment", "sha256": hashlib.sha256(b"old").hexdigest()},
+    )
+    path = _asset_file(tmp_path, b"new")
+    with pytest.raises(RuntimeError, match="清理"):
+        AssetUploader(client, bucket="downloads").upload_release_asset(path, product_id="ai4ms", version="v1", replace=True)
+    assert not any(".rollback-" in object_key for _, object_key in client.objects)
 
 
 def test_cli_upload_asset_requires_fields_and_writes_candidate(tmp_path: Path, monkeypatch, capsys):
