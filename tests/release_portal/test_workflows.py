@@ -64,6 +64,7 @@ def test_metrics_workflow_installs_dashboard_dependencies():
         "python scripts/generate_org_dashboard.py"
     )
     assert "REPO_VISIBILITY: all" in workflow
+    assert 'HIDE_PRIVATE_REPO_NAMES: "true"' in workflow
 
 
 def test_sync_workflow_alerts_after_two_failures_and_closes_on_recovery():
