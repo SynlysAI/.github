@@ -8,6 +8,7 @@ import pytest
 from scripts.release_portal.assets import (
     AssetConflictError,
     AssetUploader,
+    Boto3R2Client,
     FilesystemR2Client,
     InMemoryR2Client,
     StorageConfig,
@@ -126,6 +127,37 @@ def test_boto_style_client_uses_keyword_parameters(tmp_path: Path):
     )
     assert ("downloads", result["downloadPath"]) in [(call[1], call[2]) for call in client.calls if call[0] == "head"]
     assert any(call[0] == "copy" and call[2]["Bucket"] == "downloads" for call in client.calls)
+
+
+def test_boto3_adapter_omits_unset_optional_parameters():
+    """R2 公开 JSON 上传不能向 boto3 传入 None 形式的可选参数。"""
+
+    class StrictBotoClient:
+        def __init__(self):
+            self.kwargs = None
+
+        def put_object(self, **kwargs):
+            if "ContentDisposition" in kwargs and kwargs["ContentDisposition"] is None:
+                raise AssertionError("ContentDisposition must be omitted when unset")
+            self.kwargs = kwargs
+            return kwargs
+
+    client = StrictBotoClient()
+    adapter = Boto3R2Client(
+        access_key_id="access",
+        secret_access_key="secret",
+        account_id="account",
+        client=client,
+    )
+    adapter.put_object(
+        "downloads",
+        "portal/v1/products.json",
+        io.BytesIO(b"{}"),
+        content_type="application/json",
+        cache_control="public, max-age=300",
+    )
+    assert "ContentDisposition" not in client.kwargs
+    assert client.kwargs["CacheControl"] == "public, max-age=300"
 
 
 def test_boto_style_missing_get_object_is_treated_as_no_snapshot(tmp_path: Path):

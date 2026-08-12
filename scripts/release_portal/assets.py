@@ -269,7 +269,18 @@ class Boto3R2Client:
 
     def put_object(self, bucket: str, key: str, body: BinaryIO, **kwargs: Any) -> Any:
         """使用 boto3 关键字参数写入对象。"""
-        return self.client.put_object(Bucket=bucket, Key=key, Body=body, ContentType=kwargs.get("content_type", kwargs.get("ContentType")), ContentDisposition=kwargs.get("content_disposition", kwargs.get("ContentDisposition")), Metadata=kwargs.get("metadata", kwargs.get("Metadata", {})))
+        params: dict[str, Any] = {"Bucket": bucket, "Key": key, "Body": body}
+        aliases = {
+            "content_type": "ContentType",
+            "content_disposition": "ContentDisposition",
+            "cache_control": "CacheControl",
+            "metadata": "Metadata",
+        }
+        for source, target in aliases.items():
+            value = kwargs.get(source, kwargs.get(target))
+            if value is not None:
+                params[target] = value
+        return self.client.put_object(**params)
 
     def copy_object(self, bucket: str, source_key: str, destination_key: str) -> Any:
         """使用 boto3 关键字参数复制对象。"""
