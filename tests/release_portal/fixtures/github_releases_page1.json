@@ -1,4 +1,4 @@
 [
-  {"id": 101, "tag_name": "v1.2.0", "name": "Stable", "body": "notes", "published_at": "2026-01-02T03:04:05Z", "html_url": "https://github.com/SynlysAI/AI4MS/releases/tag/v1.2.0", "prerelease": false, "draft": false, "assets": [{"name": "ai4ms-linux-amd64.tar.gz", "size": 42, "content_type": "application/gzip", "browser_download_url": "https://uploads.example/a"}]},
+  {"id": 101, "tag_name": "v1.2.0", "name": "Stable", "body": "notes", "published_at": "2026-01-02T03:04:05Z", "html_url": "https://github.com/SynlysAI/AI4MS/releases/tag/v1.2.0", "prerelease": false, "draft": false, "assets": [{"id": 501, "name": "ai4ms-linux-amd64.tar.gz", "size": 42, "content_type": "application/gzip", "url": "https://api.github.com/repos/SynlysAI/AI4MS/releases/assets/501", "browser_download_url": "https://uploads.example/a"}]},
   {"id": 102, "tag_name": "v1.3.0-rc1", "name": null, "body": null, "published_at": null, "html_url": "https://github.com/SynlysAI/AI4MS/releases/tag/v1.3.0-rc1", "prerelease": true, "draft": false, "assets": []}
 ]

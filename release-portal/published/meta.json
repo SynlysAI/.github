@@ -18,7 +18,32 @@
     }
   },
   "dataVersion": "1",
-  "generatedAt": "2026-08-11T07:47:32Z",
+  "generatedAt": "2026-08-12T01:03:46Z",
   "schemaVersion": 1,
-  "sourceWatermarks": {}
+  "sourceWatermarks": {
+    "SynlysAI/AI4MS": {
+      "publishedAt": null,
+      "sha": null
+    },
+    "SynlysAI/Poly_Agent": {
+      "publishedAt": null,
+      "sha": null
+    },
+    "SynlysAI/RAGPortal": {
+      "publishedAt": null,
+      "sha": null
+    },
+    "SynlysAI/SmartAccess": {
+      "publishedAt": null,
+      "sha": null
+    },
+    "SynlysAI/SpecLabOS": {
+      "publishedAt": null,
+      "sha": null
+    },
+    "SynlysAI/Spec_Agent": {
+      "publishedAt": null,
+      "sha": null
+    }
+  }
 }

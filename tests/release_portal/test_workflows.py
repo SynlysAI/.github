@@ -227,6 +227,51 @@ def test_sync_command_uploads_formal_asset_with_original_name(tmp_path: Path, mo
     assert '"status":"success"' in capsys.readouterr().out
 
 
+def test_download_release_asset_uses_authenticated_api_url(tmp_path: Path, monkeypatch):
+    """私有仓库附件应通过带安装令牌的 Release Asset API 下载。"""
+
+    class FakeResponse:
+        """提供流式附件响应的最小替身。"""
+
+        url = "https://objects.githubusercontent.com/release-assets/installer.exe"
+
+        @staticmethod
+        def raise_for_status():
+            """模拟成功 HTTP 状态。"""
+
+        @staticmethod
+        def iter_content(*, chunk_size):
+            """按下载函数约定返回附件块。"""
+            assert chunk_size == 1024 * 1024
+            return [b"release asset"]
+
+        @staticmethod
+        def close():
+            """模拟关闭响应。"""
+
+    def fake_get(url, *, headers, stream, timeout):
+        """校验私有附件 API 请求参数。"""
+        assert url == "https://api.github.com/repos/SynlysAI/AI4MS/releases/assets/501"
+        assert headers == {
+            "Accept": "application/octet-stream",
+            "Authorization": "Bearer installation-token",
+        }
+        assert stream is True
+        assert timeout == (10, 120)
+        return FakeResponse()
+
+    monkeypatch.setattr(cli.requests, "get", fake_get)
+    monkeypatch.setattr(cli.tempfile, "mkdtemp", lambda **_kwargs: str(tmp_path))
+
+    downloaded = cli._download_release_asset(
+        "https://api.github.com/repos/SynlysAI/AI4MS/releases/assets/501",
+        "installer.exe",
+        "installation-token",
+    )
+
+    assert downloaded.read_bytes() == b"release asset"
+
+
 def test_publish_command_uploads_manifest_after_all_other_collections(tmp_path: Path):
     """发布命令应先写唯一 generation，再最后更新根 manifest 指针。"""
     candidate = tmp_path / "timeline.json"

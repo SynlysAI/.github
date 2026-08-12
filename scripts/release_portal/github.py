@@ -492,7 +492,16 @@ Returns:
         for raw in item.get("assets") or []:
             name = str(raw.get("name") or "")
             platform, architecture = _asset_target(name)
-            assets.append(ReleaseAsset(name=name, size=int(raw.get("size") or 0), content_type=raw.get("content_type"), download_url=raw.get("browser_download_url"), platform=platform, architecture=architecture))
+            assets.append(
+                ReleaseAsset(
+                    name=name,
+                    size=int(raw.get("size") or 0),
+                    content_type=raw.get("content_type"),
+                    download_url=raw.get("url") or raw.get("browser_download_url"),
+                    platform=platform,
+                    architecture=architecture,
+                )
+            )
         return Release(id=str(item.get("id") or item.get("node_id") or item.get("tag_name") or ""), tag=item.get("tag_name"), name=str(item.get("name") or ""), body=str(item.get("body") or ""), published_at=item.get("published_at"), release_url=item.get("html_url"), prerelease=bool(item.get("prerelease", False)), draft=bool(item.get("draft", False)), assets=tuple(assets))
 
     @staticmethod
