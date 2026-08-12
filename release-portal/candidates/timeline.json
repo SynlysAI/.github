@@ -1,4 +1,746 @@
 {
-  "schemaVersion": 1,
-  "events": []
+  "events": [
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ai4ms:aggregate:2026-06-08:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:00:00Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "d196039",
+          "f523b56",
+          "60c4898",
+          "0fa3f4d",
+          "de5dc13",
+          "06e4049",
+          "90ad0ad",
+          "34ca0cb",
+          "39643a4",
+          "b327150"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "general Bug fix",
+        "zh": "general 问题修复"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ai4ms:aggregate:2026-06-08:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:00:00Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "4b5d020",
+          "6416b08",
+          "c0942e1",
+          "9a61f40",
+          "e9bbb6e",
+          "1f2a24a",
+          "6716016",
+          "846d8d4",
+          "8c1e138",
+          "25a60b7",
+          "2c4c6a1",
+          "c35ff8a",
+          "48b4413"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ai4ms:commit:2026-06-08:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-09T16:31:35Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "3d40b8f"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "general Algorithm improvement",
+        "zh": "general 算法改进"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-06-29:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-29T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "d66937b",
+          "ce46d6b",
+          "168c9f4"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "general Algorithm improvement",
+        "zh": "general 算法改进"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-06-29:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-29T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "c061ad6",
+          "64c9ce8",
+          "62c6f8b",
+          "0be375f",
+          "8491342",
+          "c9bc270"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-07-06:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-06T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "720c3f1",
+          "035ba13",
+          "fc803fe",
+          "e4b49ed",
+          "40c555e",
+          "326072d",
+          "1ff3252"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-07-13:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-13T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "98d79bf",
+          "6fc0233",
+          "b98d5f0",
+          "dde0343",
+          "c55ac36"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-07-20:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "99e4b51",
+          "50a9660",
+          "c4fa3c6",
+          "3d4e02e",
+          "46e549f"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "general Algorithm improvement",
+        "zh": "general 算法改进"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-07-20:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "b06d66f",
+          "8a68087",
+          "9de7cd5",
+          "7bb93e9",
+          "34e9d78",
+          "fb9b3f7",
+          "eb9acb5"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-07-27:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-27T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "2b847ea",
+          "79cd799",
+          "191393d",
+          "6d05e93",
+          "8fc673e"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "general Bug fix",
+        "zh": "general 问题修复"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-07-27:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-27T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "ef270e7",
+          "21fb874",
+          "bef18b7",
+          "dfb1010"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-08-03:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-03T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "e1abbec",
+          "f9f4527"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "general Algorithm improvement",
+        "zh": "general 算法改进"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-08-03:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-03T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "fcee1d7",
+          "0143567",
+          "d07d912"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "general Bug fix",
+        "zh": "general 问题修复"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-08-03:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-03T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "9bc10e9",
+          "d5d4e09",
+          "c3b08a0"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-08-10:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-10T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "164ff6b",
+          "2235f2b",
+          "2094c27"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "general Algorithm improvement",
+        "zh": "general 算法改进"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-08-10:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-10T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "8086dba",
+          "f0d15e1",
+          "7397238"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-07-06:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-11T04:41:37Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "11c0bae"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "general Algorithm improvement",
+        "zh": "general 算法改进"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-07-06:bugfix:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-11T13:12:46Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "db9e6da"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "general Bug fix",
+        "zh": "general 问题修复"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-07-13:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-15T09:52:23Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "469b62c"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "general Algorithm improvement",
+        "zh": "general 算法改进"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ragportal:aggregate:2026-07-27:feature:backend",
+      "level": "aggregate",
+      "module": "backend",
+      "occurredAt": "2026-07-27T08:00:00Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "210708f",
+          "c47dc0f",
+          "8d5d006",
+          "200852b"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "New feature (backend)",
+        "zh": "新增功能（backend）"
+      },
+      "title": {
+        "en": "backend New feature",
+        "zh": "backend 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ragportal:commit:2026-07-27:feature:frontend",
+      "level": "commit",
+      "module": "frontend",
+      "occurredAt": "2026-07-31T06:39:53Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "b66038f"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "New feature (frontend)",
+        "zh": "新增功能（frontend）"
+      },
+      "title": {
+        "en": "frontend New feature",
+        "zh": "frontend 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:aggregate:2026-06-08:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "3e93e80",
+          "b226956",
+          "13b060b",
+          "e6c5b42",
+          "2838e7a"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:aggregate:2026-06-15:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-15T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "bd54f37",
+          "b2f05a5",
+          "605d5d5",
+          "3a771c7"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    }
+  ],
+  "schemaVersion": 1
 }
