@@ -48,7 +48,7 @@ jobs:
       - name: Generate custom analytics dashboard
         env:
           GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}
-          REPO_VISIBILITY: public
+          REPO_VISIBILITY: all
           HIDE_PRIVATE_REPO_NAMES: "true"
           INCLUDE_FORKS: "false"
         run: |

@@ -77,8 +77,12 @@ def test_dashboard_allowlist_is_loaded_from_catalog_and_excludes_internal_reposi
         repo_allowlist=allowlist | {"InternalResearch"},
     )
 
-    assert [repo.name for repo in data["repos"]] == ["AI4MS"]
-    assert data["source_facts"]["skipped_repos"] == {"not_allowlisted": 1, "private": 1}
+    assert [repo.name for repo in data["repos"]] == ["AI4MS", "SmartAccess"]
+    assert data["source_facts"]["skipped_repos"] == {"not_allowlisted": 1}
+    private_repo = data["repos"][1]
+    assert private_repo.display_name == "SMAR-01"
+    assert private_repo.description == "Private repository"
+    assert private_repo.default_branch == "hidden"
     svg = dashboard.render_dashboard(data)
     for sensitive_value in ("InternalResearch", "SmartAccess", "内部私有配方", "secret-release", "private-main"):
         assert sensitive_value not in svg

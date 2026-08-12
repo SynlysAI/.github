@@ -63,6 +63,7 @@ def test_metrics_workflow_installs_dashboard_dependencies():
     assert workflow.index("python -m pip install -r requirements.txt") < workflow.index(
         "python scripts/generate_org_dashboard.py"
     )
+    assert "REPO_VISIBILITY: all" in workflow
 
 
 def test_sync_workflow_alerts_after_two_failures_and_closes_on_recovery():
