@@ -55,6 +55,15 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
     _assert_trusted_main_runs_cli(workflow, "sync")
 
 
+def test_metrics_workflow_installs_dashboard_dependencies():
+    """统计图工作流必须安装脚本依赖后再执行生成步骤。"""
+    workflow = _workflow("metrics.yml")
+    assert "python -m pip install -r requirements.txt" in workflow
+    assert workflow.index("python -m pip install -r requirements.txt") < workflow.index(
+        "python scripts/generate_org_dashboard.py"
+    )
+
+
 def test_sync_workflow_alerts_after_two_failures_and_closes_on_recovery():
     """同步连续失败应创建告警 Issue，恢复后关闭既有告警。"""
     workflow = _workflow("release-portal-sync.yml")
