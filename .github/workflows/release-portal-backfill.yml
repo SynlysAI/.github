@@ -41,7 +41,7 @@ jobs:
 
       - name: 获取产品源读取令牌
         id: source-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.SYNLYSAI_APP_ID }}
           private-key: ${{ secrets.SYNLYSAI_APP_PRIVATE_KEY }}
@@ -52,7 +52,7 @@ jobs:
 
       - name: 获取门户写入令牌
         id: portal-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.SYNLYSAI_APP_ID }}
           private-key: ${{ secrets.SYNLYSAI_APP_PRIVATE_KEY }}
