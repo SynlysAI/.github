@@ -113,11 +113,6 @@ def svg_rect(x: float, y: float, width: float, height: float, *, cls: str = "", 
     return f'<rect x="{x}" y="{y}" width="{width}" height="{height}" rx="{rx}"{class_attr} />'
 
 
-def anonymize_repo_name(repo_name: str, index: int) -> str:
-    prefix = repo_name.split("-")[0].split("_")[0].upper()[:4] or "REPO"
-    return f"{prefix}-{index:02d}"
-
-
 @dataclass
 class RepoStat:
     name: str
@@ -224,11 +219,10 @@ def collect_org_analytics(
         max_pages=4,
     )
     normalized_org = org.casefold()
-    catalog_allowlist = catalog_repository_allowlist()
     requested_allowlist = {name.casefold() for name in repo_allowlist}
+    catalog_allowlist = catalog_repository_allowlist() if requested_allowlist else set()
     effective_allowlist = {
-        name for name in catalog_allowlist
-        if not requested_allowlist or name.casefold() in requested_allowlist
+        name for name in catalog_allowlist if name.casefold() in requested_allowlist
     }
     repo_allowlist_normalized = {name.casefold() for name in effective_allowlist}
     skipped_repos = Counter()
@@ -238,9 +232,6 @@ def collect_org_analytics(
         repo_owner = ((repo.get("owner") or {}).get("login") or "").casefold()
         if repo_owner != normalized_org:
             skipped_repos["owner_mismatch"] += 1
-            continue
-        if repo.get("archived"):
-            skipped_repos["archived"] += 1
             continue
         if repo.get("fork") and not include_forks:
             skipped_repos["fork"] += 1
@@ -270,8 +261,8 @@ def collect_org_analytics(
         is_private = bool(repo.get("private", False))
         if is_private:
             private_index += 1
-        private_mask = is_private and hide_private_repo_names
-        display_name = anonymize_repo_name(repo_name, private_index) if private_mask else repo_name
+        private_mask = is_private
+        display_name = repo_name
         display_description = "Private repository" if private_mask else (repo.get("description") or "No description available.")
         display_default_branch = "hidden" if private_mask else repo.get("default_branch", "main")
 
@@ -321,7 +312,7 @@ def collect_org_analytics(
                 {
                     "display_repo": display_name,
                     "number": int(issue.get("number", 0)),
-                    "display_title": f"private issue #{int(issue.get('number', 0))}" if (is_private and hide_private_repo_names) else title,
+                    "display_title": f"private issue #{int(issue.get('number', 0))}" if private_mask else title,
                     "state": issue.get("state", "open"),
                     "updated_at": parse_iso8601(issue.get("updated_at")),
                 }
@@ -334,7 +325,7 @@ def collect_org_analytics(
                 {
                     "display_repo": display_name,
                     "number": int(pull.get("number", 0)),
-                    "display_title": f"private pr #{int(pull.get('number', 0))}" if (is_private and hide_private_repo_names) else title,
+                    "display_title": f"private pr #{int(pull.get('number', 0))}" if private_mask else title,
                     "state": pull.get("state", "open"),
                     "draft": bool(pull.get("draft", False)),
                     "updated_at": parse_iso8601(pull.get("updated_at")),
@@ -361,7 +352,7 @@ def collect_org_analytics(
             roadmap_items.append(
                 {
                     "display_repo": display_name,
-                    "display_title": "private milestone" if (is_private and hide_private_repo_names) else title,
+                    "display_title": "private milestone" if private_mask else title,
                     "state": milestone.get("state", "open"),
                     "open_issues": int(milestone.get("open_issues", 0)),
                     "closed_issues": int(milestone.get("closed_issues", 0)),
@@ -765,7 +756,7 @@ def main() -> None:
         repo_visibility = "public"
     hide_private_repo_names = env_flag("HIDE_PRIVATE_REPO_NAMES", True)
     include_forks = env_flag("INCLUDE_FORKS", False)
-    repo_allowlist = catalog_repository_allowlist()
+    repo_allowlist = set()
 
     client = GitHubClient(token=token)
     data = collect_org_analytics(
