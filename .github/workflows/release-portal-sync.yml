@@ -71,6 +71,9 @@ jobs:
           git fetch origin main
           git checkout --detach origin/main
           printf '{"schemaVersion": 1, "events": []}\n' > "$RUNNER_TEMP/release-portal-before-timeline.json"
+          if git cat-file -e origin/main:release-portal/candidates/timeline.json; then
+            git show origin/main:release-portal/candidates/timeline.json > "$RUNNER_TEMP/release-portal-before-timeline.json"
+          fi
           if git ls-remote --exit-code --heads origin "$CANDIDATE_BRANCH" >/dev/null 2>&1; then
             git fetch origin "$CANDIDATE_BRANCH:refs/remotes/origin/$CANDIDATE_BRANCH"
             echo "CANDIDATE_EXPECTED_SHA=$(git rev-parse "refs/remotes/origin/$CANDIDATE_BRANCH")" >> "$GITHUB_ENV"
@@ -81,9 +84,6 @@ jobs:
             done
           else
             echo "CANDIDATE_EXPECTED_SHA=0000000000000000000000000000000000000000" >> "$GITHUB_ENV"
-          fi
-          if [ -f release-portal/candidates/timeline.json ]; then
-            cp release-portal/candidates/timeline.json "$RUNNER_TEMP/release-portal-before-timeline.json"
           fi
 
       - name: 同步正式 Release 与附件
