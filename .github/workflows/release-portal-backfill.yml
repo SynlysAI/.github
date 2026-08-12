@@ -105,7 +105,7 @@ jobs:
           --output "$RUNNER_TEMP/release-portal-pr-body.md"
 
       - name: 保存本次候选 artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-portal-candidates
           path: |
