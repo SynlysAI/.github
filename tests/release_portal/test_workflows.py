@@ -53,6 +53,7 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
     assert 'git stash drop "$stash_ref"' in workflow
     assert 'git stash drop "$stash_sha"' not in workflow
     _assert_trusted_main_runs_cli(workflow, "sync")
+    _assert_review_summary_compares_main_to_candidate(workflow)
 
 
 def test_sync_workflow_alerts_after_two_failures_and_closes_on_recovery():
@@ -100,6 +101,7 @@ def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     assert 'git stash drop "$stash_ref"' in workflow
     assert 'git stash drop "$stash_sha"' not in workflow
     _assert_trusted_main_runs_cli(workflow, "backfill")
+    _assert_review_summary_compares_main_to_candidate(workflow)
 
 
 def test_publish_workflow_validates_before_manifest_last_upload():
@@ -157,6 +159,28 @@ def _assert_trusted_main_runs_cli(workflow: str, command: str) -> None:
     assert "release-portal/state/backfill.json" in workflow[restore:cli]
     assert "git checkout -B" not in workflow[restore:cli]
     assert "git checkout -B" in workflow[cli:]
+
+
+def _assert_review_summary_compares_main_to_candidate(workflow: str) -> None:
+    """确认审核摘要比较主分支与完整候选分支，而非最后一批增量。
+
+    Args:
+        workflow: 工作流 YAML 文本。
+    """
+    restore = workflow.index("仅恢复候选数据输入")
+    fetch_candidate = workflow.index('if git ls-remote --exit-code --heads origin "$CANDIDATE_BRANCH"')
+    summary = workflow.index("用主分支代码生成审核摘要")
+    baseline_copy = (
+        "git show origin/main:release-portal/candidates/timeline.json "
+        '> "$RUNNER_TEMP/release-portal-before-timeline.json"'
+    )
+    candidate_copy = (
+        "cp release-portal/candidates/timeline.json "
+        '"$RUNNER_TEMP/release-portal-before-timeline.json"'
+    )
+
+    assert baseline_copy in workflow[restore:fetch_candidate]
+    assert candidate_copy not in workflow[fetch_candidate:summary]
 
 
 def test_sync_command_uploads_formal_asset_with_original_name(tmp_path: Path, monkeypatch, capsys):
