@@ -248,9 +248,6 @@ def collect_org_analytics(
         if repo_allowlist_normalized and repo_name.casefold() not in repo_allowlist_normalized:
             skipped_repos["not_allowlisted"] += 1
             continue
-        if repo.get("private", False):
-            skipped_repos["private"] += 1
-            continue
         filtered_repos.append(repo)
     repos_payload = filtered_repos
 
@@ -273,7 +270,10 @@ def collect_org_analytics(
         is_private = bool(repo.get("private", False))
         if is_private:
             private_index += 1
-        display_name = anonymize_repo_name(repo_name, private_index) if (is_private and hide_private_repo_names) else repo_name
+        private_mask = is_private and hide_private_repo_names
+        display_name = anonymize_repo_name(repo_name, private_index) if private_mask else repo_name
+        display_description = "Private repository" if private_mask else (repo.get("description") or "No description available.")
+        display_default_branch = "hidden" if private_mask else repo.get("default_branch", "main")
 
         contributors = client.paginate(f"/repos/{org}/{repo_name}/contributors?per_page=100", max_pages=4)
         repo_commit_total = 0
@@ -347,8 +347,8 @@ def collect_org_analytics(
             release_items.append(
                 {
                     "display_repo": display_name,
-                    "display_name": f"private release {release.get('tag_name') or ''}".strip() if (is_private and hide_private_repo_names) else name,
-                    "tag_name": release.get("tag_name") or "",
+                    "display_name": "private release" if private_mask else name,
+                    "tag_name": "hidden" if private_mask else (release.get("tag_name") or ""),
                     "draft": bool(release.get("draft", False)),
                     "prerelease": bool(release.get("prerelease", False)),
                     "published_at": parse_iso8601(release.get("published_at") or release.get("created_at")),
@@ -373,8 +373,8 @@ def collect_org_analytics(
             RepoStat(
                 name=repo_name,
                 display_name=display_name,
-                description=repo.get("description") or "No description available.",
-                default_branch=repo.get("default_branch", "main"),
+                description=display_description,
+                default_branch=display_default_branch,
                 stars=int(repo.get("stargazers_count", 0)),
                 forks=int(repo.get("forks_count", 0)),
                 total_commits=repo_commit_total,
@@ -734,7 +734,7 @@ def render_dashboard(data: dict[str, Any]) -> str:
         scope_note += f"; skipped {skipped_count} non-tracked repos"
     parts.append(svg_rect(52, 1640, 1336, 62, cls="panel-bright", rx=20))
     parts.append(svg_text(74, 1678, f"Telemetry source: GitHub REST API. {scope_note}. People panels reflect {member_label}.", cls="footer"))
-    parts.append(svg_text(1362, 1678, f"private repositories excluded · refreshed {generated_at.strftime('%Y-%m-%d %H:%M UTC')}", cls="footer", anchor="end"))
+    parts.append(svg_text(1362, 1678, f"private names masked · refreshed {generated_at.strftime('%Y-%m-%d %H:%M UTC')}", cls="footer", anchor="end"))
     parts.append("</svg>")
     return "\n".join(parts)
 
