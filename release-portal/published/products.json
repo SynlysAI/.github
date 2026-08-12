@@ -1,0 +1,113 @@
+{
+  "products": [
+    {
+      "aiPolicy": "metadata-only",
+      "category": "materials-informatics",
+      "defaultBranch": "main",
+      "entryType": "web",
+      "logo": "logo.png",
+      "name": {
+        "en": "AI4MS",
+        "zh": "AI4MS"
+      },
+      "productId": "ai4ms",
+      "repository": "SynlysAI/AI4MS",
+      "tagline": {
+        "en": "AI-powered materials informatics platform",
+        "zh": "AI 驱动的材料信息学平台"
+      },
+      "webUrl": "https://ai4ms.xmuzc.com/"
+    },
+    {
+      "aiPolicy": "metadata-only",
+      "category": "spectroscopy",
+      "defaultBranch": "main",
+      "entryType": "web",
+      "logo": "logo.png",
+      "name": {
+        "en": "Spec Agent",
+        "zh": "光谱智能体"
+      },
+      "productId": "spec-agent",
+      "repository": "SynlysAI/Spec_Agent",
+      "tagline": {
+        "en": "Intelligent assistant for spectrum analysis",
+        "zh": "面向光谱分析的智能实验助手"
+      },
+      "webUrl": "https://specagent.xmuzc.com/"
+    },
+    {
+      "aiPolicy": "metadata-only",
+      "category": "polymer-science",
+      "defaultBranch": "main",
+      "entryType": "web",
+      "logo": "logo.png",
+      "name": {
+        "en": "Poly Agent",
+        "zh": "聚合物智能体"
+      },
+      "productId": "poly-agent",
+      "repository": "SynlysAI/Poly_Agent",
+      "tagline": {
+        "en": "Agent for polymer design and analysis",
+        "zh": "聚合物设计与分析智能体"
+      },
+      "webUrl": "https://specpoly.xmuzc.com/"
+    },
+    {
+      "aiPolicy": "metadata-only",
+      "category": "laboratory-platform",
+      "defaultBranch": "main",
+      "entryType": "web",
+      "logo": "logo.png",
+      "name": {
+        "en": "SpecLabOS",
+        "zh": "光谱实验室操作系统"
+      },
+      "productId": "speclabos",
+      "repository": "SynlysAI/SpecLabOS",
+      "tagline": {
+        "en": "Lab system connecting instruments, data, and workflows",
+        "zh": "连接仪器、数据与工作流的实验室系统"
+      },
+      "webUrl": "https://speclabos.xmuzc.com/"
+    },
+    {
+      "aiPolicy": "metadata-only",
+      "category": "knowledge-retrieval",
+      "defaultBranch": "main",
+      "entryType": "web",
+      "logo": "logo.png",
+      "name": {
+        "en": "RAGPortal",
+        "zh": "RAG 知识门户"
+      },
+      "productId": "ragportal",
+      "repository": "SynlysAI/RAGPortal",
+      "tagline": {
+        "en": "Portal for research knowledge retrieval and Q&A",
+        "zh": "面向科研知识检索与问答的门户"
+      },
+      "webUrl": "https://rag.xmuzc.com/"
+    },
+    {
+      "aiPolicy": "metadata-only",
+      "category": "developer-tools",
+      "defaultBranch": "main",
+      "entryType": "download",
+      "logo": "logo.png",
+      "name": {
+        "en": "SmartAccess",
+        "zh": "SmartAccess"
+      },
+      "productId": "smartaccess",
+      "repository": "SynlysAI/SmartAccess",
+      "tagline": {
+        "en": "Secure and auditable software distribution",
+        "zh": "安全、可审计的软件分发入口"
+      },
+      "webUrl": null
+    }
+  ],
+  "schemaVersion": 1
+}

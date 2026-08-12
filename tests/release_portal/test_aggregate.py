@@ -1,0 +1,89 @@
+"""Commit 聚合与回填状态测试。"""
+
+import json
+from pathlib import Path
+
+from jsonschema import validate
+
+from scripts.release_portal.aggregate import (
+    aggregate_commits,
+    initial_backfill_state,
+    update_backfill_state,
+)
+
+
+def _commit(sha, when, release, message="feat(core): change"):
+    return {"sha": sha, "message": message, "occurred_at": when, "release_id": release}
+
+
+def test_aggregates_across_releases_and_iso_weeks_are_separate():
+    commits = [
+        _commit("a", "2026-01-05T00:00:00Z", "r1"),
+        _commit("b", "2026-01-06T00:00:00Z", "r2"),
+        _commit("c", "2026-01-12T00:00:00Z", "r3"),
+    ]
+    events = aggregate_commits("p", commits)
+    assert [(event["level"], event["source"]["commitShas"]) for event in events] == [
+        ("aggregate", ["a", "b"]),
+        ("commit", ["c"]),
+    ]
+
+
+def test_duplicate_commits_and_hidden_override_do_not_change_output():
+    commits = [_commit("a", "2026-01-05T00:00:00Z", "r1"), _commit("a", "2026-01-05T00:00:00Z", "r1")]
+    assert len(aggregate_commits("p", commits)) == 1
+    assert aggregate_commits("p", [_commit("a", "2026-01-05T00:00:00Z", "r1")], overrides=[{"sha": "a", "hide": True}]) == []
+
+
+def test_pinned_override_is_propagated_and_backfill_checkpoint_is_resumable():
+    event = aggregate_commits("p", [_commit("a", "2026-01-05T00:00:00Z", "r1")], overrides=[{"sha": "a", "pin": True}])[0]
+    assert event["pinned"] is True
+    state = {"schemaVersion": 1, "repositories": {"repo": {"cursor": None, "completed": False, "watermark": {"sha": None, "publishedAt": None}}}}
+    update_backfill_state(state, "repo", [{"sha": "a", "occurred_at": "2026-01-05T00:00:00Z"}], completed=False)
+    assert state["repositories"]["repo"]["cursor"] == "a"
+    update_backfill_state(state, "repo", [], completed=True)
+    assert state["repositories"]["repo"]["completed"] is True
+
+
+def test_source_repository_is_non_empty_and_can_be_overridden():
+    event = aggregate_commits("spec-agent", [_commit("a", "2026-01-05T00:00:00Z", "r1")])[0]
+    assert event["source"]["repository"] == "spec-agent"
+    event = aggregate_commits("spec-agent", [_commit("a", "2026-01-05T00:00:00Z", "r1")], repository="SynlysAI/Spec_Agent")[0]
+    assert event["source"]["repository"] == "SynlysAI/Spec_Agent"
+
+
+def test_member_repository_has_priority_over_repository_argument():
+    commit = {**_commit("a", "2026-01-05T00:00:00Z", "r1"), "repository": "SynlysAI/Spec_Agent"}
+    event = aggregate_commits("spec-agent", [commit], repository="fallback/repository")[0]
+    assert event["source"]["repository"] == "SynlysAI/Spec_Agent"
+
+
+def test_timeline_event_source_passes_schema_with_fallback_repository():
+    event = aggregate_commits("spec-agent", [_commit("abcdef1234567890", "2026-01-05T00:00:00Z", "r1")])[0]
+    schema = json.loads((Path(__file__).parents[2] / "release-portal" / "schemas" / "timeline.schema.json").read_text(encoding="utf-8"))
+    validate({"schemaVersion": 1, "events": [{**event, "productId": "spec-agent"}]}, schema)
+
+
+def test_backfill_checkpoint_is_idempotent_for_repeated_shas():
+    state = {"schemaVersion": 1, "repositories": {}}
+    batch = [{"sha": "a", "occurred_at": "2026-01-05T00:00:00Z"}, {"sha": "a", "occurred_at": "2026-01-05T00:00:00Z"}, {"sha": "b", "occurred_at": "2026-01-06T00:00:00Z"}]
+    update_backfill_state(state, "repo", batch)
+    update_backfill_state(state, "repo", batch)
+    assert state["repositories"]["repo"]["processed"] == 2
+    assert state["repositories"]["repo"]["processedShas"] == ["a", "b"]
+
+
+def test_initial_backfill_state_includes_empty_processed_sha_list():
+    state = initial_backfill_state(["SynlysAI/Spec_Agent"])
+    assert state["repositories"]["SynlysAI/Spec_Agent"]["processedShas"] == []
+
+
+def test_backfill_processes_at_most_500_then_advances_next_batch():
+    state = initial_backfill_state(["repo"])
+    first_batch = [{"sha": f"{index:07x}", "occurred_at": "2026-01-05T00:00:00Z"} for index in range(501)]
+    update_backfill_state(state, "repo", first_batch)
+    assert state["repositories"]["repo"]["processed"] == 500
+    assert state["repositories"]["repo"]["cursor"] == "00001f3"
+    update_backfill_state(state, "repo", first_batch[500:])
+    assert state["repositories"]["repo"]["processed"] == 501
+    assert state["repositories"]["repo"]["cursor"] == "00001f4"

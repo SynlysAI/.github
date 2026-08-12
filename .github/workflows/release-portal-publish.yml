@@ -1,0 +1,58 @@
+name: Release Portal Publish
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - release-portal/catalog.yml
+      - release-portal/faqs.yml
+      - release-portal/overrides.yml
+      - release-portal/published/**
+      - release-portal/candidates/**
+      - .github/workflows/release-portal-publish.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-portal-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: 检出待发布数据
+        uses: actions/checkout@v4
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安装运行依赖
+        run: python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: 运行 Release Portal 全量测试
+        run: python -m pytest tests/release_portal -q
+
+      - name: 校验公开集合 Schema
+        run: python -m scripts.release_portal.cli publish --validate-only
+
+      - name: 按集合顺序发布到 R2
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+        run: python -m scripts.release_portal.cli publish
+
+      - name: 写入发布摘要
+        run: |
+          {
+            echo "## Release Portal 发布完成"
+            echo
+            echo "已在 manifest.json 最后上传公开数据快照。"
+          } >> "$GITHUB_STEP_SUMMARY"

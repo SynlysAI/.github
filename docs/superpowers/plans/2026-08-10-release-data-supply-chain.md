@@ -225,7 +225,7 @@ tests/release_portal/
 - [ ] `release-portal-backfill.yml` 仅手动触发：按产品或全部产品每次回填 500 条历史提交，上传候选 artifact 并更新同一个审核 PR，直到六仓库状态为 `complete`。
 - [ ] `release-portal-publish.yml` 在主分支的 catalog/FAQ/override/published 文件变化时触发：跑全量测试和 Schema 校验，再依次上传五个集合、`meta.json`，最后上传 `manifest.json`；任一文件失败时不得更新 manifest。
 - [ ] 配置 `concurrency`，同一发布组只允许一个任务运行；同步任务可取消旧运行，发布任务不可中途取消。
-- [ ] 所需 Secrets 固定为 `SYNLYSAI_APP_ID`、`SYNLYSAI_APP_PRIVATE_KEY`、`AI_API_KEY`、`R2_ACCESS_KEY_ID`、`R2_SECRET_ACCESS_KEY`；Vars 固定为 `AI_BASE_URL`、`AI_MODEL`、`CLOUDFLARE_ACCOUNT_ID`、`R2_BUCKET`。
+- [ ] 所需 Secrets 固定为 `SYNLYSAI_APP_ID`、`SYNLYSAI_APP_PRIVATE_KEY`、`AI_API_KEY`、`R2_ACCESS_KEY_ID`、`R2_SECRET_ACCESS_KEY`；普通仓库 Vars 固定为 `AI_BASE_URL`、`AI_MODEL`、`CLOUDFLARE_ACCOUNT_ID`、`R2_BUCKET`。`AI_PRIVATE_ENDPOINT_ALLOWLIST` 仅作为 `release-portal-private-ai` GitHub Environment 的受保护 Var 配置，必须启用 required reviewers，独立于且不得等于 `AI_BASE_URL` 自证。
 - [ ] 将 GitHub Actions 和 Python 依赖纳入 Dependabot；工作流权限使用最小 `contents: write`、`pull-requests: write`，私有仓库读取由 GitHub App 安装权限控制。
 - [ ] 用 `workflow_dispatch` 依次验收单产品增量、单产品回填、六产品发布和失败重试。
 - [ ] 提交：`git commit -m "ci: 建立 Release Portal 自动同步与发布"`。
@@ -240,7 +240,7 @@ tests/release_portal/
 
 - [ ] 在组织首页增加官网 Release Portal 入口，并明确 GitHub 是来源、官网是统一公开渠道。
 - [ ] 现有组织统计看板继续独立运行，只复用 `catalog.yml` 的仓库 allowlist，避免内部仓库误入公开 SVG。
-- [ ] 运维文档写明新增产品、修改入口、隐藏节点、置顶节点、手动上传资源、回滚 R2 对象和处理 AI 失败的完整命令。
+- [ ] 运维文档写明新增产品、修改入口、隐藏节点、置顶节点、手动上传资源、回滚 R2 对象和处理 AI 失败的完整命令；开篇说明 `AI_PRIVATE_ENDPOINT_ALLOWLIST` 是仅限 `release-portal-private-ai`、启用 required reviewers 的 Environment Var，不属于普通仓库 Vars，且不得由 `AI_BASE_URL` 填充。
 - [ ] 所有 CLI 输出 JSON 日志，至少包含 `runId`、`productId`、`stage`、`count`、`durationMs`、`status`，不得输出密钥或私有正文。
 - [ ] 发布成功后写 GitHub Job Summary；连续两次同步失败时创建带 `release-portal` 标签的 Issue，恢复后自动关闭。
 - [ ] 运行 `python -m pytest tests/release_portal -q` 与现有 dashboard 生成命令，预期测试通过且 SVG 可生成。

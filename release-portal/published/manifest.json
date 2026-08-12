@@ -1,0 +1,64 @@
+{
+  "collections": {
+    "faqs": {
+      "bytes": 39,
+      "path": "faqs.json",
+      "sha256": "d85de192b22c3fdda3c36ca9da45d71f35deed613bfc8f71eb1b34f942e11abc"
+    },
+    "meta": {
+      "bytes": 637,
+      "path": "meta.json",
+      "sha256": "cfb2a92e6233aa14da280c02cac44fcbe411a38ffca3c0e84804b62ce8568ab5"
+    },
+    "products": {
+      "bytes": 3143,
+      "path": "products.json",
+      "sha256": "69b5d778f3752513c5983bfededce6e5869122fac122cce3cba6e88e67e4cccd"
+    },
+    "releases": {
+      "bytes": 43,
+      "path": "releases.json",
+      "sha256": "5b83016e5254cffb69379ba236d0ffa67347fcae4b2aa7af2e246f731966217d"
+    },
+    "timeline": {
+      "bytes": 41,
+      "path": "timeline.json",
+      "sha256": "8642e28c7a2dd0c2483579065efa8e3122a9ab1e328da7d6c9a71a34abbe75ed"
+    }
+  },
+  "dataVersion": "1",
+  "files": [
+    {
+      "bytes": 3143,
+      "name": "products.json",
+      "path": "products.json",
+      "sha256": "69b5d778f3752513c5983bfededce6e5869122fac122cce3cba6e88e67e4cccd"
+    },
+    {
+      "bytes": 43,
+      "name": "releases.json",
+      "path": "releases.json",
+      "sha256": "5b83016e5254cffb69379ba236d0ffa67347fcae4b2aa7af2e246f731966217d"
+    },
+    {
+      "bytes": 41,
+      "name": "timeline.json",
+      "path": "timeline.json",
+      "sha256": "8642e28c7a2dd0c2483579065efa8e3122a9ab1e328da7d6c9a71a34abbe75ed"
+    },
+    {
+      "bytes": 39,
+      "name": "faqs.json",
+      "path": "faqs.json",
+      "sha256": "d85de192b22c3fdda3c36ca9da45d71f35deed613bfc8f71eb1b34f942e11abc"
+    },
+    {
+      "bytes": 637,
+      "name": "meta.json",
+      "path": "meta.json",
+      "sha256": "cfb2a92e6233aa14da280c02cac44fcbe411a38ffca3c0e84804b62ce8568ab5"
+    }
+  ],
+  "generatedAt": "2026-08-11T07:47:32Z",
+  "schemaVersion": 1
+}

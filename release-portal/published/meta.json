@@ -1,0 +1,24 @@
+{
+  "collections": {
+    "faqs": {
+      "count": 0,
+      "sha256": "d85de192b22c3fdda3c36ca9da45d71f35deed613bfc8f71eb1b34f942e11abc"
+    },
+    "products": {
+      "count": 6,
+      "sha256": "69b5d778f3752513c5983bfededce6e5869122fac122cce3cba6e88e67e4cccd"
+    },
+    "releases": {
+      "count": 0,
+      "sha256": "5b83016e5254cffb69379ba236d0ffa67347fcae4b2aa7af2e246f731966217d"
+    },
+    "timeline": {
+      "count": 0,
+      "sha256": "8642e28c7a2dd0c2483579065efa8e3122a9ab1e328da7d6c9a71a34abbe75ed"
+    }
+  },
+  "dataVersion": "1",
+  "generatedAt": "2026-08-11T07:47:32Z",
+  "schemaVersion": 1,
+  "sourceWatermarks": {}
+}
