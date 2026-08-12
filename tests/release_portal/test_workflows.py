@@ -49,6 +49,9 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
     assert "cancel-in-progress: true" in workflow
     assert "scripts.release_portal.review_summary" in workflow
     assert "--body-file" in workflow
+    assert 'stash_ref="stash@{0}"' in workflow
+    assert 'git stash drop "$stash_ref"' in workflow
+    assert 'git stash drop "$stash_sha"' not in workflow
     _assert_trusted_main_runs_cli(workflow, "sync")
 
 
@@ -93,6 +96,9 @@ def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     assert "permission-pull-requests: read" in workflow
     assert "GITHUB_TOKEN: ${{ steps.source-token.outputs.token }}" in workflow
     assert "GH_TOKEN: ${{ steps.portal-token.outputs.token }}" in workflow
+    assert 'stash_ref="stash@{0}"' in workflow
+    assert 'git stash drop "$stash_ref"' in workflow
+    assert 'git stash drop "$stash_sha"' not in workflow
     _assert_trusted_main_runs_cli(workflow, "backfill")
 
 
