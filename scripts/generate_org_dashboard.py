@@ -113,11 +113,6 @@ def svg_rect(x: float, y: float, width: float, height: float, *, cls: str = "", 
     return f'<rect x="{x}" y="{y}" width="{width}" height="{height}" rx="{rx}"{class_attr} />'
 
 
-def anonymize_repo_name(repo_name: str, index: int) -> str:
-    prefix = repo_name.split("-")[0].split("_")[0].upper()[:4] or "REPO"
-    return f"{prefix}-{index:02d}"
-
-
 @dataclass
 class RepoStat:
     name: str
@@ -237,9 +232,6 @@ def collect_org_analytics(
         repo_owner = ((repo.get("owner") or {}).get("login") or "").casefold()
         if repo_owner != normalized_org:
             skipped_repos["owner_mismatch"] += 1
-            continue
-        if repo.get("archived"):
-            skipped_repos["archived"] += 1
             continue
         if repo.get("fork") and not include_forks:
             skipped_repos["fork"] += 1
