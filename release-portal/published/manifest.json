@@ -6,9 +6,9 @@
       "sha256": "d85de192b22c3fdda3c36ca9da45d71f35deed613bfc8f71eb1b34f942e11abc"
     },
     "meta": {
-      "bytes": 637,
+      "bytes": 1119,
       "path": "meta.json",
-      "sha256": "cfb2a92e6233aa14da280c02cac44fcbe411a38ffca3c0e84804b62ce8568ab5"
+      "sha256": "b6e8f3c70d071f3220ca8267ec2d04e0ff2aa79b312f5ffc30a0b94008376a6d"
     },
     "products": {
       "bytes": 3143,
@@ -53,12 +53,12 @@
       "sha256": "d85de192b22c3fdda3c36ca9da45d71f35deed613bfc8f71eb1b34f942e11abc"
     },
     {
-      "bytes": 637,
+      "bytes": 1119,
       "name": "meta.json",
       "path": "meta.json",
-      "sha256": "cfb2a92e6233aa14da280c02cac44fcbe411a38ffca3c0e84804b62ce8568ab5"
+      "sha256": "b6e8f3c70d071f3220ca8267ec2d04e0ff2aa79b312f5ffc30a0b94008376a6d"
     }
   ],
-  "generatedAt": "2026-08-11T07:47:32Z",
+  "generatedAt": "2026-08-12T01:03:46Z",
   "schemaVersion": 1
 }

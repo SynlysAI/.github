@@ -54,6 +54,9 @@ def test_release_pagination_and_normalization():
     assert len(releases) == 3
     assert releases[1].prerelease is True and releases[2].draft is True
     assert releases[0].assets[0].platform == "linux"
+    assert releases[0].assets[0].download_url == (
+        "https://api.github.com/repos/SynlysAI/AI4MS/releases/assets/501"
+    )
     assert session.calls[0][1]["headers"]["Authorization"] == "Bearer app-token"
 
 
