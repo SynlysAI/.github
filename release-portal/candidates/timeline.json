@@ -498,6 +498,37 @@
       "version": null
     },
     {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:aggregate:2026-08-10:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-10T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "eec61a8",
+          "8524244",
+          "1432536"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "general Bug fix",
+        "zh": "general 问题修复"
+      },
+      "version": null
+    },
+    {
       "changeType": "feature",
       "detailsMarkdown": {
         "en": "",
@@ -515,7 +546,9 @@
           "f0d15e1",
           "7397238",
           "f9e296e",
-          "0d2da75"
+          "0d2da75",
+          "99f3c1b",
+          "02883d4"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
