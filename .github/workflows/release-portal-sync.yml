@@ -143,8 +143,9 @@ jobs:
         run: |
           previous_stash="$(git rev-parse -q --verify refs/stash || true)"
           git stash push --include-untracked --message release-portal-candidates -- release-portal/candidates release-portal/state/backfill.json
-          stash_ref="$(git rev-parse -q --verify refs/stash || true)"
-          if [ -z "$stash_ref" ] || [ "$stash_ref" = "$previous_stash" ]; then
+          stash_sha="$(git rev-parse -q --verify refs/stash || true)"
+          stash_ref="stash@{0}"
+          if [ -z "$stash_sha" ] || [ "$stash_sha" = "$previous_stash" ]; then
             echo "没有新增候选数据"
             exit 0
           fi
