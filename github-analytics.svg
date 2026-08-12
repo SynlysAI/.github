@@ -221,5 +221,5 @@
 <text x="1060" y="1582" text-anchor="start" class="stream-copy">Awaiting milestone configuration</text>
 <rect x="52" y="1640" width="1336" height="62" rx="20" class="panel-bright" />
 <text x="74" y="1678" text-anchor="start" class="footer">Telemetry source: GitHub REST API. Scope=public; owner=SynlysAI; forks=excluded; skipped 1 non-tracked repos. People panels reflect public contributors.</text>
-<text x="1362" y="1678" text-anchor="end" class="footer">private repositories excluded · refreshed 2026-08-12 06:26 UTC</text>
+<text x="1362" y="1678" text-anchor="end" class="footer">private repositories excluded · refreshed 2026-08-12 06:28 UTC</text>
 </svg>
