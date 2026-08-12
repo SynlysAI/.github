@@ -513,7 +513,9 @@
         "commitShas": [
           "8086dba",
           "f0d15e1",
-          "7397238"
+          "7397238",
+          "f9e296e",
+          "0d2da75"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
@@ -601,6 +603,35 @@
       "source": {
         "commitShas": [
           "469b62c"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "general Algorithm improvement",
+        "zh": "general 算法改进"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-10:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-12T06:31:06Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "ff6b38c"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
