@@ -685,6 +685,35 @@
         "en": "",
         "zh": ""
       },
+      "id": "poly-agent:commit:2026-08-10:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-13T01:19:54Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "19e3ba9"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "general New feature",
+        "zh": "general 新增功能"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
       "id": "ragportal:aggregate:2026-07-27:feature:backend",
       "level": "aggregate",
       "module": "backend",
