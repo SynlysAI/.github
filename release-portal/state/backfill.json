@@ -246,9 +246,9 @@
     },
     "SynlysAI/RAGPortal": {
       "completed": true,
-      "cursor": "02ee527631a31ca08b2d6fd6e313ca85b0008e3d",
+      "cursor": "1d96237ee1285401c6ae32d16ed62ee817f289cb",
       "page": 2,
-      "processed": 23,
+      "processed": 24,
       "processedShas": [
         "5010753faa727f73bd806450c91abd6cb832a353",
         "4df0f685756cd33da1da34f355d42913c796829f",
@@ -272,11 +272,12 @@
         "8d5d006b1f54f45050970b1e1e12916314e038c3",
         "c47dc0f2fde6080dc6bf34188e8c5e16ad336911",
         "210708fc76eb8f5efb2a31382ffd1664ede943bf",
-        "02ee527631a31ca08b2d6fd6e313ca85b0008e3d"
+        "02ee527631a31ca08b2d6fd6e313ca85b0008e3d",
+        "1d96237ee1285401c6ae32d16ed62ee817f289cb"
       ],
       "watermark": {
-        "publishedAt": "2026-08-05T06:57:54Z",
-        "sha": "5010753faa727f73bd806450c91abd6cb832a353"
+        "publishedAt": "2026-08-13T08:50:15Z",
+        "sha": "1d96237ee1285401c6ae32d16ed62ee817f289cb"
       }
     },
     "SynlysAI/SmartAccess": {
