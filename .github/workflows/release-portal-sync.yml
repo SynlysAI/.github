@@ -23,6 +23,8 @@ concurrency:
 
 jobs:
   sync:
+    # 该 Environment 需启用 required reviewers；白名单由受保护审批配置维护，独立于 AI_BASE_URL，不得从其填充。
+    environment: release-portal-private-ai
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -95,6 +97,10 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           R2_BUCKET: ${{ vars.R2_BUCKET }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ vars.AI_BASE_URL }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          AI_PRIVATE_ENDPOINT_ALLOWLIST: ${{ vars.AI_PRIVATE_ENDPOINT_ALLOWLIST }}
         run: >-
           python -m scripts.release_portal.cli sync
           --product "${{ inputs.product || 'all' }}"
