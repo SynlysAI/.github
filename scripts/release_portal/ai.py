@@ -494,9 +494,13 @@ class AIClient:
                 {
                     "role": "system",
                     "content": (
-                        "Return exactly one JSON object with title.zh, title.en, "
-                        "summary.zh, summary.en, detailsMarkdown.zh, "
-                        "detailsMarkdown.en, changeType, and module."
+                        "Return exactly one JSON object with these fields: "
+                        '"title": {"zh": string, "en": string}, '
+                        '"summary": {"zh": string, "en": string}, '
+                        '"detailsMarkdown": {"zh": string, "en": string}, '
+                        '"changeType": string, "module": string. '
+                        "title/summary/detailsMarkdown are nested objects with "
+                        "zh/en keys, not flattened keys like \"title.zh\"."
                     ),
                 },
                 {"role": "user", "content": json.dumps(request, ensure_ascii=False)},
