@@ -47,7 +47,7 @@ def test_catalog_allowlist_is_fixed() -> None:
     } == {
         ("ai4ms", "SynlysAI/AI4MS", "web", "https://ai4ms.xmuzc.com/"),
         ("spec-agent", "SynlysAI/Spec_Agent", "web", "https://specagent.xmuzc.com/"),
-        ("poly-agent", "SynlysAI/Poly_Agent", "web", "https://specpoly.xmuzc.com/"),
+        ("poly-agent", "SynlysAI/Poly_Agent", "web", "https://polyagent.xmuzc.com/"),
         ("speclabos", "SynlysAI/SpecLabOS", "web", "https://speclabos.xmuzc.com/"),
         ("ragportal", "SynlysAI/RAGPortal", "web", "https://rag.xmuzc.com/"),
         ("smartaccess", "SynlysAI/SmartAccess", "download", None),

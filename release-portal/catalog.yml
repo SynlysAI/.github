@@ -23,7 +23,7 @@ products:
   - productId: poly-agent
     repository: SynlysAI/Poly_Agent
     entryType: web
-    webUrl: https://specpoly.xmuzc.com/
+    webUrl: https://polyagent.xmuzc.com/
     name: {zh: 聚合物智能体, en: Poly Agent}
     tagline: {zh: 聚合物设计与分析智能体, en: Agent for polymer design and analysis}
     category: polymer-science
