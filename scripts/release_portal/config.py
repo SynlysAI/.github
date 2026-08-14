@@ -17,7 +17,7 @@ EXPECTED_PRODUCTS = {
     "spec-agent": ("SynlysAI/Spec_Agent", "web", "https://specagent.xmuzc.com/"),
     "poly-agent": ("SynlysAI/Poly_Agent", "web", "https://polyagent.xmuzc.com/"),
     "speclabos": ("SynlysAI/SpecLabOS", "web", "https://speclabos.xmuzc.com/"),
-    "ragportal": ("SynlysAI/RAGPortal", "web", "https://rag.xmuzc.com/"),
+    "ragportal": ("SynlysAI/RAGPortal", "web", "https://ragportal.xmuzc.com/"),
     "smartaccess": ("SynlysAI/SmartAccess", "download", None),
 }
 CATALOG_KEYS = {"schemaVersion", "products"}

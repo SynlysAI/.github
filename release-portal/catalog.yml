@@ -43,7 +43,7 @@ products:
   - productId: ragportal
     repository: SynlysAI/RAGPortal
     entryType: web
-    webUrl: https://rag.xmuzc.com/
+    webUrl: https://ragportal.xmuzc.com/
     name: {zh: RAG 知识门户, en: RAGPortal}
     tagline: {zh: 面向科研知识检索与问答的门户, en: Portal for research knowledge retrieval and Q&A}
     category: knowledge-retrieval

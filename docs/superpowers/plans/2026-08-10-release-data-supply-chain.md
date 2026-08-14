@@ -43,7 +43,7 @@ assets/{productId}/{version}/{assetName}
 | `spec-agent` | `SynlysAI/Spec_Agent` | `web` | `https://specagent.xmuzc.com/` |
 | `poly-agent` | `SynlysAI/Poly_Agent` | `web` | `https://polyagent.xmuzc.com/` |
 | `speclabos` | `SynlysAI/SpecLabOS` | `web` | `https://speclabos.xmuzc.com/` |
-| `ragportal` | `SynlysAI/RAGPortal` | `web` | `https://rag.xmuzc.com/` |
+| `ragportal` | `SynlysAI/RAGPortal` | `web` | `https://ragportal.xmuzc.com/` |
 | `smartaccess` | `SynlysAI/SmartAccess` | `download` | `null` |
 
 公开时间线事件字段固定为：
