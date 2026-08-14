@@ -32,7 +32,7 @@ jobs:
           fetch-depth: 1
 
       - name: 配置 Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
 
@@ -41,7 +41,7 @@ jobs:
 
       - name: 获取产品源读取令牌
         id: source-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.SYNLYSAI_APP_ID }}
           private-key: ${{ secrets.SYNLYSAI_APP_PRIVATE_KEY }}
@@ -52,7 +52,7 @@ jobs:
 
       - name: 获取门户写入令牌
         id: portal-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.SYNLYSAI_APP_ID }}
           private-key: ${{ secrets.SYNLYSAI_APP_PRIVATE_KEY }}
@@ -105,7 +105,7 @@ jobs:
           --output "$RUNNER_TEMP/release-portal-pr-body.md"
 
       - name: 保存本次候选 artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-portal-candidates
           path: |
