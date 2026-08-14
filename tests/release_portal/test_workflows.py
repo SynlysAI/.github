@@ -30,7 +30,7 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
 
     assert "cron: \"17 */6 * * *\"" in workflow
     assert "workflow_dispatch:" in workflow
-    assert "actions/create-github-app-token@v1" in workflow
+    assert "actions/create-github-app-token@v3" in workflow
     assert "id: source-token" in workflow
     assert "id: portal-token" in workflow
     assert "repositories: AI4MS,Spec_Agent,Poly_Agent,SpecLabOS,RAGPortal,SmartAccess" in workflow
@@ -92,7 +92,7 @@ def test_backfill_workflow_is_manual_and_limits_each_product_batch():
     assert "push:" not in workflow
     assert "python -m scripts.release_portal.cli backfill" in workflow
     assert "--limit 500" in workflow
-    assert "actions/upload-artifact@v4" in workflow
+    assert "actions/upload-artifact@v7" in workflow
     assert "automation/release-portal-candidates" in workflow
     assert "environment: release-portal-private-ai" in workflow
     assert "AI_PRIVATE_ENDPOINT_ALLOWLIST: ${{ vars.AI_PRIVATE_ENDPOINT_ALLOWLIST }}" in workflow
