@@ -739,25 +739,6 @@ def test_sync_adds_only_commits_newer_than_watermark(tmp_path: Path, monkeypatch
                 }
             ]
 
-    seen_prs: list[dict[str, str]] = []
-
-    class RecordingAI:
-        """记录 sync 传给 AI 的关联 PR。"""
-
-        @classmethod
-        def from_environment(cls):
-            """返回记录客户端。"""
-            return cls()
-
-        @staticmethod
-        def enrich_candidate(event, *, product_name, commit_messages, pull_requests, repository_private):
-            """保留候选并记录 PR 参数。"""
-            del product_name, commit_messages, repository_private
-            seen_prs.extend(pull_requests)
-            return event
-
-    monkeypatch.setenv("AI_API_KEY", "test-key")
-    monkeypatch.setattr(cli, "AIClient", RecordingAI)
     args = cli._parser().parse_args(
         [
             "sync",
@@ -779,7 +760,6 @@ def test_sync_adds_only_commits_newer_than_watermark(tmp_path: Path, monkeypatch
     assert client.calls == [("SynlysAI/AI4MS", True, old_sha, 500, 1)]
     assert [sha for event in timeline["events"] for sha in event["source"]["commitShas"]] == [new_sha[:7]]
     assert updated_state["repositories"]["SynlysAI/AI4MS"]["watermark"]["sha"] == new_sha
-    assert seen_prs == [{"title": "Incremental PR", "body": "PR body"}]
 
 
 def test_sync_continues_after_full_batch_without_losing_or_repeating_commits(tmp_path: Path, monkeypatch):

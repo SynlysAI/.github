@@ -104,10 +104,25 @@ def aggregate_commits(product_id: str, commits: Iterable[Any], *, releases: Iter
         level = "aggregate" if len(members) >= 2 else "commit"
         event_id = f"{product}:{level}:{week}:{change_type}:{module}"
         first = members[0]
-        title, summary = _event_text(change_type, module)
         occurred_at = f"{week}T08:00:00Z" if level == "aggregate" else (first.occurred_at or f"{week}T08:00:00Z")
         source_repository = next((item.repository for item in members if item.repository), None)
         source_repository = source_repository or repository or product_id
+        if level == "commit":
+            subject_text = (first.subject or first.message or "").strip()
+            if not subject_text:
+                subject_text = _event_text(change_type, module)[0]["zh"]
+            title = {"zh": subject_text, "en": subject_text}
+            summary = {"zh": subject_text, "en": subject_text}
+            details: dict[str, str] = {"zh": "", "en": ""}
+        else:
+            title, summary = _event_text(change_type, module)
+            lines = [
+                f"- {(item.subject or item.message or '').strip()}"
+                for item in members
+                if (item.subject or item.message or "").strip()
+            ]
+            details_md = "\n".join(lines)
+            details = {"zh": details_md, "en": details_md}
         events.append({
             "id": event_id,
             "productId": product,
@@ -118,7 +133,7 @@ def aggregate_commits(product_id: str, commits: Iterable[Any], *, releases: Iter
             "module": module,
             "title": title,
             "summary": summary,
-            "detailsMarkdown": {"zh": "", "en": ""},
+            "detailsMarkdown": details,
             "source": {"repository": source_repository, "commitShas": [_short_sha(item.sha) for item in members], "releaseUrl": None},
             "pinned": any(item.pinned for item in members),
         })

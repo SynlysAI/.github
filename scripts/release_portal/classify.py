@@ -26,6 +26,26 @@ ALGORITHM_KEYWORDS = (
 )
 NOISE_TYPES = {"merge", "revert", "deps", "dependency", "dependencies", "format", "fmt", "test", "tests", "docs", "doc", "ci"}
 _CONVENTIONAL = re.compile(r"^(?P<kind>[A-Za-z][\w-]*)(?:\((?P<scope>[^)]+)\))?(?P<breaking>!)?:\s*(?P<subject>.+)$")
+KEYWORD_CHANGE_TYPES = (
+    (("新增", "支持", "加入", "添加", "引入", "集成", "上线"), "feature"),
+    (("修复", "修正", "改正", "解决"), "bugfix"),
+    (("优化", "完善", "改进", "提升", "调整"), "performance"),
+    (("重构", "迁移", "兼容", "升级", "改造"), "architecture"),
+)
+
+
+def _infer_change_type(message: str) -> str:
+    """从提交信息关键词推断变更类型，用于非 Conventional Commits 的中文提交。
+
+    Args:
+        message: 提交信息首行。
+    Returns:
+        推断的变更类型；无法识别时返回空字符串。
+    """
+    for keywords, change_type in KEYWORD_CHANGE_TYPES:
+        if any(keyword in message for keyword in keywords):
+            return change_type
+    return ""
 
 
 @dataclass(frozen=True)
@@ -49,6 +69,7 @@ class ClassifiedCommit:
     occurred_at: str | None
     change_type: str
     module: str
+    subject: str = ""
     release_id: str | None = None
     product_id: str | None = None
     repository: str | None = None
@@ -177,16 +198,18 @@ def classify_commit(commit: Any, *, product_id: str | None = None, overrides: It
     match = _CONVENTIONAL.match(message)
     # hide: false、restore/show 或显式改类都表示人工恢复该候选。
     restored = bool(override.get("restore") or override.get("show") or override.get("hide") is False or override.get("changeType"))
+    inferred = ""
     if not match:
-        # 非 Conventional 标题只有人工明确改类/恢复时才允许进入候选。
-        if not restored or not override.get("changeType"):
+        # 非 Conventional 标题：人工改类/恢复，或关键词可推断类型时才进入候选。
+        inferred = _infer_change_type(message)
+        if (not restored or not override.get("changeType")) and not inferred:
             return None
         kind, scope, subject = "", None, message
     else:
         kind, scope, subject = match.group("kind").casefold(), match.group("scope"), match.group("subject").strip()
     if not restored and _is_noise(kind, subject, message, value):
         return None
-    change_type = str(override.get("changeType") or "").strip() or TYPE_MAP.get(kind, "")
+    change_type = str(override.get("changeType") or "").strip() or TYPE_MAP.get(kind, "") or inferred
     if not change_type:
         return None
     if any(keyword.casefold() in f"{subject} {message}".casefold() for keyword in ALGORITHM_KEYWORDS) and not override.get("changeType"):
@@ -205,6 +228,7 @@ def classify_commit(commit: Any, *, product_id: str | None = None, overrides: It
         occurred_at=occurred_at,
         change_type=change_type,
         module=module,
+        subject=subject,
         release_id=value.get("release_id") or value.get("releaseId"),
         product_id=product_id or value.get("product_id") or value.get("productId"),
         repository=value.get("repository") or value.get("repo"),

@@ -24,7 +24,6 @@ from .aggregate import (
     save_backfill_state,
     update_backfill_state,
 )
-from .ai import AIClient
 from .classify import load_overrides as load_classification_overrides
 from .config import load_catalog
 from .github import COMMIT_PAGE_SIZE, GitHubClient
@@ -505,7 +504,7 @@ def _sync(args: argparse.Namespace, *, object_store: Any | None = None, github_c
                     overrides=overrides,
                     repository=product.repository,
                 )
-                timeline_additions.extend(_enrich_events(events, product, new_commits))
+                timeline_additions.extend(events)
                 processed += len(new_commits)
         records.sort(key=lambda item: (str(item.get("publishedAt") or ""), str(item.get("id") or "")), reverse=True)
         _atomic_write_json(args.candidates, {"schemaVersion": 1, "releases": records})
@@ -646,38 +645,6 @@ def _merge_candidate_events(existing: list[dict[str, Any]], additions: list[dict
     return [merged[event_id] for event_id in sorted(merged)]
 
 
-def _enrich_events(events: list[dict[str, Any]], product: Any, commits: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """使用已配置 AI 为候选补全双语文案，失败时保留确定性候选。
-
-    Args:
-        events: 本批确定性候选事件。
-        product: 当前 catalog 产品。
-        commits: 本批脱敏前的 GitHub 提交映射。
-
-    Returns:
-        可供人工审核的候选事件列表。
-    """
-    if not os.getenv("AI_API_KEY"):
-        return events
-    client = AIClient.from_environment()
-    by_sha = {str(item.get("sha") or "")[:7]: item for item in commits}
-    enriched: list[dict[str, Any]] = []
-    for event in events:
-        sources = [by_sha[sha] for sha in (event.get("source") or {}).get("commitShas", []) if sha in by_sha]
-        messages = [item.get("message") for item in sources]
-        pull_requests = [pr for item in sources for pr in item.get("pull_requests", [])]
-        enriched.append(
-            client.enrich_candidate(
-                event,
-                product_name=str(product.name.get("en") or product.product_id),
-                commit_messages=messages,
-                pull_requests=pull_requests,
-                repository_private=True,
-            )
-        )
-    return enriched
-
-
 def _backfill(args: argparse.Namespace, *, github_client: Any | None = None) -> int:
     """按仓库最多 500 条提交回填候选事件和检查点。
 
@@ -727,7 +694,7 @@ def _backfill(args: argparse.Namespace, *, github_client: Any | None = None) -> 
                 overrides=overrides,
                 repository=product.repository,
             )
-            additions.extend(_enrich_events(events, product, batch))
+            additions.extend(events)
             processed += len(batch)
         candidate["events"] = _merge_candidate_events(candidate["events"], additions)
         _atomic_write_json(args.candidates, candidate)
