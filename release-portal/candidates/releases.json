@@ -1,4 +1,38 @@
 {
-  "releases": [],
+  "releases": [
+    {
+      "assets": [],
+      "body": "rag文档上传平台",
+      "draft": false,
+      "id": "ragportal:369776138",
+      "name": "v0.1.0",
+      "prerelease": false,
+      "productId": "ragportal",
+      "publishedAt": "2026-08-13T08:44:55Z",
+      "releaseUrl": "https://github.com/SynlysAI/RAGPortal/releases/tag/v0.0.1",
+      "version": "v0.0.1"
+    },
+    {
+      "assets": [
+        {
+          "architecture": "unknown",
+          "downloadPath": "assets/smartaccess/v0.1.0/SmartAccess-v0730.zip",
+          "name": "SmartAccess-v0730.zip",
+          "platform": "unknown",
+          "sha256": "61005cc42b24761a61184f6567803a50468dea82b7e13f520cfd3244efb569ed",
+          "size": 336086625
+        }
+      ],
+      "body": "支持软件GUI操作的自动化工作流编排及数据采集监控",
+      "draft": false,
+      "id": "smartaccess:362125923",
+      "name": "20260730内测完整版v0.1.0",
+      "prerelease": false,
+      "productId": "smartaccess",
+      "publishedAt": "2026-07-30T00:55:08Z",
+      "releaseUrl": "https://github.com/SynlysAI/SmartAccess/releases/tag/v0.1.0",
+      "version": "v0.1.0"
+    }
+  ],
   "schemaVersion": 1
 }
