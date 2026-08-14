@@ -115,7 +115,12 @@ def aggregate_commits(product_id: str, commits: Iterable[Any], *, releases: Iter
             summary = {"zh": subject_text, "en": subject_text}
             details: dict[str, str] = {"zh": "", "en": ""}
         else:
-            title, summary = _event_text(change_type, module)
+            fallback_title, summary = _event_text(change_type, module)
+            first_subject = (first.subject or first.message or "").strip()
+            if first_subject:
+                title = {"zh": f"{first_subject} 等 {len(members)} 项", "en": f"{first_subject} and {len(members)} more"}
+            else:
+                title = fallback_title
             lines = [
                 f"- {(item.subject or item.message or '').strip()}"
                 for item in members
