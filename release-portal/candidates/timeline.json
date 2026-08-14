@@ -531,8 +531,8 @@
     {
       "changeType": "feature",
       "detailsMarkdown": {
-        "en": "",
-        "zh": ""
+        "en": "## Summary\n- Added tests for SQLite data seeding and syncing scripts\n- Enhanced assistant service argument handling\n- Enhanced tool service argument handling and error reporting\n\n## Details\nThe commit messages indicate a focus on two areas:\n\n1. **SQLite Data Tests**: New tests for the scripts that handle seeding and syncing data in SQLite. This ensures reliability and correctness of data operations.\n\n2. **Service Enhancements**:\n   - The assistant service now has improved argument handling, likely making it more robust to different input formats and better at validating parameters.\n   - The tool service has improved argument handling and error reporting, which means clearer error messages and better handling of edge cases.\n\nThese changes contribute to overall code quality and maintainability.",
+        "zh": "## 摘要\n- 为SQLite数据种子和同步脚本添加了测试\n- 改进了assistant服务的参数处理\n- 改进了tool服务的参数处理和错误报告\n\n## 详情\n提交信息表明重点关注两个领域：\n\n1. **SQLite数据测试**：为处理SQLite中种子和同步数据的脚本添加测试，确保数据操作的可靠性和正确性。\n\n2. **服务增强**：\n   - assistant服务现在具有改进的参数处理，可能使其对不同的输入格式更加健壮，并且更好地验证参数。\n   - tool服务改进了参数处理和错误报告，意味着更清晰的错误消息和更好的边界情况处理。\n\n这些更改提高了整体代码质量和可维护性。"
       },
       "id": "poly-agent:aggregate:2026-08-10:feature:general",
       "level": "aggregate",
@@ -548,18 +548,20 @@
           "f9e296e",
           "0d2da75",
           "99f3c1b",
-          "02883d4"
+          "02883d4",
+          "f06ae25",
+          "f40d819"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
       },
       "summary": {
-        "en": "New feature (general)",
-        "zh": "新增功能（general）"
+        "en": "This change adds comprehensive tests for SQLite data seeding and syncing scripts, and enhances assistant and tool services with better argument handling and error reporting.",
+        "zh": "此更改添加了对SQLite数据种子和同步脚本的全面测试，并通过改进参数处理和错误报告增强了assistant和tool服务。"
       },
       "title": {
-        "en": "general New feature",
-        "zh": "general 新增功能"
+        "en": "Add tests for SQLite data seeding and syncing, improve assistant/tool services",
+        "zh": "为SQLite数据种子和同步添加测试，改进assistant/tool服务"
       },
       "version": null
     },
