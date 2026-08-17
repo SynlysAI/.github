@@ -723,8 +723,8 @@
     {
       "changeType": "algorithm",
       "detailsMarkdown": {
-        "en": "- enhance clipboard import functionality in AlgorithmTestPanel\n- add script to backfill creator names for old algorithm versions and packages\n- add derived algorithm agent tool registry\n- Implement algorithm run queuing and execution workflow\n- 重构垂类预测模型输入面板",
-        "zh": "- enhance clipboard import functionality in AlgorithmTestPanel\n- add script to backfill creator names for old algorithm versions and packages\n- add derived algorithm agent tool registry\n- Implement algorithm run queuing and execution workflow\n- 重构垂类预测模型输入面板"
+        "en": "- 支持模型原始提案编辑与历史缺失回填\n- 支持全版本模型提案真实回填",
+        "zh": "- 支持模型原始提案编辑与历史缺失回填\n- 支持全版本模型提案真实回填"
       },
       "id": "poly-agent:aggregate:2026-08-10:algorithm:general",
       "level": "aggregate",
@@ -738,7 +738,9 @@
           "2235f2b",
           "2094c27",
           "ff6b38c",
-          "65b3d2b"
+          "65b3d2b",
+          "3a52466",
+          "476fb99"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
@@ -748,16 +750,16 @@
         "zh": "算法改进（general）"
       },
       "title": {
-        "en": "enhance clipboard import functionality in AlgorithmTestPanel and 5 more",
-        "zh": "enhance clipboard import functionality in AlgorithmTestPanel 等 5 项"
+        "en": "支持模型原始提案编辑与历史缺失回填 and 2 more",
+        "zh": "支持模型原始提案编辑与历史缺失回填 等 2 项"
       },
       "version": null
     },
     {
       "changeType": "bugfix",
       "detailsMarkdown": {
-        "en": "- tolerate legacy extra fields when restoring assistant chats\n- submit edited tool arguments directly on confirm\n- keep tool-call result text dark inside dialogue bubbles\n- append auth query token to artifact image preview URL",
-        "zh": "- tolerate legacy extra fields when restoring assistant chats\n- submit edited tool arguments directly on confirm\n- keep tool-call result text dark inside dialogue bubbles\n- append auth query token to artifact image preview URL"
+        "en": "- 修复 AI4MS 共享认证库连接\n- 修复 LUI 统一认证级联失败\n- 修复 assistant_events 索引初始化冲突",
+        "zh": "- 修复 AI4MS 共享认证库连接\n- 修复 LUI 统一认证级联失败\n- 修复 assistant_events 索引初始化冲突"
       },
       "id": "poly-agent:aggregate:2026-08-10:bugfix:general",
       "level": "aggregate",
@@ -770,7 +772,10 @@
           "eec61a8",
           "8524244",
           "1432536",
-          "a1cec52"
+          "a1cec52",
+          "07d9111",
+          "5d0d1fe",
+          "c03ee88"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
@@ -780,16 +785,16 @@
         "zh": "问题修复（general）"
       },
       "title": {
-        "en": "tolerate legacy extra fields when restoring assistant chats and 4 more",
-        "zh": "tolerate legacy extra fields when restoring assistant chats 等 4 项"
+        "en": "修复 AI4MS 共享认证库连接 and 3 more",
+        "zh": "修复 AI4MS 共享认证库连接 等 3 项"
       },
       "version": null
     },
     {
       "changeType": "feature",
       "detailsMarkdown": {
-        "en": "- Implement Assistant Tool Call Service with state management and validation\n- add agent tools management and orchestration API tests\n- add ToolMenuPicker component and tool categorization utilities\n- add assistant run functionality with persistent storage and worker support\n- add toolCallRunDetailRoute function and integrate into DialogueView and TaskCenterView\n- enhance clipboard import functionality with header mode selection and mixed separator support\n- enhance tool call handling with stale phase checks and merge functionality\n- add computation worker configuration to PM2 setup\n- add tests for SQLite data seeding and syncing scripts\n- enhance assistant service and tool service with improved argument handling and error reporting",
-        "zh": "- Implement Assistant Tool Call Service with state management and validation\n- add agent tools management and orchestration API tests\n- add ToolMenuPicker component and tool categorization utilities\n- add assistant run functionality with persistent storage and worker support\n- add toolCallRunDetailRoute function and integrate into DialogueView and TaskCenterView\n- enhance clipboard import functionality with header mode selection and mixed separator support\n- enhance tool call handling with stale phase checks and merge functionality\n- add computation worker configuration to PM2 setup\n- add tests for SQLite data seeding and syncing scripts\n- enhance assistant service and tool service with improved argument handling and error reporting"
+        "en": "- add language and code standards documentation, including Git management and output norms\n- 新增 LUI 工具调用服务端续答与执行可靠性",
+        "zh": "- add language and code standards documentation, including Git management and output norms\n- 新增 LUI 工具调用服务端续答与执行可靠性"
       },
       "id": "poly-agent:aggregate:2026-08-10:feature:general",
       "level": "aggregate",
@@ -808,7 +813,9 @@
           "02883d4",
           "19e3ba9",
           "f06ae25",
-          "f40d819"
+          "f40d819",
+          "355658d",
+          "069b6d3"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
@@ -818,8 +825,39 @@
         "zh": "新增功能（general）"
       },
       "title": {
-        "en": "Implement Assistant Tool Call Service with state management and validation and 10 more",
-        "zh": "Implement Assistant Tool Call Service with state management and validation 等 10 项"
+        "en": "add language and code standards documentation, including Git management and output norms and 2 more",
+        "zh": "add language and code standards documentation, including Git management and output norms 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 调整助手运行列表的分页大小上限至 200，并增加相应测试用例\n- 优化 LUI 问答性能\n- 完善 LUI Runtime、会话 token 统计与后续规划",
+        "zh": "- 调整助手运行列表的分页大小上限至 200，并增加相应测试用例\n- 优化 LUI 问答性能\n- 完善 LUI Runtime、会话 token 统计与后续规划"
+      },
+      "id": "poly-agent:aggregate:2026-08-10:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-10T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "a60de90",
+          "e3160e3",
+          "5319e71"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "调整助手运行列表的分页大小上限至 200，并增加相应测试用例 and 3 more",
+        "zh": "调整助手运行列表的分页大小上限至 200，并增加相应测试用例 等 3 项"
       },
       "version": null
     },
@@ -936,6 +974,35 @@
       "title": {
         "en": "完善 updateFullJson 字段类型校验：数组元素对象校验、number/boolean/object 类型检查",
         "zh": "完善 updateFullJson 字段类型校验：数组元素对象校验、number/boolean/object 类型检查"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-17:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-17T02:12:03Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "397aa14"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "修复 LUI 垂类算法参数注入覆盖问题",
+        "zh": "修复 LUI 垂类算法参数注入覆盖问题"
+      },
+      "title": {
+        "en": "修复 LUI 垂类算法参数注入覆盖问题",
+        "zh": "修复 LUI 垂类算法参数注入覆盖问题"
       },
       "version": null
     },
