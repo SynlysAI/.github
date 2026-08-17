@@ -1,1 +1,3382 @@
-{"schemaVersion": 1, "events": []}
+{
+  "events": [
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 安装 shadcn/ui 缺失的运行时依赖\n- 增强 MongoDB 连接健壮性与 auth_secret 校验\n- 修复数据层代码质量问题\n- 修复邀请码并发竞争条件与禁用端点\n- 修复最终代码审查发现的三个问题\n- 索引创建兼容已存在的同字段索引\n- 修复表单控件暗色主题样式\n- 修复登录/注册错误信息未正确显示后端返回的具体原因\n- 安装 @types/node 修复 tsc -b 编译错误\n- 适配仓库后端 API 响应格式，修复登录/注册错误提示",
+        "zh": "- 安装 shadcn/ui 缺失的运行时依赖\n- 增强 MongoDB 连接健壮性与 auth_secret 校验\n- 修复数据层代码质量问题\n- 修复邀请码并发竞争条件与禁用端点\n- 修复最终代码审查发现的三个问题\n- 索引创建兼容已存在的同字段索引\n- 修复表单控件暗色主题样式\n- 修复登录/注册错误信息未正确显示后端返回的具体原因\n- 安装 @types/node 修复 tsc -b 编译错误\n- 适配仓库后端 API 响应格式，修复登录/注册错误提示"
+      },
+      "id": "ai4ms:aggregate:2026-06-08:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:00:00Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "d196039",
+          "f523b56",
+          "60c4898",
+          "0fa3f4d",
+          "de5dc13",
+          "06e4049",
+          "90ad0ad",
+          "34ca0cb",
+          "39643a4",
+          "b327150"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "安装 shadcn/ui 缺失的运行时依赖 and 10 more",
+        "zh": "安装 shadcn/ui 缺失的运行时依赖 等 10 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 实现 Token 生成/校验与鉴权守卫\n- 实现用户注册与登录业务逻辑\n- 实现 Auth API 端点\n- 实现 Admin API 端点\n- 添加 API 客户端与 Zustand 鉴权状态管理\n- 实现前端所有页面与组件\n- 全新设计前端门户界面\n- 新增亮色模式，全站支持亮/暗双主题切换\n- 前后端支持外部 IP 访问\n- 邀请码管理支持启用和删除 + 亮色模式调优\n- 首页免登录访问 + 登录页增加门户说明\n- FastAPI 托管前端静态文件，生产部署单端口\n- 替换为 JG 透明 logo + 密码可见切换\n- 首页顶栏添加合作单位图标",
+        "zh": "- 实现 Token 生成/校验与鉴权守卫\n- 实现用户注册与登录业务逻辑\n- 实现 Auth API 端点\n- 实现 Admin API 端点\n- 添加 API 客户端与 Zustand 鉴权状态管理\n- 实现前端所有页面与组件\n- 全新设计前端门户界面\n- 新增亮色模式，全站支持亮/暗双主题切换\n- 前后端支持外部 IP 访问\n- 邀请码管理支持启用和删除 + 亮色模式调优\n- 首页免登录访问 + 登录页增加门户说明\n- FastAPI 托管前端静态文件，生产部署单端口\n- 替换为 JG 透明 logo + 密码可见切换\n- 首页顶栏添加合作单位图标"
+      },
+      "id": "ai4ms:aggregate:2026-06-08:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:00:00Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "4b5d020",
+          "6416b08",
+          "c0942e1",
+          "9a61f40",
+          "e9bbb6e",
+          "1f2a24a",
+          "6716016",
+          "846d8d4",
+          "8c1e138",
+          "25a60b7",
+          "2c4c6a1",
+          "c35ff8a",
+          "48b4413",
+          "5c7b1f3"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "实现 Token 生成/校验与鉴权守卫 and 14 more",
+        "zh": "实现 Token 生成/校验与鉴权守卫 等 14 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ai4ms:commit:2026-06-08:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-09T16:31:35Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "3d40b8f"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "添加用户与邀请码数据模型及仓储层",
+        "zh": "添加用户与邀请码数据模型及仓储层"
+      },
+      "title": {
+        "en": "添加用户与邀请码数据模型及仓储层",
+        "zh": "添加用户与邀请码数据模型及仓储层"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ai4ms:commit:2026-06-08:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-12T06:13:00Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "2eb9824"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "优化首页合作单位展示与粒子背景",
+        "zh": "优化首页合作单位展示与粒子背景"
+      },
+      "title": {
+        "en": "优化首页合作单位展示与粒子背景",
+        "zh": "优化首页合作单位展示与粒子背景"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ai4ms:commit:2026-06-22:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-24T09:04:28Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "0f410f7"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "新增注册页密码确认",
+        "zh": "新增注册页密码确认"
+      },
+      "title": {
+        "en": "新增注册页密码确认",
+        "zh": "新增注册页密码确认"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ai4ms:commit:2026-08-03:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-03T09:18:09Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "6c0eb56"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "新增RAG文件上传应用",
+        "zh": "新增RAG文件上传应用"
+      },
+      "title": {
+        "en": "新增RAG文件上传应用",
+        "zh": "新增RAG文件上传应用"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "- add optimization campaigns feature with campaign management and detail views\n- enhance computation and optimization services with new test coverage and artifact download functionality\n- implement Tanimoto planner and enhance optimization service with automation features",
+        "zh": "- add optimization campaigns feature with campaign management and detail views\n- enhance computation and optimization services with new test coverage and artifact download functionality\n- implement Tanimoto planner and enhance optimization service with automation features"
+      },
+      "id": "poly-agent:aggregate:2026-06-29:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-29T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "d66937b",
+          "ce46d6b",
+          "168c9f4"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "add optimization campaigns feature with campaign management and detail views and 3 more",
+        "zh": "add optimization campaigns feature with campaign management and detail views 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复 Vue 模板中中文引号导致的编译错误\n- 修复 SPAStaticFiles 收到 WebSocket 请求时的断言错误\n- 修复 alchemistApi.js 缺少 Authorization 认证头的 bug\n- 修复 API 路径尾部斜杠导致的 307 重定向绕过代理问题",
+        "zh": "- 修复 Vue 模板中中文引号导致的编译错误\n- 修复 SPAStaticFiles 收到 WebSocket 请求时的断言错误\n- 修复 alchemistApi.js 缺少 Authorization 认证头的 bug\n- 修复 API 路径尾部斜杠导致的 307 重定向绕过代理问题"
+      },
+      "id": "poly-agent:aggregate:2026-06-29:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-29T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "b3e641b",
+          "46d87d3",
+          "ecd6701",
+          "d3ad56b"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复 Vue 模板中中文引号导致的编译错误 and 4 more",
+        "zh": "修复 Vue 模板中中文引号导致的编译错误 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 统一界面尺寸与 Spec Agent 对齐，新增 PM2 部署配置\n- 新增 ALchemist 工具代理路由和后端地址配置\n- 新增 ALchemist 主动学习优化工具前端\n- 新增 LLM 对话与实验建议功能，优化多项前端细节\n- add Local xTB computation adapter and mock adapter\n- 完善实验设计功能：新增最优实验设计与 DoE 方法专属参数\n- 新增 CSV 导入功能，完善操作流程文档\n- add ChemOS laser parser and ORCA workflow adapter\n- enhance campaign management and integration services\n- update ChemOS computation progress documentation with current capabilities and future plans\n- enhance project setup and service management\n- update environment and frontend components for new computation tools",
+        "zh": "- 统一界面尺寸与 Spec Agent 对齐，新增 PM2 部署配置\n- 新增 ALchemist 工具代理路由和后端地址配置\n- 新增 ALchemist 主动学习优化工具前端\n- 新增 LLM 对话与实验建议功能，优化多项前端细节\n- add Local xTB computation adapter and mock adapter\n- 完善实验设计功能：新增最优实验设计与 DoE 方法专属参数\n- 新增 CSV 导入功能，完善操作流程文档\n- add ChemOS laser parser and ORCA workflow adapter\n- enhance campaign management and integration services\n- update ChemOS computation progress documentation with current capabilities and future plans\n- enhance project setup and service management\n- update environment and frontend components for new computation tools"
+      },
+      "id": "poly-agent:aggregate:2026-06-29:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-29T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "5d55dc1",
+          "31fd834",
+          "58141ce",
+          "81baab4",
+          "c061ad6",
+          "9ae0455",
+          "ee5d693",
+          "64c9ce8",
+          "62c6f8b",
+          "0be375f",
+          "8491342",
+          "c9bc270"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "统一界面尺寸与 Spec Agent 对齐，新增 PM2 部署配置 and 12 more",
+        "zh": "统一界面尺寸与 Spec Agent 对齐，新增 PM2 部署配置 等 12 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化前端 UI 细节\n- 优化 ALchemist 主动学习工具前端功能\n- 优化 ALchemist 可视化诊断图表\n- 将工具名从\"主动学习优化\"改为\"实验设计与优化\"",
+        "zh": "- 优化前端 UI 细节\n- 优化 ALchemist 主动学习工具前端功能\n- 优化 ALchemist 可视化诊断图表\n- 将工具名从\"主动学习优化\"改为\"实验设计与优化\""
+      },
+      "id": "poly-agent:aggregate:2026-06-29:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-29T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "8a2f403",
+          "7cdb337",
+          "6efe97a",
+          "ba36309"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化前端 UI 细节 and 4 more",
+        "zh": "优化前端 UI 细节 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 调整知识库检索控制布局\n- 修复 422 校验错误不显示具体字段位置",
+        "zh": "- 调整知识库检索控制布局\n- 修复 422 校验错误不显示具体字段位置"
+      },
+      "id": "poly-agent:aggregate:2026-07-06:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-06T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "db9e6da",
+          "3a18aee"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "调整知识库检索控制布局 and 2 more",
+        "zh": "调整知识库检索控制布局 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- rebrand ChemOS to Compute Engine, add stale-run reaper, and revamp dashboard with live data\n- rebrand ChemOS to Compute Engine, add stale-run reaper, and revamp dashboard with live data\n- 新增 Research Engine 模块\n- complete ResearchEngine P0 workflows\n- Implement global task center API and frontend integration\n- 添加任务中心菜单项到侧边栏\n- enhance KnowledgeBaseView layout with segmented control and responsive grid\n- add standalone literature RAG service",
+        "zh": "- rebrand ChemOS to Compute Engine, add stale-run reaper, and revamp dashboard with live data\n- rebrand ChemOS to Compute Engine, add stale-run reaper, and revamp dashboard with live data\n- 新增 Research Engine 模块\n- complete ResearchEngine P0 workflows\n- Implement global task center API and frontend integration\n- 添加任务中心菜单项到侧边栏\n- enhance KnowledgeBaseView layout with segmented control and responsive grid\n- add standalone literature RAG service"
+      },
+      "id": "poly-agent:aggregate:2026-07-06:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-06T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "720c3f1",
+          "035ba13",
+          "18afcda",
+          "fc803fe",
+          "e4b49ed",
+          "40c555e",
+          "326072d",
+          "1ff3252"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "rebrand ChemOS to Compute Engine, add stale-run reaper, and revamp dashboard with live data and 8 more",
+        "zh": "rebrand ChemOS to Compute Engine, add stale-run reaper, and revamp dashboard with live data 等 8 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- enhance Neo4j graph store with subgraph prioritization and corpus statistics\n- update frontend and backend ports to 5200 and 5201 respectively\n- enhance dashboard and tool services views with dynamic greetings and service health statistics\n- add import script and tests for Agirent literature corpus management\n- add tests for electrolyte formulation package zip integrity and content validation",
+        "zh": "- enhance Neo4j graph store with subgraph prioritization and corpus statistics\n- update frontend and backend ports to 5200 and 5201 respectively\n- enhance dashboard and tool services views with dynamic greetings and service health statistics\n- add import script and tests for Agirent literature corpus management\n- add tests for electrolyte formulation package zip integrity and content validation"
+      },
+      "id": "poly-agent:aggregate:2026-07-13:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-13T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "98d79bf",
+          "6fc0233",
+          "b98d5f0",
+          "dde0343",
+          "c55ac36"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "enhance Neo4j graph store with subgraph prioritization and corpus statistics and 5 more",
+        "zh": "enhance Neo4j graph store with subgraph prioritization and corpus statistics 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "- Enhance algorithm attribution and capability tracking\n- enhance AlgorithmTestPanel and AlgorithmResultView with improved input handling and UI updates\n- add visibility feature for algorithm packages\n- Enhance algorithm package management and developer attribution\n- Add developer organization and visibility fields to algorithm models and services",
+        "zh": "- Enhance algorithm attribution and capability tracking\n- enhance AlgorithmTestPanel and AlgorithmResultView with improved input handling and UI updates\n- add visibility feature for algorithm packages\n- Enhance algorithm package management and developer attribution\n- Add developer organization and visibility fields to algorithm models and services"
+      },
+      "id": "poly-agent:aggregate:2026-07-20:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "99e4b51",
+          "50a9660",
+          "c4fa3c6",
+          "3d4e02e",
+          "46e549f"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "Enhance algorithm attribution and capability tracking and 5 more",
+        "zh": "Enhance algorithm attribution and capability tracking 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- Update README and documentation structure for improved navigation and clarity\n- Implement collapsible top bar in KnowledgeBaseView and remove AttributionBanner from VerticalPredictionView\n- add script for migrating polymer data assets to MongoDB and MinIO\n- add .env_prod to .gitignore for improved environment management\n- refactor Raman resource management for improved flexibility and clarity\n- update Raman resource management to support runtime resources and environment variable handling\n- add DataAnalysisView component for comprehensive data analysis and visualization",
+        "zh": "- Update README and documentation structure for improved navigation and clarity\n- Implement collapsible top bar in KnowledgeBaseView and remove AttributionBanner from VerticalPredictionView\n- add script for migrating polymer data assets to MongoDB and MinIO\n- add .env_prod to .gitignore for improved environment management\n- refactor Raman resource management for improved flexibility and clarity\n- update Raman resource management to support runtime resources and environment variable handling\n- add DataAnalysisView component for comprehensive data analysis and visualization"
+      },
+      "id": "poly-agent:aggregate:2026-07-20:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "b06d66f",
+          "8a68087",
+          "9de7cd5",
+          "7bb93e9",
+          "34e9d78",
+          "fb9b3f7",
+          "eb9acb5"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "Update README and documentation structure for improved navigation and clarity and 7 more",
+        "zh": "Update README and documentation structure for improved navigation and clarity 等 7 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "architecture",
+      "detailsMarkdown": {
+        "en": "- remove unused navigation buttons and related functions in KnowledgeBaseView and ResearchEngineView\n- 重构 LLM 配置加载\n- 重构知识库接入 WeKnora 服务",
+        "zh": "- remove unused navigation buttons and related functions in KnowledgeBaseView and ResearchEngineView\n- 重构 LLM 配置加载\n- 重构知识库接入 WeKnora 服务"
+      },
+      "id": "poly-agent:aggregate:2026-07-27:architecture:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-27T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "b27c237",
+          "798e39e",
+          "c4b44bc"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Architecture change (general)",
+        "zh": "架构调整（general）"
+      },
+      "title": {
+        "en": "remove unused navigation buttons and related functions in KnowledgeBaseView and ResearchEngineView and 3 more",
+        "zh": "remove unused navigation buttons and related functions in KnowledgeBaseView and ResearchEngineView 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- detect callable collection replacement API\n- avoid dynamic collection replacement lookup\n- preserve extra dataset index compatibility\n- isolate source row index names\n- reuse compatible dataset indexes\n- 修正工具服务状态统计",
+        "zh": "- detect callable collection replacement API\n- avoid dynamic collection replacement lookup\n- preserve extra dataset index compatibility\n- isolate source row index names\n- reuse compatible dataset indexes\n- 修正工具服务状态统计"
+      },
+      "id": "poly-agent:aggregate:2026-07-27:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-27T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "2b847ea",
+          "79cd799",
+          "191393d",
+          "6d05e93",
+          "8fc673e",
+          "6c9be62"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "detect callable collection replacement API and 6 more",
+        "zh": "detect callable collection replacement API 等 6 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- add knowledge graph keyword extraction and query generation\n- enhance vertical prediction panel with nested field management and JSON tree view\n- 调试支持图片预览\n- 工作台对话新增支持知识库检索\n- add MD-AllAtom C files listing and download functionality\n- enhance data catalog relationships",
+        "zh": "- add knowledge graph keyword extraction and query generation\n- enhance vertical prediction panel with nested field management and JSON tree view\n- 调试支持图片预览\n- 工作台对话新增支持知识库检索\n- add MD-AllAtom C files listing and download functionality\n- enhance data catalog relationships"
+      },
+      "id": "poly-agent:aggregate:2026-07-27:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-27T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "ef270e7",
+          "21fb874",
+          "f86f1fb",
+          "b171289",
+          "bef18b7",
+          "dfb1010"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "add knowledge graph keyword extraction and query generation and 6 more",
+        "zh": "add knowledge graph keyword extraction and query generation 等 6 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化知识库流式检索交互\n- 优化工作台问答配置体验",
+        "zh": "- 优化知识库流式检索交互\n- 优化工作台问答配置体验"
+      },
+      "id": "poly-agent:aggregate:2026-07-27:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-27T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "f3db0e8",
+          "119dc65"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化知识库流式检索交互 and 2 more",
+        "zh": "优化知识库流式检索交互 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "- add AlgorithmInterfaceConfigPanel for managing algorithm interface configurations\n- 任务中心算法结果深链到具体运行记录\n- 垂类预测模型运行结果展示优化",
+        "zh": "- add AlgorithmInterfaceConfigPanel for managing algorithm interface configurations\n- 任务中心算法结果深链到具体运行记录\n- 垂类预测模型运行结果展示优化"
+      },
+      "id": "poly-agent:aggregate:2026-08-03:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-03T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "e1abbec",
+          "f9f4527",
+          "c2cd475"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "add AlgorithmInterfaceConfigPanel for managing algorithm interface configurations and 3 more",
+        "zh": "add AlgorithmInterfaceConfigPanel for managing algorithm interface configurations 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 409 错误优先展示后端 detail，并修正 409 错误码映射\n- artifact 下载端点支持 query token 直链降级\n- update sidebar behavior and styling for improved usability",
+        "zh": "- 409 错误优先展示后端 detail，并修正 409 错误码映射\n- artifact 下载端点支持 query token 直链降级\n- update sidebar behavior and styling for improved usability"
+      },
+      "id": "poly-agent:aggregate:2026-08-03:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-03T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "fcee1d7",
+          "0143567",
+          "d07d912"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "409 错误优先展示后端 detail，并修正 409 错误码映射 and 3 more",
+        "zh": "409 错误优先展示后端 detail，并修正 409 错误码映射 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- add PI synthesis difficulty scoring mock service\n- 接口配置示例与教学引导\n- Enhance remote interface handling and task center integration",
+        "zh": "- add PI synthesis difficulty scoring mock service\n- 接口配置示例与教学引导\n- Enhance remote interface handling and task center integration"
+      },
+      "id": "poly-agent:aggregate:2026-08-03:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-03T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "9bc10e9",
+          "d5d4e09",
+          "c3b08a0"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "add PI synthesis difficulty scoring mock service and 3 more",
+        "zh": "add PI synthesis difficulty scoring mock service 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "- 支持模型原始提案编辑与历史缺失回填\n- 支持全版本模型提案真实回填",
+        "zh": "- 支持模型原始提案编辑与历史缺失回填\n- 支持全版本模型提案真实回填"
+      },
+      "id": "poly-agent:aggregate:2026-08-10:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-10T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "164ff6b",
+          "2235f2b",
+          "2094c27",
+          "ff6b38c",
+          "65b3d2b",
+          "3a52466",
+          "476fb99"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "支持模型原始提案编辑与历史缺失回填 and 2 more",
+        "zh": "支持模型原始提案编辑与历史缺失回填 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复 AI4MS 共享认证库连接\n- 修复 LUI 统一认证级联失败\n- 修复 assistant_events 索引初始化冲突",
+        "zh": "- 修复 AI4MS 共享认证库连接\n- 修复 LUI 统一认证级联失败\n- 修复 assistant_events 索引初始化冲突"
+      },
+      "id": "poly-agent:aggregate:2026-08-10:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-10T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "eec61a8",
+          "8524244",
+          "1432536",
+          "a1cec52",
+          "07d9111",
+          "5d0d1fe",
+          "c03ee88"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复 AI4MS 共享认证库连接 and 3 more",
+        "zh": "修复 AI4MS 共享认证库连接 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- add language and code standards documentation, including Git management and output norms\n- 新增 LUI 工具调用服务端续答与执行可靠性",
+        "zh": "- add language and code standards documentation, including Git management and output norms\n- 新增 LUI 工具调用服务端续答与执行可靠性"
+      },
+      "id": "poly-agent:aggregate:2026-08-10:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-10T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "8086dba",
+          "f0d15e1",
+          "7397238",
+          "f9e296e",
+          "0d2da75",
+          "99f3c1b",
+          "02883d4",
+          "19e3ba9",
+          "f06ae25",
+          "f40d819",
+          "355658d",
+          "069b6d3"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "add language and code standards documentation, including Git management and output norms and 2 more",
+        "zh": "add language and code standards documentation, including Git management and output norms 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 调整助手运行列表的分页大小上限至 200，并增加相应测试用例\n- 优化 LUI 问答性能\n- 完善 LUI Runtime、会话 token 统计与后续规划",
+        "zh": "- 调整助手运行列表的分页大小上限至 200，并增加相应测试用例\n- 优化 LUI 问答性能\n- 完善 LUI Runtime、会话 token 统计与后续规划"
+      },
+      "id": "poly-agent:aggregate:2026-08-10:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-10T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "a60de90",
+          "e3160e3",
+          "5319e71"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "调整助手运行列表的分页大小上限至 200，并增加相应测试用例 and 3 more",
+        "zh": "调整助手运行列表的分页大小上限至 200，并增加相应测试用例 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-07-06:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-11T04:41:37Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "11c0bae"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "add AlgorithmUploadPanel for algorithm package management",
+        "zh": "add AlgorithmUploadPanel for algorithm package management"
+      },
+      "title": {
+        "en": "add AlgorithmUploadPanel for algorithm package management",
+        "zh": "add AlgorithmUploadPanel for algorithm package management"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-07-13:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-15T09:52:23Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "469b62c"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "add electrolyte formulation predictor algorithm package",
+        "zh": "add electrolyte formulation predictor algorithm package"
+      },
+      "title": {
+        "en": "add electrolyte formulation predictor algorithm package",
+        "zh": "add electrolyte formulation predictor algorithm package"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-03:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-06T08:37:30Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "c9dbdfe"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "完善实验方案转发台下发链路",
+        "zh": "完善实验方案转发台下发链路"
+      },
+      "title": {
+        "en": "完善实验方案转发台下发链路",
+        "zh": "完善实验方案转发台下发链路"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-10:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-12T07:52:29Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "aae712e"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "完善 updateFullJson 字段类型校验：数组元素对象校验、number/boolean/object 类型检查",
+        "zh": "完善 updateFullJson 字段类型校验：数组元素对象校验、number/boolean/object 类型检查"
+      },
+      "title": {
+        "en": "完善 updateFullJson 字段类型校验：数组元素对象校验、number/boolean/object 类型检查",
+        "zh": "完善 updateFullJson 字段类型校验：数组元素对象校验、number/boolean/object 类型检查"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-17:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-17T02:12:03Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "397aa14"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "修复 LUI 垂类算法参数注入覆盖问题",
+        "zh": "修复 LUI 垂类算法参数注入覆盖问题"
+      },
+      "title": {
+        "en": "修复 LUI 垂类算法参数注入覆盖问题",
+        "zh": "修复 LUI 垂类算法参数注入覆盖问题"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- FastAPI entry + SQLite schema + HMAC token verification\n- auth routes (login proxy, me, logout) + public config\n- WeKnora client + KB cache + upload proxy + status sync\n- upload endpoint + KB list + admin APIs",
+        "zh": "- FastAPI entry + SQLite schema + HMAC token verification\n- auth routes (login proxy, me, logout) + public config\n- WeKnora client + KB cache + upload proxy + status sync\n- upload endpoint + KB list + admin APIs"
+      },
+      "id": "ragportal:aggregate:2026-07-27:feature:backend",
+      "level": "aggregate",
+      "module": "backend",
+      "occurredAt": "2026-07-27T08:00:00Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "210708f",
+          "c47dc0f",
+          "8d5d006",
+          "200852b"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "New feature (backend)",
+        "zh": "新增功能（backend）"
+      },
+      "title": {
+        "en": "FastAPI entry + SQLite schema + HMAC token verification and 4 more",
+        "zh": "FastAPI entry + SQLite schema + HMAC token verification 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复导航下拉菜单悬停断层\n- 修复提交人组织部门信息显示\n- 修复刷新后组织部门信息丢失\n- 修复普通用户访问上传记录页时调用管理员接口",
+        "zh": "- 修复导航下拉菜单悬停断层\n- 修复提交人组织部门信息显示\n- 修复刷新后组织部门信息丢失\n- 修复普通用户访问上传记录页时调用管理员接口"
+      },
+      "id": "ragportal:aggregate:2026-08-03:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-03T08:00:00Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "91b22c3",
+          "14dcabb",
+          "8f74f64",
+          "4df0f68"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复导航下拉菜单悬停断层 and 4 more",
+        "zh": "修复导航下拉菜单悬停断层 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增 WeKnora 历史回写功能\n- 新增管理员指定上传者\n- 新增知识库申请审批流程",
+        "zh": "- 新增 WeKnora 历史回写功能\n- 新增管理员指定上传者\n- 新增知识库申请审批流程"
+      },
+      "id": "ragportal:aggregate:2026-08-03:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-03T08:00:00Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "7c61dc3",
+          "a94a6b3",
+          "fe58913"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增 WeKnora 历史回写功能 and 3 more",
+        "zh": "新增 WeKnora 历史回写功能 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化仪表盘排行钻取\n- 完善上传状态与回写字段\n- 优化知识库申请与刷新体验\n- 优化知识库申请记录操作交互",
+        "zh": "- 优化仪表盘排行钻取\n- 完善上传状态与回写字段\n- 优化知识库申请与刷新体验\n- 优化知识库申请记录操作交互"
+      },
+      "id": "ragportal:aggregate:2026-08-03:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-03T08:00:00Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "6ef37c2",
+          "1b0ae99",
+          "694a9e9",
+          "5010753"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化仪表盘排行钻取 and 4 more",
+        "zh": "优化仪表盘排行钻取 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ragportal:commit:2026-07-27:bugfix:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-31T10:05:27Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "a41abc5"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "修正 RAGPortal 登录与 WeKnora 上传适配",
+        "zh": "修正 RAGPortal 登录与 WeKnora 上传适配"
+      },
+      "title": {
+        "en": "修正 RAGPortal 登录与 WeKnora 上传适配",
+        "zh": "修正 RAGPortal 登录与 WeKnora 上传适配"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ragportal:commit:2026-07-27:feature:frontend",
+      "level": "commit",
+      "module": "frontend",
+      "occurredAt": "2026-07-31T06:39:53Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "b66038f"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "complete React SPA — login, upload, my-records, admin",
+        "zh": "complete React SPA — login, upload, my-records, admin"
+      },
+      "title": {
+        "en": "complete React SPA — login, upload, my-records, admin",
+        "zh": "complete React SPA — login, upload, my-records, admin"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修正 v2 UI 验收问题\n- 统一 v2 表格行高与控件尺寸，修复下拉箭头及 ROI 显示问题\n- 调整顶栏高度、移动 AI 辅助接入按钮、修复等待步骤锚点残留",
+        "zh": "- 修正 v2 UI 验收问题\n- 统一 v2 表格行高与控件尺寸，修复下拉箭头及 ROI 显示问题\n- 调整顶栏高度、移动 AI 辅助接入按钮、修复等待步骤锚点残留"
+      },
+      "id": "smartaccess:aggregate:2026-06-08:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "37f54a1",
+          "843ffcc",
+          "41b21ea"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修正 v2 UI 验收问题 and 3 more",
+        "zh": "修正 v2 UI 验收问题 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- Add script to launch SmartAccess desktop application and implement QSS for dark theme\n- Implement LocalVisionProvider with PaddleOCR and OpenCV for enhanced vision capabilities\n- Enhance orchestration with screenshot capabilities and condition normalization\n- Implement OpenAI-compatible workflow and anchor profile generators\n- Introduce AI profile management and workspace settings\n- 新增 Codex Responses API 适配器\n- 新增 SmartAccess v2 重构版本\n- 新增 SmartAccess v2 界面重构设计文档\n- 新增 SmartAccess v2 界面刷新实施计划\n- 新增 v2 桌面 UI 样式工具",
+        "zh": "- Add script to launch SmartAccess desktop application and implement QSS for dark theme\n- Implement LocalVisionProvider with PaddleOCR and OpenCV for enhanced vision capabilities\n- Enhance orchestration with screenshot capabilities and condition normalization\n- Implement OpenAI-compatible workflow and anchor profile generators\n- Introduce AI profile management and workspace settings\n- 新增 Codex Responses API 适配器\n- 新增 SmartAccess v2 重构版本\n- 新增 SmartAccess v2 界面重构设计文档\n- 新增 SmartAccess v2 界面刷新实施计划\n- 新增 v2 桌面 UI 样式工具"
+      },
+      "id": "smartaccess:aggregate:2026-06-08:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "3e93e80",
+          "b226956",
+          "13b060b",
+          "e6c5b42",
+          "2838e7a",
+          "82b4ad4",
+          "cb564fa",
+          "f28c652",
+          "a70d51c",
+          "315ca2e"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "Add script to launch SmartAccess desktop application and implement QSS for dark theme and 10 more",
+        "zh": "Add script to launch SmartAccess desktop application and implement QSS for dark theme 等 10 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化 v2 桌面全局主题\n- 优化 v2 主窗口导航样式\n- 优化 v2 数据表格表现\n- 优化 v2 窗口布局与界面细节\n- 优化工作流页面布局与窗口自动还原",
+        "zh": "- 优化 v2 桌面全局主题\n- 优化 v2 主窗口导航样式\n- 优化 v2 数据表格表现\n- 优化 v2 窗口布局与界面细节\n- 优化工作流页面布局与窗口自动还原"
+      },
+      "id": "smartaccess:aggregate:2026-06-08:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "60ae8cb",
+          "85c780e",
+          "e132695",
+          "d72eed9",
+          "47f7aff"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化 v2 桌面全局主题 and 5 more",
+        "zh": "优化 v2 桌面全局主题 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修正 v2 OCR 观察区域与配置读取\n- 修复 AI 辅助接入后截图丢失\n- 修复截图 OCR 误判图片块\\n\\n- 关闭截图 OCR 的版面检测，避免单个数字被识别为图片\\n- 保持现有远程 API 调用与结果解析逻辑不变\n- 增强控制台操作日志 + 修复 AI 输入弹框文字不换行\n- 修复输入单元格尾部被遮挡的BUG\n- 修复模态弹窗下窗口定位",
+        "zh": "- 修正 v2 OCR 观察区域与配置读取\n- 修复 AI 辅助接入后截图丢失\n- 修复截图 OCR 误判图片块\\n\\n- 关闭截图 OCR 的版面检测，避免单个数字被识别为图片\\n- 保持现有远程 API 调用与结果解析逻辑不变\n- 增强控制台操作日志 + 修复 AI 输入弹框文字不换行\n- 修复输入单元格尾部被遮挡的BUG\n- 修复模态弹窗下窗口定位"
+      },
+      "id": "smartaccess:aggregate:2026-06-15:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-15T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "1f0fae3",
+          "e16a391",
+          "94ad132",
+          "1623c5d",
+          "25ef2c7",
+          "528bbd9"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修正 v2 OCR 观察区域与配置读取 and 6 more",
+        "zh": "修正 v2 OCR 观察区域与配置读取 等 6 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 优化顶栏切换按钮为图标按钮并新增 Ghost 样式\n- 添加 environment.yml 依赖版本信息\n- 新增 API 视觉提供者 ApiVisionProvider\n- 增强 PaddleOCR 导入失败处理，添加详细错误信息并更新测试用例\n- 支持弹窗截图与锚点点击\n- Enhance multiview support in anchors and workflows\n- Add capture metadata handling and improve window focus management\n- Enhance workflow validation and step handling\n- 支持多窗口联合截图标定\n- Implement incrementing input rules for workflow steps",
+        "zh": "- 优化顶栏切换按钮为图标按钮并新增 Ghost 样式\n- 添加 environment.yml 依赖版本信息\n- 新增 API 视觉提供者 ApiVisionProvider\n- 增强 PaddleOCR 导入失败处理，添加详细错误信息并更新测试用例\n- 支持弹窗截图与锚点点击\n- Enhance multiview support in anchors and workflows\n- Add capture metadata handling and improve window focus management\n- Enhance workflow validation and step handling\n- 支持多窗口联合截图标定\n- Implement incrementing input rules for workflow steps"
+      },
+      "id": "smartaccess:aggregate:2026-06-15:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-15T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "5c67f78",
+          "121ae3e",
+          "9b3895e",
+          "2715e0f",
+          "93cfc0d",
+          "bd54f37",
+          "b2f05a5",
+          "605d5d5",
+          "8996ae2",
+          "3a771c7"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "优化顶栏切换按钮为图标按钮并新增 Ghost 样式 and 10 more",
+        "zh": "优化顶栏切换按钮为图标按钮并新增 Ghost 样式 等 10 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 调整 OCR 步骤等待语义\n- 窗口标题匹配改为默认精确匹配 + 监控页面 UI 优化\n- 优化表格编辑框内边距",
+        "zh": "- 调整 OCR 步骤等待语义\n- 窗口标题匹配改为默认精确匹配 + 监控页面 UI 优化\n- 优化表格编辑框内边距"
+      },
+      "id": "smartaccess:aggregate:2026-06-15:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-15T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "eec2b6c",
+          "22278e0",
+          "61bce3c"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "调整 OCR 步骤等待语义 and 3 more",
+        "zh": "调整 OCR 步骤等待语义 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复 SmartAccess 远程任务 worker 事件回传缺陷\n- 修复发布页面工作流选择与设备选择之间的关联选择\n- 修复旧 ai_provider 字段引用，更新为 text/vision 分离显示\n- 修复 DeepSeek 生成 input_mode 非法值时校验失败的问题\n- 修复模板重启后发布时间丢失和来源变为 local\n- 修复重启后模板状态列未更新为 Published\n- 修复设备接入界面锚点ID修改后画布标签未同步更新\n- 修复 OCR 动作步骤保存后重新打开被静默丢弃",
+        "zh": "- 修复 SmartAccess 远程任务 worker 事件回传缺陷\n- 修复发布页面工作流选择与设备选择之间的关联选择\n- 修复旧 ai_provider 字段引用，更新为 text/vision 分离显示\n- 修复 DeepSeek 生成 input_mode 非法值时校验失败的问题\n- 修复模板重启后发布时间丢失和来源变为 local\n- 修复重启后模板状态列未更新为 Published\n- 修复设备接入界面锚点ID修改后画布标签未同步更新\n- 修复 OCR 动作步骤保存后重新打开被静默丢弃"
+      },
+      "id": "smartaccess:aggregate:2026-06-22:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-22T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "fafff76",
+          "cc401b5",
+          "890df8b",
+          "100f13e",
+          "1698b4b",
+          "9b48580",
+          "0f39cb7",
+          "2ef37cd"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复 SmartAccess 远程任务 worker 事件回传缺陷 and 8 more",
+        "zh": "修复 SmartAccess 远程任务 worker 事件回传缺陷 等 8 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增 SmartAccess 与 SpecLabOS 联动设计文档\n- 新增 SmartAccess SpecLabOS 联动实施计划\n- 新增 SmartAccess 远程任务 worker\n- SmartAccess 远程任务方案优化：桌面端集成替代独立 worker\n- 新增环境一键安装与离线包构建脚本\n- 新增 AI 文字/多模态分离配置实施计划\n- 新增 AppSettings 的 ai_text_* / ai_vision_* 字段定义\n- 新增双层结构化架构说明及相关架构图\n- 重构模板平台页面并增加云端删除支持\n- 新增独立 OCR 动作类型，支持锚点主动 OCR 识别\n- 新增 SpecLabOS 统一门户登录功能",
+        "zh": "- 新增 SmartAccess 与 SpecLabOS 联动设计文档\n- 新增 SmartAccess SpecLabOS 联动实施计划\n- 新增 SmartAccess 远程任务 worker\n- SmartAccess 远程任务方案优化：桌面端集成替代独立 worker\n- 新增环境一键安装与离线包构建脚本\n- 新增 AI 文字/多模态分离配置实施计划\n- 新增 AppSettings 的 ai_text_* / ai_vision_* 字段定义\n- 新增双层结构化架构说明及相关架构图\n- 重构模板平台页面并增加云端删除支持\n- 新增独立 OCR 动作类型，支持锚点主动 OCR 识别\n- 新增 SpecLabOS 统一门户登录功能"
+      },
+      "id": "smartaccess:aggregate:2026-06-22:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-22T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "99c2c02",
+          "d4a702e",
+          "71a8c12",
+          "6f20cd9",
+          "3ecff0f",
+          "a267b64",
+          "6497f0a",
+          "d810b52",
+          "9d4d717",
+          "b18a01b",
+          "2c15f97"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增 SmartAccess 与 SpecLabOS 联动设计文档 and 11 more",
+        "zh": "新增 SmartAccess 与 SpecLabOS 联动设计文档 等 11 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 扩展 OCR 接口模式支持\n- 新增 SpecLabOS 平台心跳上报",
+        "zh": "- 扩展 OCR 接口模式支持\n- 新增 SpecLabOS 平台心跳上报"
+      },
+      "id": "smartaccess:aggregate:2026-07-13:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-13T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "3dd96f4",
+          "27c05d1"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "扩展 OCR 接口模式支持 and 2 more",
+        "zh": "扩展 OCR 接口模式支持 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "architecture",
+      "detailsMarkdown": {
+        "en": "- 重构锚点校验与工作流OCR配置\n- 重构工作流动作参数与 OCR 轮询配置",
+        "zh": "- 重构锚点校验与工作流OCR配置\n- 重构工作流动作参数与 OCR 轮询配置"
+      },
+      "id": "smartaccess:aggregate:2026-07-20:architecture:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "1d0d615",
+          "1735de2"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Architecture change (general)",
+        "zh": "架构调整（general）"
+      },
+      "title": {
+        "en": "重构锚点校验与工作流OCR配置 and 2 more",
+        "zh": "重构锚点校验与工作流OCR配置 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复远程任务与模板发布时间展示\n- 修复画布窗口缩放后的居中偏移",
+        "zh": "- 修复远程任务与模板发布时间展示\n- 修复画布窗口缩放后的居中偏移"
+      },
+      "id": "smartaccess:aggregate:2026-07-20:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "3172c46",
+          "7cdc20a"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复远程任务与模板发布时间展示 and 2 more",
+        "zh": "修复远程任务与模板发布时间展示 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 集成 SmartDataHub 数据采集模块\n- 新增系统设置并优化设备与工作流交互\n- 添加smartaccess功能使用说明",
+        "zh": "- 集成 SmartDataHub 数据采集模块\n- 新增系统设置并优化设备与工作流交互\n- 添加smartaccess功能使用说明"
+      },
+      "id": "smartaccess:aggregate:2026-07-20:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "d799e2b",
+          "7a2f329",
+          "66aed2c"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "集成 SmartDataHub 数据采集模块 and 3 more",
+        "zh": "集成 SmartDataHub 数据采集模块 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 完善数据采集失败重试控制\n- 优化校准画布平移边界\n- 优化 AI 辅助接入与校验区域交互\n- 完善工作流运行参数与 OCR 校验",
+        "zh": "- 完善数据采集失败重试控制\n- 优化校准画布平移边界\n- 优化 AI 辅助接入与校验区域交互\n- 完善工作流运行参数与 OCR 校验"
+      },
+      "id": "smartaccess:aggregate:2026-07-20:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "a4a3e64",
+          "33b104c",
+          "4b9bc78",
+          "a9cb2ea"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "完善数据采集失败重试控制 and 4 more",
+        "zh": "完善数据采集失败重试控制 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:commit:2026-06-22:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-24T01:04:38Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "10678f5"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "新增 AI 文字模型与多模态模型分离配置设计文档",
+        "zh": "新增 AI 文字模型与多模态模型分离配置设计文档"
+      },
+      "title": {
+        "en": "新增 AI 文字模型与多模态模型分离配置设计文档",
+        "zh": "新增 AI 文字模型与多模态模型分离配置设计文档"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:commit:2026-06-22:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-23T14:58:30Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "e4278b4"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "模板页顶部下拉调整设备与工作流联动",
+        "zh": "模板页顶部下拉调整设备与工作流联动"
+      },
+      "title": {
+        "en": "模板页顶部下拉调整设备与工作流联动",
+        "zh": "模板页顶部下拉调整设备与工作流联动"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:commit:2026-06-29:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-29T03:29:05Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "e5965fb"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "支持 PyInstaller 打包为 EXE 并修复打包后图标路径",
+        "zh": "支持 PyInstaller 打包为 EXE 并修复打包后图标路径"
+      },
+      "title": {
+        "en": "支持 PyInstaller 打包为 EXE 并修复打包后图标路径",
+        "zh": "支持 PyInstaller 打包为 EXE 并修复打包后图标路径"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:commit:2026-07-06:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-10T03:43:26Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "dbfdd03"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "修复AI生成使用模型显示错误的问题",
+        "zh": "修复AI生成使用模型显示错误的问题"
+      },
+      "title": {
+        "en": "修复AI生成使用模型显示错误的问题",
+        "zh": "修复AI生成使用模型显示错误的问题"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:commit:2026-07-06:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-10T10:09:31Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "3c2a66d"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "新增编译打包脚本",
+        "zh": "新增编译打包脚本"
+      },
+      "title": {
+        "en": "新增编译打包脚本",
+        "zh": "新增编译打包脚本"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:commit:2026-07-13:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-17T08:01:33Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "ecb19e6"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "优化模板发布与节点校验",
+        "zh": "优化模板发布与节点校验"
+      },
+      "title": {
+        "en": "优化模板发布与节点校验",
+        "zh": "优化模板发布与节点校验"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:commit:2026-07-27:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-28T03:06:46Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "1af1a37"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "优化登录界面，添加版本信息",
+        "zh": "优化登录界面，添加版本信息"
+      },
+      "title": {
+        "en": "优化登录界面，添加版本信息",
+        "zh": "优化登录界面，添加版本信息"
+      },
+      "version": null
+    },
+    {
+      "changeType": "architecture",
+      "detailsMarkdown": {
+        "en": "- 提交重构相关的md需求计划文件\n- 提交重构验收进度表\n- 推进 IR/Raman 任务迁移与前端提交流程\n- 完成 NMRServer 与谱图预览迁移",
+        "zh": "- 提交重构相关的md需求计划文件\n- 提交重构验收进度表\n- 推进 IR/Raman 任务迁移与前端提交流程\n- 完成 NMRServer 与谱图预览迁移"
+      },
+      "id": "spec-agent:aggregate:2026-04-06:architecture:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-06T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "9633a7a",
+          "78f61bd",
+          "e8bfba5",
+          "b2811fe"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Architecture change (general)",
+        "zh": "架构调整（general）"
+      },
+      "title": {
+        "en": "提交重构相关的md需求计划文件 and 4 more",
+        "zh": "提交重构相关的md需求计划文件 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增 Backend P0 异步任务骨架\n- 新增 Phase2 前端MVP页面骨架\n- 新增问答与批量验收测试模块",
+        "zh": "- 新增 Backend P0 异步任务骨架\n- 新增 Phase2 前端MVP页面骨架\n- 新增问答与批量验收测试模块"
+      },
+      "id": "spec-agent:aggregate:2026-04-06:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-06T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "e750819",
+          "f8297c4",
+          "19bc465"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增 Backend P0 异步任务骨架 and 3 more",
+        "zh": "新增 Backend P0 异步任务骨架 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化谱图文件上传模式，更新相关需求计划文档\n- 完善任务提交页交互与NMR参数联动\n- 完成去源依赖重构并优化前端交互\n- 完善验收指标与 LLM 服务重构",
+        "zh": "- 优化谱图文件上传模式，更新相关需求计划文档\n- 完善任务提交页交互与NMR参数联动\n- 完成去源依赖重构并优化前端交互\n- 完善验收指标与 LLM 服务重构"
+      },
+      "id": "spec-agent:aggregate:2026-04-06:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-06T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "791872b",
+          "f3ee527",
+          "22d1d19",
+          "82e90af"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化谱图文件上传模式，更新相关需求计划文档 and 4 more",
+        "zh": "优化谱图文件上传模式，更新相关需求计划文档 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "architecture",
+      "detailsMarkdown": {
+        "en": "- 重构后端目录结构\n- 重构提交",
+        "zh": "- 重构后端目录结构\n- 重构提交"
+      },
+      "id": "spec-agent:aggregate:2026-04-13:architecture:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-13T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "5353845",
+          "19d5ff5"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Architecture change (general)",
+        "zh": "架构调整（general）"
+      },
+      "title": {
+        "en": "重构后端目录结构 and 2 more",
+        "zh": "重构后端目录结构 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 批量验收报告添加历史记录\n- 新增 LCMS 任务分析全链路\n- 新加入raman的官能团预测\n- 提交历史代码，新增Raman远程批量测试\n- 新增LCMS验收\n- 新增实验数据采集与管理能力",
+        "zh": "- 批量验收报告添加历史记录\n- 新增 LCMS 任务分析全链路\n- 新加入raman的官能团预测\n- 提交历史代码，新增Raman远程批量测试\n- 新增LCMS验收\n- 新增实验数据采集与管理能力"
+      },
+      "id": "spec-agent:aggregate:2026-04-13:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-13T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "be18bde",
+          "774037f",
+          "1787de5",
+          "c7937f7",
+          "c919a46",
+          "d2b71ce"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "批量验收报告添加历史记录 and 6 more",
+        "zh": "批量验收报告添加历史记录 等 6 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 完善 NMR 峰检测参数与结果图展示\n- 前后端接口调用优化\n- 后端重构优化\n- 后端重构优化\n- 后端重构优化",
+        "zh": "- 完善 NMR 峰检测参数与结果图展示\n- 前后端接口调用优化\n- 后端重构优化\n- 后端重构优化\n- 后端重构优化"
+      },
+      "id": "spec-agent:aggregate:2026-04-13:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-13T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "8d5c111",
+          "8980c76",
+          "0c26c2e",
+          "d079a13",
+          "4dbfad3"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "完善 NMR 峰检测参数与结果图展示 and 5 more",
+        "zh": "完善 NMR 峰检测参数与结果图展示 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增AI编码规范\n- 新增过滤已入库的样本\n- 新增简单的日志记录\n- 新增样品删除功能\n- 新增日志记录功能\n- 新增smiles、分子骨架和官能团统计\n- 新增raman批量采集工具",
+        "zh": "- 新增AI编码规范\n- 新增过滤已入库的样本\n- 新增简单的日志记录\n- 新增样品删除功能\n- 新增日志记录功能\n- 新增smiles、分子骨架和官能团统计\n- 新增raman批量采集工具"
+      },
+      "id": "spec-agent:aggregate:2026-04-20:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-20T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "e181c89",
+          "7f5ecfb",
+          "3911da9",
+          "6650757",
+          "83e8c6a",
+          "b430432",
+          "a37eacf"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增AI编码规范 and 7 more",
+        "zh": "新增AI编码规范 等 7 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化数据采集页面\n- 优化数据采集页面\n- 优化工作台页面\n- 优化数据采集效率\n- 优化数据采集显示\n- 优化绘图内存释放",
+        "zh": "- 优化数据采集页面\n- 优化数据采集页面\n- 优化工作台页面\n- 优化数据采集效率\n- 优化数据采集显示\n- 优化绘图内存释放"
+      },
+      "id": "spec-agent:aggregate:2026-04-20:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-20T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "fbe4a76",
+          "0a74c30",
+          "6881c0e",
+          "c66cd42",
+          "a730f92",
+          "bac435f"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化数据采集页面 and 6 more",
+        "zh": "优化数据采集页面 等 6 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复代码正则小BUG\n- 修复csv导出带括号的文件路径格式问题",
+        "zh": "- 修复代码正则小BUG\n- 修复csv导出带括号的文件路径格式问题"
+      },
+      "id": "spec-agent:aggregate:2026-04-27:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-27T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "77989d1",
+          "2421bec"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复代码正则小BUG and 2 more",
+        "zh": "修复代码正则小BUG 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 1.修复IR和RAMAN谱图输入的顺序逻辑；2.新增raman批量采集工具\n- 新增峰识别的结构化信息\n- 新增峰识别的结构化信息以及批量导出csv\n- 新增导出核磁解析结果脚本\n- 新增导出核磁解析结果脚本",
+        "zh": "- 1.修复IR和RAMAN谱图输入的顺序逻辑；2.新增raman批量采集工具\n- 新增峰识别的结构化信息\n- 新增峰识别的结构化信息以及批量导出csv\n- 新增导出核磁解析结果脚本\n- 新增导出核磁解析结果脚本"
+      },
+      "id": "spec-agent:aggregate:2026-04-27:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-27T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "63bccda",
+          "48e8890",
+          "bd60069",
+          "a9db3a1",
+          "d846a04"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "1.修复IR和RAMAN谱图输入的顺序逻辑；2.新增raman批量采集工具 and 5 more",
+        "zh": "1.修复IR和RAMAN谱图输入的顺序逻辑；2.新增raman批量采集工具 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复谱图预览BUG\n- 修复前端鉴权与路由回退\n- 修复任务提交结果显示BUG\n- 修复前端受保护资源请求与路由回退\n- 修复 NMRServer 结构图鉴权加载与拉曼文案默认值",
+        "zh": "- 修复谱图预览BUG\n- 修复前端鉴权与路由回退\n- 修复任务提交结果显示BUG\n- 修复前端受保护资源请求与路由回退\n- 修复 NMRServer 结构图鉴权加载与拉曼文案默认值"
+      },
+      "id": "spec-agent:aggregate:2026-05-04:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-05-04T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "f399479",
+          "37e79c9",
+          "9f02f5d",
+          "93f9070",
+          "31eb32c"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复谱图预览BUG and 5 more",
+        "zh": "修复谱图预览BUG 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增raman采集的镜头聚焦功能\n- 新增本地账号密码登录\n- 新增本地账号密码登录\n- 新增本地账号密码登录\n- 新增本地账号密码登录\n- 新增日志记录",
+        "zh": "- 新增raman采集的镜头聚焦功能\n- 新增本地账号密码登录\n- 新增本地账号密码登录\n- 新增本地账号密码登录\n- 新增本地账号密码登录\n- 新增日志记录"
+      },
+      "id": "spec-agent:aggregate:2026-05-04:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-05-04T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "3863b7b",
+          "ecbbeae",
+          "a0065a2",
+          "3c96a60",
+          "0212267",
+          "80edacf"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增raman采集的镜头聚焦功能 and 6 more",
+        "zh": "新增raman采集的镜头聚焦功能 等 6 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复 worker 日志误写入 app.log\n- 修正日志运行时判断",
+        "zh": "- 修复 worker 日志误写入 app.log\n- 修正日志运行时判断"
+      },
+      "id": "spec-agent:aggregate:2026-05-11:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-05-11T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "8d3ec32",
+          "b918d32"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复 worker 日志误写入 app.log and 2 more",
+        "zh": "修复 worker 日志误写入 app.log 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 支持raman数据采集dat格式\n- 新增IR和RAMAN的基线消除功能",
+        "zh": "- 支持raman数据采集dat格式\n- 新增IR和RAMAN的基线消除功能"
+      },
+      "id": "spec-agent:aggregate:2026-05-11:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-05-11T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "7360196",
+          "04b58ce"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "支持raman数据采集dat格式 and 2 more",
+        "zh": "支持raman数据采集dat格式 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复测评中心 NMR 峰检测核种选择\n- 修复版本显示bug",
+        "zh": "- 修复测评中心 NMR 峰检测核种选择\n- 修复版本显示bug"
+      },
+      "id": "spec-agent:aggregate:2026-05-18:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-05-18T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "46ed4fc",
+          "3a7db96"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复测评中心 NMR 峰检测核种选择 and 2 more",
+        "zh": "修复测评中心 NMR 峰检测核种选择 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增RAMAN和NMR的一致性检查，计算CV系数\n- 1.新增版本号；2.新增worker日志；3.修改部分验收指标测试和日志提取脚本\n- 新增 LCMS 数据转化工具\n- 新增gpc、lcms的设备测试一致性测评指标获取脚本\n- 新增评测中心与设备一致性评测",
+        "zh": "- 新增RAMAN和NMR的一致性检查，计算CV系数\n- 1.新增版本号；2.新增worker日志；3.修改部分验收指标测试和日志提取脚本\n- 新增 LCMS 数据转化工具\n- 新增gpc、lcms的设备测试一致性测评指标获取脚本\n- 新增评测中心与设备一致性评测"
+      },
+      "id": "spec-agent:aggregate:2026-05-18:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-05-18T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "ec49635",
+          "5fa9c8f",
+          "df6528b",
+          "2047363",
+          "4a2a167"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增RAMAN和NMR的一致性检查，计算CV系数 and 5 more",
+        "zh": "新增RAMAN和NMR的一致性检查，计算CV系数 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 1.优化raman日志提取\n- 1.优化gpc三色曲线匹配识别；2.优化控制台日志输出\n- 调整评测中心指标展示文案\n- 调整LCMS一致性指标摘要展示\n- 优化GPC分析流程与一致性评测",
+        "zh": "- 1.优化raman日志提取\n- 1.优化gpc三色曲线匹配识别；2.优化控制台日志输出\n- 调整评测中心指标展示文案\n- 调整LCMS一致性指标摘要展示\n- 优化GPC分析流程与一致性评测"
+      },
+      "id": "spec-agent:aggregate:2026-05-18:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-05-18T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "289e7f7",
+          "49523a0",
+          "a754bcb",
+          "a3ff248",
+          "2f2fbc5"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "1.优化raman日志提取 and 5 more",
+        "zh": "1.优化raman日志提取 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 调整部署文档为全平台说明\n- 调整示例环境配置默认值",
+        "zh": "- 调整部署文档为全平台说明\n- 调整示例环境配置默认值"
+      },
+      "id": "spec-agent:aggregate:2026-05-25:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-05-25T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "f6c1ef0",
+          "89ec31b"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "调整部署文档为全平台说明 and 2 more",
+        "zh": "调整部署文档为全平台说明 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "- 新增用户与邀请码基础模型\n- 优化问答模型接入与登录页交互",
+        "zh": "- 新增用户与邀请码基础模型\n- 优化问答模型接入与登录页交互"
+      },
+      "id": "spec-agent:aggregate:2026-06-01:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-01T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "11b4c64",
+          "2864ceb"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "新增用户与邀请码基础模型 and 2 more",
+        "zh": "新增用户与邀请码基础模型 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复当前用户接口回显逻辑\n- 修复认证上下文与邀请码并发风险\n- 修复认证公共页与404路由判定\n- 修复安全漏洞与代码质量优化\n- 修复 GPC ROI 绘图条件并统一 Raman 文案",
+        "zh": "- 修复当前用户接口回显逻辑\n- 修复认证上下文与邀请码并发风险\n- 修复认证公共页与404路由判定\n- 修复安全漏洞与代码质量优化\n- 修复 GPC ROI 绘图条件并统一 Raman 文案"
+      },
+      "id": "spec-agent:aggregate:2026-06-01:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-01T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "6ea48b2",
+          "db60796",
+          "61c4c5f",
+          "895908f",
+          "48fec12"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复当前用户接口回显逻辑 and 5 more",
+        "zh": "修复当前用户接口回显逻辑 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增管理员接口与角色保护\n- 支持 LCMS 转换 Docker 模式\n- 新增管理员初始化脚本\n- 新增任务提交页顶部说明卡",
+        "zh": "- 新增管理员接口与角色保护\n- 支持 LCMS 转换 Docker 模式\n- 新增管理员初始化脚本\n- 新增任务提交页顶部说明卡"
+      },
+      "id": "spec-agent:aggregate:2026-06-01:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-01T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "308ff33",
+          "6389da1",
+          "3b2b4fe",
+          "1afd2f8"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增管理员接口与角色保护 and 4 more",
+        "zh": "新增管理员接口与角色保护 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 完善注册补偿与密码哈希安全性\n- 完善任务提交页上传提示与范例下载\n- 优化顶部导航面包屑展示\n- 优化GPC ROI计算与登录页交互",
+        "zh": "- 完善注册补偿与密码哈希安全性\n- 完善任务提交页上传提示与范例下载\n- 优化顶部导航面包屑展示\n- 优化GPC ROI计算与登录页交互"
+      },
+      "id": "spec-agent:aggregate:2026-06-01:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-01T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "9fc3b19",
+          "a611631",
+          "f895c05",
+          "d4255e8"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "完善注册补偿与密码哈希安全性 and 4 more",
+        "zh": "完善注册补偿与密码哈希安全性 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化问答对话流式输出及markdown渲染\n- 优化问答对话流式输出及markdown渲染",
+        "zh": "- 优化问答对话流式输出及markdown渲染\n- 优化问答对话流式输出及markdown渲染"
+      },
+      "id": "spec-agent:aggregate:2026-07-27:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-27T08:00:00Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "96da3ae",
+          "5db42ea"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化问答对话流式输出及markdown渲染 and 2 more",
+        "zh": "优化问答对话流式输出及markdown渲染 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-04-13:bugfix:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-04-13T02:34:19Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "cb97a1c"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "修复部分bug，更新环境",
+        "zh": "修复部分bug，更新环境"
+      },
+      "title": {
+        "en": "修复部分bug，更新环境",
+        "zh": "修复部分bug，更新环境"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-04-27:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-04-29T01:43:51Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "f4f9c06"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "优化核磁检测结果信息",
+        "zh": "优化核磁检测结果信息"
+      },
+      "title": {
+        "en": "优化核磁检测结果信息",
+        "zh": "优化核磁检测结果信息"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-05-04:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-05-09T07:00:38Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "f4ec060"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "调整拉曼采集 txt 导出格式",
+        "zh": "调整拉曼采集 txt 导出格式"
+      },
+      "title": {
+        "en": "调整拉曼采集 txt 导出格式",
+        "zh": "调整拉曼采集 txt 导出格式"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-05-25:bugfix:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-05-29T08:57:46Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "76e09ca"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "修复 PM2 跨平台启动与接口文档路由问题",
+        "zh": "修复 PM2 跨平台启动与接口文档路由问题"
+      },
+      "title": {
+        "en": "修复 PM2 跨平台启动与接口文档路由问题",
+        "zh": "修复 PM2 跨平台启动与接口文档路由问题"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-05-25:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-05-29T02:48:02Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "74927f6"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "新增数据库部署的 Docker Compose 配置",
+        "zh": "新增数据库部署的 Docker Compose 配置"
+      },
+      "title": {
+        "en": "新增数据库部署的 Docker Compose 配置",
+        "zh": "新增数据库部署的 Docker Compose 配置"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-06-08:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-08T01:00:45Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "486fd1a"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "完善注册资料与工作台公告",
+        "zh": "完善注册资料与工作台公告"
+      },
+      "title": {
+        "en": "完善注册资料与工作台公告",
+        "zh": "完善注册资料与工作台公告"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-07-20:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:45:24Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "d432986"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "新增核磁预测服务模型来源展示",
+        "zh": "新增核磁预测服务模型来源展示"
+      },
+      "title": {
+        "en": "新增核磁预测服务模型来源展示",
+        "zh": "新增核磁预测服务模型来源展示"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-08-03:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-06T02:51:33Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "a6d8902"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "支持样本路径迁移到 MinIO",
+        "zh": "支持样本路径迁移到 MinIO"
+      },
+      "title": {
+        "en": "支持样本路径迁移到 MinIO",
+        "zh": "支持样本路径迁移到 MinIO"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "- 添加领域模型与工作流仓储\n- 添加设备注册表与动作声明模型",
+        "zh": "- 添加领域模型与工作流仓储\n- 添加设备注册表与动作声明模型"
+      },
+      "id": "speclabos:aggregate:2026-04-27:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-27T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "71815f6",
+          "8bf450d"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "添加领域模型与工作流仓储 and 2 more",
+        "zh": "添加领域模型与工作流仓储 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复工作流仓储代码质量问题\n- 修复设备注册表重复注册语义\n- 修复 Task 7 页面骨架质量问题",
+        "zh": "- 修复工作流仓储代码质量问题\n- 修复设备注册表重复注册语义\n- 修复 Task 7 页面骨架质量问题"
+      },
+      "id": "speclabos:aggregate:2026-04-27:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-27T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "0f12b2e",
+          "bebccf8",
+          "0558e9f"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复工作流仓储代码质量问题 and 3 more",
+        "zh": "修复工作流仓储代码质量问题 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 添加 FastAPI 路由骨架\n- 添加设备监控页与工作流编排页",
+        "zh": "- 添加 FastAPI 路由骨架\n- 添加设备监控页与工作流编排页"
+      },
+      "id": "speclabos:aggregate:2026-04-27:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-27T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "eb895ba",
+          "eda25a4"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "添加 FastAPI 路由骨架 and 2 more",
+        "zh": "添加 FastAPI 路由骨架 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 完善 Task 1 配置路径与测试覆盖\n- 优化 React 管理台首包与布局样式\n- 调整管理台头部布局与品牌文案\n- 补全工作流执行链路与控制台界面优化\n- 优化页面操作区布局",
+        "zh": "- 完善 Task 1 配置路径与测试覆盖\n- 优化 React 管理台首包与布局样式\n- 调整管理台头部布局与品牌文案\n- 补全工作流执行链路与控制台界面优化\n- 优化页面操作区布局"
+      },
+      "id": "speclabos:aggregate:2026-04-27:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-04-27T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "f41eb7d",
+          "7c1bf48",
+          "621b282",
+          "52e2c3b",
+          "198da00"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "完善 Task 1 配置路径与测试覆盖 and 5 more",
+        "zh": "完善 Task 1 配置路径与测试覆盖 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增lcms服务接口地址\n- 1.优化页面接口刷新BUG;2.新增版本号;3.新增设备自动化日志展示\n- 1.优化页面接口刷新BUG;2.新增版本号;3.新增设备自动化日志展示\n- 新增浏览器标签页 favicon 图标\n- 新增系统日志日期筛选\n- 新增设备日志自动化率统计",
+        "zh": "- 新增lcms服务接口地址\n- 1.优化页面接口刷新BUG;2.新增版本号;3.新增设备自动化日志展示\n- 1.优化页面接口刷新BUG;2.新增版本号;3.新增设备自动化日志展示\n- 新增浏览器标签页 favicon 图标\n- 新增系统日志日期筛选\n- 新增设备日志自动化率统计"
+      },
+      "id": "speclabos:aggregate:2026-05-18:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-05-18T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "c29ec77",
+          "5430c25",
+          "de26060",
+          "c9ffa0f",
+          "2ee91de",
+          "11955b5"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增lcms服务接口地址 and 6 more",
+        "zh": "新增lcms服务接口地址 等 6 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增工具服务模块 — 树脂合成指令解析\n- 日志服务添加 30 秒 TTL 内存缓存\n- 新增科学数据助手 — Sciverse/点石 AI 对话检索工具\n- 新增统一登录注册界面",
+        "zh": "- 新增工具服务模块 — 树脂合成指令解析\n- 日志服务添加 30 秒 TTL 内存缓存\n- 新增科学数据助手 — Sciverse/点石 AI 对话检索工具\n- 新增统一登录注册界面"
+      },
+      "id": "speclabos:aggregate:2026-06-08:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "2a3cfef",
+          "57c4e0f",
+          "2ebf4ca",
+          "4b283aa"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增工具服务模块 — 树脂合成指令解析 and 4 more",
+        "zh": "新增工具服务模块 — 树脂合成指令解析 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复 SmartAccess 运行查询分层\n- 修复 SmartAccess 事件回传幂等范围\n- 修复 SmartAccess 模板状态展示兼容\n- 修复 SmartAccess 运行详情页字段缺失与进度计算\n- 优化 SmartAccess 认证与修复 Python 3.11 兼容性",
+        "zh": "- 修复 SmartAccess 运行查询分层\n- 修复 SmartAccess 事件回传幂等范围\n- 修复 SmartAccess 模板状态展示兼容\n- 修复 SmartAccess 运行详情页字段缺失与进度计算\n- 优化 SmartAccess 认证与修复 Python 3.11 兼容性"
+      },
+      "id": "speclabos:aggregate:2026-06-22:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-22T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "ef9a254",
+          "4c9031e",
+          "4cbbfc2",
+          "5c2c1bf",
+          "16e6559"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复 SmartAccess 运行查询分层 and 5 more",
+        "zh": "修复 SmartAccess 运行查询分层 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增 SmartAccess 模板和运行服务\n- 新增 SmartAccess 平台接口\n- 新增 SmartAccess 模板前端页面\n- 统一时间显示为北京时间并新增 SmartAccess 模板删除功能",
+        "zh": "- 新增 SmartAccess 模板和运行服务\n- 新增 SmartAccess 平台接口\n- 新增 SmartAccess 模板前端页面\n- 统一时间显示为北京时间并新增 SmartAccess 模板删除功能"
+      },
+      "id": "speclabos:aggregate:2026-06-22:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-06-22T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "5691b34",
+          "d8872df",
+          "bd58126",
+          "cf09c36"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增 SmartAccess 模板和运行服务 and 4 more",
+        "zh": "新增 SmartAccess 模板和运行服务 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "architecture",
+      "detailsMarkdown": {
+        "en": "- 重构设备接入注册与状态探测\n- 兼容smartaccess云同步按照执行端同步",
+        "zh": "- 重构设备接入注册与状态探测\n- 兼容smartaccess云同步按照执行端同步"
+      },
+      "id": "speclabos:aggregate:2026-07-13:architecture:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-13T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "814de7d",
+          "cdc29a9"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "Architecture change (general)",
+        "zh": "架构调整（general）"
+      },
+      "title": {
+        "en": "重构设备接入注册与状态探测 and 2 more",
+        "zh": "重构设备接入注册与状态探测 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 集成 SmartDataHub 数据入库接口\n- 重构设备配置与集成扫描\n- 新增 SmartDataHub 数据中心页签\n- 新增设备权限管理与 SmartAccess 执行端心跳\n- 新增 SmartAccess 执行端注册校验",
+        "zh": "- 集成 SmartDataHub 数据入库接口\n- 重构设备配置与集成扫描\n- 新增 SmartDataHub 数据中心页签\n- 新增设备权限管理与 SmartAccess 执行端心跳\n- 新增 SmartAccess 执行端注册校验"
+      },
+      "id": "speclabos:aggregate:2026-07-13:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-13T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "56c319a",
+          "b07c105",
+          "496e10f",
+          "defd250",
+          "cbb04d4"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "集成 SmartDataHub 数据入库接口 and 5 more",
+        "zh": "集成 SmartDataHub 数据入库接口 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化设备监控与工作流导航\n- 优化设备状态探测与启用配置\n- 完善 SmartAccess 权限控制\n- 优化设备监控与 SmartAccess 任务展示\n- 优化侧边栏导航滚动体验",
+        "zh": "- 优化设备监控与工作流导航\n- 优化设备状态探测与启用配置\n- 完善 SmartAccess 权限控制\n- 优化设备监控与 SmartAccess 任务展示\n- 优化侧边栏导航滚动体验"
+      },
+      "id": "speclabos:aggregate:2026-07-13:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-13T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "3dd243e",
+          "2d035f4",
+          "ab23b55",
+          "1a5389f",
+          "f8dc6f6"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化设备监控与工作流导航 and 5 more",
+        "zh": "优化设备监控与工作流导航 等 5 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 支持 SmartAccess 运行时参数下发\n- 新增外部实验任务接收与展示",
+        "zh": "- 支持 SmartAccess 运行时参数下发\n- 新增外部实验任务接收与展示"
+      },
+      "id": "speclabos:aggregate:2026-07-20:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "548ea3e",
+          "a4467ec"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "支持 SmartAccess 运行时参数下发 and 2 more",
+        "zh": "支持 SmartAccess 运行时参数下发 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-05-04:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-05-06T09:33:39Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "12cc5b9"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "新增raman聚焦动作",
+        "zh": "新增raman聚焦动作"
+      },
+      "title": {
+        "en": "新增raman聚焦动作",
+        "zh": "新增raman聚焦动作"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-05-18:bugfix:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-05-19T08:29:51Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "2c448d2"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "修复设备日志目录不可访问时接口报错，跳过不可达来源并输出警告日志",
+        "zh": "修复设备日志目录不可访问时接口报错，跳过不可达来源并输出警告日志"
+      },
+      "title": {
+        "en": "修复设备日志目录不可访问时接口报错，跳过不可达来源并输出警告日志",
+        "zh": "修复设备日志目录不可访问时接口报错，跳过不可达来源并输出警告日志"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-06-08:bugfix:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-08T08:01:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "85018a6"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "修复设备日志页面接口频繁超时",
+        "zh": "修复设备日志页面接口频繁超时"
+      },
+      "title": {
+        "en": "修复设备日志页面接口频繁超时",
+        "zh": "修复设备日志页面接口频繁超时"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-06-22:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-23T09:47:16Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "a98a945"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "SmartAccess 与 SpecLabOS 联动优化",
+        "zh": "SmartAccess 与 SpecLabOS 联动优化"
+      },
+      "title": {
+        "en": "SmartAccess 与 SpecLabOS 联动优化",
+        "zh": "SmartAccess 与 SpecLabOS 联动优化"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-06-29:bugfix:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-29T03:13:31Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "b881d22"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "修复 MongoDB 中途宕机后服务无法自动恢复",
+        "zh": "修复 MongoDB 中途宕机后服务无法自动恢复"
+      },
+      "title": {
+        "en": "修复 MongoDB 中途宕机后服务无法自动恢复",
+        "zh": "修复 MongoDB 中途宕机后服务无法自动恢复"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-07-20:algorithm:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-20T08:46:22Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "47f4d19"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "新增科学数据助手模型服务标识",
+        "zh": "新增科学数据助手模型服务标识"
+      },
+      "title": {
+        "en": "新增科学数据助手模型服务标识",
+        "zh": "新增科学数据助手模型服务标识"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-07-27:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-07-30T01:33:19Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "eca4b7a"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "优化科学数据助手为真流式并支持 Markdown 渲染",
+        "zh": "优化科学数据助手为真流式并支持 Markdown 渲染"
+      },
+      "title": {
+        "en": "优化科学数据助手为真流式并支持 Markdown 渲染",
+        "zh": "优化科学数据助手为真流式并支持 Markdown 渲染"
+      },
+      "version": null
+    }
+  ],
+  "schemaVersion": 1
+}
