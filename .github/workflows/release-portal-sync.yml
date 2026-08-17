@@ -10,7 +10,8 @@ on:
         type: choice
         options: [all, ai4ms, spec-agent, poly-agent, speclabos, ragportal, smartaccess]
   schedule:
-    - cron: "17 */6 * * *"
+    # 改为每周一北京时间上午 10:17 触发一次（UTC 时间 02:17）
+    - cron: "17 2 * * 1"
 
 permissions:
   contents: write
