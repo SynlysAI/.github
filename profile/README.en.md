@@ -3,7 +3,7 @@
 [![SynlysAI banner](../logo.png)](https://github.com/SynlysAI)
 
 # SynlysAI
-## https://synlysai.xmuzc.com/
+## [OfficalWebSite](Synlysai.xmuzc.com)
 
 *Bridging Synthesis, Analysis and AI.*
 
