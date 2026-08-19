@@ -862,6 +862,106 @@
       "version": null
     },
     {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复 LUI 工具版本模板参数覆盖\n- 修复命令会话创建因 MongoDB 索引名冲突失败",
+        "zh": "- 修复 LUI 工具版本模板参数覆盖\n- 修复命令会话创建因 MongoDB 索引名冲突失败"
+      },
+      "id": "poly-agent:aggregate:2026-08-17:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-17T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "bd12231",
+          "2978307"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复 LUI 工具版本模板参数覆盖 and 2 more",
+        "zh": "修复 LUI 工具版本模板参数覆盖 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增 Slash Command 后端命令平面\n- 新增 LUI Slash Command 命令面板\n- 新增 LUI 动态 Tool 命令直接执行\n- 新增 LUI 上下文压缩命令\n- 新增 LUI 会话导出与反馈命令\n- 对话页新增 Slash 命令面板触发按钮\n- add Plan 14 for LUI dynamic compute budget and tiered routing framework\n- update Plan 12 status to completed and add Plan 15 for controlled external agent execution provider seam\n- add initial documentation for Poly Agent 0.1.0 features and product updates",
+        "zh": "- 新增 Slash Command 后端命令平面\n- 新增 LUI Slash Command 命令面板\n- 新增 LUI 动态 Tool 命令直接执行\n- 新增 LUI 上下文压缩命令\n- 新增 LUI 会话导出与反馈命令\n- 对话页新增 Slash 命令面板触发按钮\n- add Plan 14 for LUI dynamic compute budget and tiered routing framework\n- update Plan 12 status to completed and add Plan 15 for controlled external agent execution provider seam\n- add initial documentation for Poly Agent 0.1.0 features and product updates"
+      },
+      "id": "poly-agent:aggregate:2026-08-17:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-17T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "630766b",
+          "d2279f4",
+          "9abe846",
+          "5f17616",
+          "8239dc4",
+          "e913f3e",
+          "c3f95e8",
+          "ddc1a07",
+          "3f4e255"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增 Slash Command 后端命令平面 and 9 more",
+        "zh": "新增 Slash Command 后端命令平面 等 9 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化首页 Slash Command 触发与命令目录状态同步\n- 优化 LUI 会话恢复与 SQLite 高频读写性能\n- 优化 LUI 会话恢复与热路径查询并补充评估规划\n- 优化报告产物下载命名\n- 更新 Plan 11 文档，增加动态计算预算原则及后续行动框架，完善策略与验收标准",
+        "zh": "- 优化首页 Slash Command 触发与命令目录状态同步\n- 优化 LUI 会话恢复与 SQLite 高频读写性能\n- 优化 LUI 会话恢复与热路径查询并补充评估规划\n- 优化报告产物下载命名\n- 更新 Plan 11 文档，增加动态计算预算原则及后续行动框架，完善策略与验收标准"
+      },
+      "id": "poly-agent:aggregate:2026-08-17:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-17T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "38ded59",
+          "40a9f83",
+          "96826ac",
+          "3308412",
+          "5dccf8a"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化首页 Slash Command 触发与命令目录状态同步 and 5 more",
+        "zh": "优化首页 Slash Command 触发与命令目录状态同步 等 5 项"
+      },
+      "version": null
+    },
+    {
       "changeType": "algorithm",
       "detailsMarkdown": {
         "en": "",
@@ -986,23 +1086,24 @@
       "id": "poly-agent:commit:2026-08-17:algorithm:general",
       "level": "commit",
       "module": "general",
-      "occurredAt": "2026-08-17T02:12:03Z",
+      "occurredAt": "2026-08-19T02:30:59Z",
       "pinned": false,
       "productId": "poly-agent",
       "source": {
         "commitShas": [
-          "397aa14"
+          "397aa14",
+          "9503128"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
       },
       "summary": {
-        "en": "修复 LUI 垂类算法参数注入覆盖问题",
-        "zh": "修复 LUI 垂类算法参数注入覆盖问题"
+        "en": "优化助手模型路由与命令面板展示",
+        "zh": "优化助手模型路由与命令面板展示"
       },
       "title": {
-        "en": "修复 LUI 垂类算法参数注入覆盖问题",
-        "zh": "修复 LUI 垂类算法参数注入覆盖问题"
+        "en": "优化助手模型路由与命令面板展示",
+        "zh": "优化助手模型路由与命令面板展示"
       },
       "version": null
     },
@@ -2794,6 +2895,35 @@
       "version": null
     },
     {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-08-17:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-19T02:44:32Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "6b88e6a"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "任务中心文本报告支持 md 渲染并新增下载功能",
+        "zh": "任务中心文本报告支持 md 渲染并新增下载功能"
+      },
+      "title": {
+        "en": "任务中心文本报告支持 md 渲染并新增下载功能",
+        "zh": "任务中心文本报告支持 md 渲染并新增下载功能"
+      },
+      "version": null
+    },
+    {
       "changeType": "algorithm",
       "detailsMarkdown": {
         "en": "- 添加领域模型与工作流仓储\n- 添加设备注册表与动作声明模型",
@@ -3374,6 +3504,35 @@
       "title": {
         "en": "优化科学数据助手为真流式并支持 Markdown 渲染",
         "zh": "优化科学数据助手为真流式并支持 Markdown 渲染"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-08-17:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-18T03:22:52Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "fb790c5"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "配置新增环境变量覆盖层并接入公共配置注入",
+        "zh": "配置新增环境变量覆盖层并接入公共配置注入"
+      },
+      "title": {
+        "en": "配置新增环境变量覆盖层并接入公共配置注入",
+        "zh": "配置新增环境变量覆盖层并接入公共配置注入"
       },
       "version": null
     }
