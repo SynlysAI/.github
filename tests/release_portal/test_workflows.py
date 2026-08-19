@@ -330,6 +330,7 @@ def test_sync_generates_release_node_event_in_timeline(tmp_path: Path):
     assert release_event["occurredAt"] == "2026-08-10T00:00:00Z"
     assert release_event["source"]["releaseUrl"] == "https://github.com/SynlysAI/AI4MS/releases/tag/v1.0.0"
     assert release_event["source"]["commitShas"] == []
+    assert release_event["title"]["zh"] == "AI4MS v1.0.0"
 
 
 def test_download_release_asset_uses_authenticated_api_url(tmp_path: Path, monkeypatch):

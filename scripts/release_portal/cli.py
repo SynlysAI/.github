@@ -412,7 +412,7 @@ def _release_event(product: Any, release: Any, version: str) -> dict[str, Any]:
     """
     name = str(getattr(release, "name", "") or "").strip()
     published_at = getattr(release, "published_at", None)
-    label = f"{name} {version}".strip() if name else version
+    label = name or version
     return {
         "id": f"{product.product_id}:release:{getattr(release, 'id', '')}",
         "productId": product.product_id,
