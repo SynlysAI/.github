@@ -399,6 +399,25 @@ def _release_record(product: Any, release: Any, assets: list[dict[str, Any]]) ->
     }
 
 
+def _strip_frontmatter(text: str) -> str:
+    """去除 Markdown 文本开头的 YAML frontmatter 分隔块。
+
+    Args:
+        text: 原始 Markdown 文本。
+
+    Returns:
+        剔除 frontmatter 后的正文，无 frontmatter 时原样返回。
+    """
+    content = text.lstrip("\ufeff \t\r\n")
+    if not content.startswith("---"):
+        return text
+    lines = content.splitlines()
+    for index, line in enumerate(lines[1:], start=1):
+        if line.strip() == "---":
+            return "\n".join(lines[index + 1:]).strip()
+    return text
+
+
 def _release_event(product: Any, release: Any, version: str) -> dict[str, Any]:
     """为正式 Release 生成 timeline 中的发布节点事件。
 
@@ -413,6 +432,7 @@ def _release_event(product: Any, release: Any, version: str) -> dict[str, Any]:
     name = str(getattr(release, "name", "") or "").strip()
     published_at = getattr(release, "published_at", None)
     label = name or version
+    body = _strip_frontmatter(str(getattr(release, "body", "") or "")).strip()
     return {
         "id": f"{product.product_id}:release:{getattr(release, 'id', '')}",
         "productId": product.product_id,
@@ -426,7 +446,7 @@ def _release_event(product: Any, release: Any, version: str) -> dict[str, Any]:
             "zh": f"发布 {version}",
             "en": f"Release {version}",
         },
-        "detailsMarkdown": {"zh": "", "en": ""},
+        "detailsMarkdown": {"zh": body, "en": body},
         "source": {
             "repository": product.repository,
             "commitShas": [],

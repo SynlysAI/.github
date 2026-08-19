@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 from scripts.release_portal import cli
 from scripts.release_portal.assets import InMemoryR2Client
@@ -331,6 +332,26 @@ def test_sync_generates_release_node_event_in_timeline(tmp_path: Path):
     assert release_event["source"]["releaseUrl"] == "https://github.com/SynlysAI/AI4MS/releases/tag/v1.0.0"
     assert release_event["source"]["commitShas"] == []
     assert release_event["title"]["zh"] == "AI4MS v1.0.0"
+    assert release_event["detailsMarkdown"]["zh"] == "公开说明"
+
+
+def test_release_event_strips_yaml_frontmatter_from_body():
+    """生成发布节点事件时应剥离正文开头的 YAML frontmatter。"""
+    release = Release(
+        id="55",
+        tag="v2.0.0",
+        name="AI4MS v2.0.0",
+        body="---\ntitle: 文档\nversion: 2.0.0\n---\n\n正式发布说明正文",
+        published_at="2026-08-11T00:00:00Z",
+        release_url="https://github.com/SynlysAI/AI4MS/releases/tag/v2.0.0",
+        prerelease=False,
+        draft=False,
+    )
+    version = str(release.tag)
+    product = SimpleNamespace(product_id="ai4ms", repository="SynlysAI/AI4MS")
+    event = cli._release_event(product, release, version)
+    assert event["detailsMarkdown"]["zh"] == "正式发布说明正文"
+    assert "title:" not in event["detailsMarkdown"]["zh"]
 
 
 def test_download_release_asset_uses_authenticated_api_url(tmp_path: Path, monkeypatch):
