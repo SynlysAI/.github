@@ -1110,6 +1110,62 @@
     {
       "changeType": "feature",
       "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-17:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-19T09:43:20Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "e77e0d4"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "新增 FedBO 试点与聚合物逆向设计规划文档",
+        "zh": "新增 FedBO 试点与聚合物逆向设计规划文档"
+      },
+      "title": {
+        "en": "新增 FedBO 试点与聚合物逆向设计规划文档",
+        "zh": "新增 FedBO 试点与聚合物逆向设计规划文档"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:release:372911323",
+      "level": "release",
+      "module": "release",
+      "occurredAt": "2026-08-19T08:56:18Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [],
+        "releaseUrl": "https://github.com/SynlysAI/Poly_Agent/releases/tag/v0.1.0",
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Release v0.1.0",
+        "zh": "发布 v0.1.0"
+      },
+      "title": {
+        "en": "v0.1.0",
+        "zh": "v0.1.0"
+      },
+      "version": "v0.1.0"
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
         "en": "- FastAPI entry + SQLite schema + HMAC token verification\n- auth routes (login proxy, me, logout) + public config\n- WeKnora client + KB cache + upload proxy + status sync\n- upload endpoint + KB list + admin APIs",
         "zh": "- FastAPI entry + SQLite schema + HMAC token verification\n- auth routes (login proxy, me, logout) + public config\n- WeKnora client + KB cache + upload proxy + status sync\n- upload endpoint + KB list + admin APIs"
       },
@@ -1291,6 +1347,33 @@
         "zh": "complete React SPA — login, upload, my-records, admin"
       },
       "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ragportal:release:369776138",
+      "level": "release",
+      "module": "release",
+      "occurredAt": "2026-08-13T08:44:55Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [],
+        "releaseUrl": "https://github.com/SynlysAI/RAGPortal/releases/tag/v0.0.1",
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "Release v0.0.1",
+        "zh": "发布 v0.0.1"
+      },
+      "title": {
+        "en": "v0.1.0",
+        "zh": "v0.1.0"
+      },
+      "version": "v0.0.1"
     },
     {
       "changeType": "bugfix",
@@ -1927,6 +2010,33 @@
         "zh": "优化登录界面，添加版本信息"
       },
       "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:release:362125923",
+      "level": "release",
+      "module": "release",
+      "occurredAt": "2026-07-30T00:55:08Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [],
+        "releaseUrl": "https://github.com/SynlysAI/SmartAccess/releases/tag/v0.1.0",
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Release v0.1.0",
+        "zh": "发布 v0.1.0"
+      },
+      "title": {
+        "en": "20260730内测完整版v0.1.0",
+        "zh": "20260730内测完整版v0.1.0"
+      },
+      "version": "v0.1.0"
     },
     {
       "changeType": "architecture",
