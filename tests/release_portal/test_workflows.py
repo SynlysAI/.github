@@ -28,7 +28,7 @@ def test_sync_workflow_uses_app_token_schedule_and_candidate_pr():
     """同步任务应定时运行，并用 GitHub App 维护候选审核 PR。"""
     workflow = _workflow("release-portal-sync.yml")
 
-    assert "cron: \"17 */6 * * *\"" in workflow
+    assert "cron: \"17 2 * * 1\"" in workflow
     assert "workflow_dispatch:" in workflow
     assert "actions/create-github-app-token@v3" in workflow
     assert "id: source-token" in workflow
