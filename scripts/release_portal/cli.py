@@ -399,6 +399,43 @@ def _release_record(product: Any, release: Any, assets: list[dict[str, Any]]) ->
     }
 
 
+def _release_event(product: Any, release: Any, version: str) -> dict[str, Any]:
+    """为正式 Release 生成 timeline 中的发布节点事件。
+
+    Args:
+        product: catalog 中的产品对象。
+        release: GitHub Release 归一化对象。
+        version: 规范化的版本标识。
+
+    Returns:
+        符合 timeline Schema 且 level 为 release 的事件。
+    """
+    name = str(getattr(release, "name", "") or "").strip()
+    published_at = getattr(release, "published_at", None)
+    label = f"{name} {version}".strip() if name else version
+    return {
+        "id": f"{product.product_id}:release:{getattr(release, 'id', '')}",
+        "productId": product.product_id,
+        "level": "release",
+        "occurredAt": published_at,
+        "version": version,
+        "changeType": "feature",
+        "module": "release",
+        "title": {"zh": label, "en": label},
+        "summary": {
+            "zh": f"发布 {version}",
+            "en": f"Release {version}",
+        },
+        "detailsMarkdown": {"zh": "", "en": ""},
+        "source": {
+            "repository": product.repository,
+            "commitShas": [],
+            "releaseUrl": getattr(release, "release_url", None),
+        },
+        "pinned": False,
+    }
+
+
 def _sync(args: argparse.Namespace, *, object_store: Any | None = None, github_client: Any | None = None) -> int:
     """同步正式 GitHub Release 及其附件到 R2 候选集合。
 
@@ -460,6 +497,7 @@ def _sync(args: argparse.Namespace, *, object_store: Any | None = None, github_c
                         except OSError:
                             pass
                 records.append(_release_record(product, release, public_assets))
+                timeline_additions.append(_release_event(product, release, version))
                 synced += 1
             repository_state = state.setdefault("repositories", {}).setdefault(product.repository, {})
             watermark = str((repository_state.get("watermark") or {}).get("sha") or "")

@@ -269,6 +269,69 @@ def test_sync_command_uploads_formal_asset_with_original_name(tmp_path: Path, mo
     assert '"status":"success"' in capsys.readouterr().out
 
 
+def test_sync_generates_release_node_event_in_timeline(tmp_path: Path):
+    """同步应为每个正式 Release 生成 level=release 的发布节点事件。"""
+    releases_path = tmp_path / "releases.json"
+    timeline_path = tmp_path / "timeline.json"
+    state_path = tmp_path / "backfill.json"
+    releases_path.write_text('{"schemaVersion": 1, "releases": []}\n', encoding="utf-8")
+    timeline_path.write_text('{"schemaVersion": 1, "events": []}\n', encoding="utf-8")
+    state_path.write_text(
+        '{"schemaVersion": 1, "repositories": {"SynlysAI/AI4MS": {'
+        '"page": 1, "processedShas": [], "watermark": {}}}}\n',
+        encoding="utf-8",
+    )
+
+    class ReleaseOnlyClient:
+        """只返回单个正式 Release、不产生提交的 GitHub 客户端。"""
+
+        @staticmethod
+        def list_releases(_repository):
+            """返回带版本标识的正式 Release。"""
+            return [
+                Release(
+                    id="42",
+                    tag="v1.0.0",
+                    name="AI4MS v1.0.0",
+                    body="公开说明",
+                    published_at="2026-08-10T00:00:00Z",
+                    release_url="https://github.com/SynlysAI/AI4MS/releases/tag/v1.0.0",
+                    prerelease=False,
+                    draft=False,
+                )
+            ]
+
+        @staticmethod
+        def list_commits(_repository, *, include_pull_requests, stop_at_sha, max_items, page):
+            """同步测试不产生新的提交。"""
+            return []
+
+    args = cli._parser().parse_args(
+        [
+            "sync",
+            "--product",
+            "ai4ms",
+            "--candidates",
+            str(releases_path),
+            "--timeline",
+            str(timeline_path),
+            "--state",
+            str(state_path),
+        ]
+    )
+
+    assert cli._sync(args, object_store=InMemoryR2Client(), github_client=ReleaseOnlyClient()) == 0
+    timeline = json.loads(timeline_path.read_text(encoding="utf-8"))
+    events = [event for event in timeline["events"] if event.get("level") == "release"]
+    assert len(events) == 1
+    release_event = events[0]
+    assert release_event["productId"] == "ai4ms"
+    assert release_event["version"] == "v1.0.0"
+    assert release_event["occurredAt"] == "2026-08-10T00:00:00Z"
+    assert release_event["source"]["releaseUrl"] == "https://github.com/SynlysAI/AI4MS/releases/tag/v1.0.0"
+    assert release_event["source"]["commitShas"] == []
+
+
 def test_download_release_asset_uses_authenticated_api_url(tmp_path: Path, monkeypatch):
     """私有仓库附件应通过带安装令牌的 Release Asset API 下载。"""
 
