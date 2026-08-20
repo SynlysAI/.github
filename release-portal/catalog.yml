@@ -57,6 +57,6 @@ products:
     name: {zh: SmartAccess, en: SmartAccess}
     tagline: {zh: AI 辅助科学仪器设备的非侵入式监控助手, en: "Non-intrusive AI assistant for scientific instrument monitoring"}
     category: developer-tools
-    logo: logo.png
+    logo: /icons/smartaccess.png
     defaultBranch: main
     aiPolicy: metadata-only
