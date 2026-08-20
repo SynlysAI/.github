@@ -5,7 +5,7 @@ products:
     entryType: web
     webUrl: https://ai4ms.xmuzc.com/
     name: {zh: AI4MS, en: AI4MS}
-    tagline: {zh: AI 驱动的材料信息学平台, en: AI-powered materials informatics platform}
+    tagline: {zh: 分子科学智能研发平台统一门户, en: "Unified portal for intelligent molecular science R&D"}
     category: materials-informatics
     logo: logo.png
     defaultBranch: main
@@ -15,7 +15,7 @@ products:
     entryType: web
     webUrl: https://specagent.xmuzc.com/
     name: {zh: 谱学分析平台, en: Spec Agent}
-    tagline: {zh: 面向光谱分析的智能实验助手, en: Intelligent assistant for spectrum analysis}
+    tagline: {zh: 面向表征实验谱图的智能解析与分析平台, en: "Intelligent platform for characterization spectral parsing and analysis"}
     category: spectroscopy
     logo: logo.png
     defaultBranch: main
@@ -55,7 +55,7 @@ products:
     entryType: download
     webUrl: null
     name: {zh: SmartAccess, en: SmartAccess}
-    tagline: {zh: 安全、可审计的软件分发入口, en: Secure and auditable software distribution}
+    tagline: {zh: AI 辅助科学仪器设备的非侵入式监控助手, en: "Non-intrusive AI assistant for scientific instrument monitoring"}
     category: developer-tools
     logo: logo.png
     defaultBranch: main
