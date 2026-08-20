@@ -14,7 +14,7 @@ products:
     repository: SynlysAI/Spec_Agent
     entryType: web
     webUrl: https://specagent.xmuzc.com/
-    name: {zh: 光谱智能体, en: Spec Agent}
+    name: {zh: 谱学分析平台, en: Spec Agent}
     tagline: {zh: 面向光谱分析的智能实验助手, en: Intelligent assistant for spectrum analysis}
     category: spectroscopy
     logo: logo.png
@@ -24,7 +24,7 @@ products:
     repository: SynlysAI/Poly_Agent
     entryType: web
     webUrl: https://polyagent.xmuzc.com/
-    name: {zh: 聚合物智能体, en: Poly Agent}
+    name: {zh: 高分子研发平台, en: Poly Agent}
     tagline: {zh: 聚合物设计与分析智能体, en: Agent for polymer design and analysis}
     category: polymer-science
     logo: logo.png
@@ -34,7 +34,7 @@ products:
     repository: SynlysAI/SpecLabOS
     entryType: web
     webUrl: https://speclabos.xmuzc.com/
-    name: {zh: 光谱实验室操作系统, en: SpecLabOS}
+    name: {zh: 实验室管理系统, en: SpecLabOS}
     tagline: {zh: 连接仪器、数据与工作流的实验室系统, en: "Lab system connecting instruments, data, and workflows"}
     category: laboratory-platform
     logo: logo.png
