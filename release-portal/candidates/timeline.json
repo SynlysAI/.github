@@ -197,6 +197,33 @@
       "version": null
     },
     {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "AI⁴MS 统一研发门户首个正式版本。\n\nAI⁴MS(AI for Molecular Science)是材料研发的统一入口,以深空科技风格 Web 门户承载各子平台的导航、统一认证与应用管理。\n\n## 主要功能\n\n- **统一门户**:集中入口,承载智能谱学分析、高分子研发、实验自动化监控三大子平台的应用卡片与导航\n- **单点登录(SSO)**:点击子平台卡片自动携带 Token 跳转,子平台校验通过后直接登录,无需重复认证\n- **用户体系**:账号密码登录、邀请码注册、admin / user 角色权限模型\n- **管理后台**:用户管理(启用/禁用)、邀请码管理(创建/禁用)",
+        "zh": "AI⁴MS 统一研发门户首个正式版本。\n\nAI⁴MS(AI for Molecular Science)是材料研发的统一入口,以深空科技风格 Web 门户承载各子平台的导航、统一认证与应用管理。\n\n## 主要功能\n\n- **统一门户**:集中入口,承载智能谱学分析、高分子研发、实验自动化监控三大子平台的应用卡片与导航\n- **单点登录(SSO)**:点击子平台卡片自动携带 Token 跳转,子平台校验通过后直接登录,无需重复认证\n- **用户体系**:账号密码登录、邀请码注册、admin / user 角色权限模型\n- **管理后台**:用户管理(启用/禁用)、邀请码管理(创建/禁用)"
+      },
+      "id": "ai4ms:release:373435233",
+      "level": "release",
+      "module": "release",
+      "occurredAt": "2026-08-20T01:15:07Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [],
+        "releaseUrl": "https://github.com/SynlysAI/AI4MS/releases/tag/v1.0.0",
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "Release v1.0.0",
+        "zh": "发布 v1.0.0"
+      },
+      "title": {
+        "en": "v1.0.0",
+        "zh": "v1.0.0"
+      },
+      "version": "v1.0.0"
+    },
+    {
       "changeType": "algorithm",
       "detailsMarkdown": {
         "en": "- add optimization campaigns feature with campaign management and detail views\n- enhance computation and optimization services with new test coverage and artifact download functionality\n- implement Tanimoto planner and enhance optimization service with automation features",
@@ -3034,6 +3061,33 @@
       "version": null
     },
     {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "Spec Agent 首个正式版本。\n\nSpec Agent 是面向表征实验谱图的智能解析与分析平台,支持 GPC、NMR、IR、Raman、LCMS 等多种谱图的智能解析、任务管理与评测。\n\n## 主要功能\n\n- **谱图智能解析**:GPC / NMR / IR / Raman / LCMS 任务提交、异步执行、结果查看\n- **报告问答**:基于 LLM 的报告内容问答对话\n- **NMRServer 工具**:谱图正向预测、反向预测、数据库搜索\n- **拉曼批量采集**:光谱仪远程采集,含信噪比指标与谱图下载\n- **LCMS 数据转化**:原始数据格式转化\n- **评测中心**:解析准确性评测、设备重复性评测、Markdown 报告下载\n- **实验数据管理**:共享目录采集、样本主档管理、分子资产统计\n- **登录鉴权**:账号密码登录、邀请码注册、管理员权限控制",
+        "zh": "Spec Agent 首个正式版本。\n\nSpec Agent 是面向表征实验谱图的智能解析与分析平台,支持 GPC、NMR、IR、Raman、LCMS 等多种谱图的智能解析、任务管理与评测。\n\n## 主要功能\n\n- **谱图智能解析**:GPC / NMR / IR / Raman / LCMS 任务提交、异步执行、结果查看\n- **报告问答**:基于 LLM 的报告内容问答对话\n- **NMRServer 工具**:谱图正向预测、反向预测、数据库搜索\n- **拉曼批量采集**:光谱仪远程采集,含信噪比指标与谱图下载\n- **LCMS 数据转化**:原始数据格式转化\n- **评测中心**:解析准确性评测、设备重复性评测、Markdown 报告下载\n- **实验数据管理**:共享目录采集、样本主档管理、分子资产统计\n- **登录鉴权**:账号密码登录、邀请码注册、管理员权限控制"
+      },
+      "id": "spec-agent:release:373435245",
+      "level": "release",
+      "module": "release",
+      "occurredAt": "2026-08-20T01:15:11Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [],
+        "releaseUrl": "https://github.com/SynlysAI/Spec_Agent/releases/tag/v1.0.0",
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "Release v1.0.0",
+        "zh": "发布 v1.0.0"
+      },
+      "title": {
+        "en": "v1.0.0",
+        "zh": "v1.0.0"
+      },
+      "version": "v1.0.0"
+    },
+    {
       "changeType": "algorithm",
       "detailsMarkdown": {
         "en": "- 添加领域模型与工作流仓储\n- 添加设备注册表与动作声明模型",
@@ -3645,6 +3699,33 @@
         "zh": "配置新增环境变量覆盖层并接入公共配置注入"
       },
       "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "SpecLabOS 首个正式版本。\n\nSpecLabOS 用于统一管理实验设备、工作流编排与任务运行,并集成模板远程下发与设备数据入库能力。\n\n## 主要功能\n\n- **统一管理**:实验设备、工作流、工作流运行任务的统一管理与查看\n- **SmartAccess 模板中心**:接收 SmartAccess 桌面端发布的工作流模板,一键发起远程运行任务,任务自动投递到指定执行端电脑并回传运行状态\n- **SmartDataHub 数据入库**:接收设备端 Collector 上报的文件,自动写入对象存储与数据库,支持资产列表与文件明细查询",
+        "zh": "SpecLabOS 首个正式版本。\n\nSpecLabOS 用于统一管理实验设备、工作流编排与任务运行,并集成模板远程下发与设备数据入库能力。\n\n## 主要功能\n\n- **统一管理**:实验设备、工作流、工作流运行任务的统一管理与查看\n- **SmartAccess 模板中心**:接收 SmartAccess 桌面端发布的工作流模板,一键发起远程运行任务,任务自动投递到指定执行端电脑并回传运行状态\n- **SmartDataHub 数据入库**:接收设备端 Collector 上报的文件,自动写入对象存储与数据库,支持资产列表与文件明细查询"
+      },
+      "id": "speclabos:release:373435281",
+      "level": "release",
+      "module": "release",
+      "occurredAt": "2026-08-20T01:15:17Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [],
+        "releaseUrl": "https://github.com/SynlysAI/SpecLabOS/releases/tag/v1.0.0",
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "Release v1.0.0",
+        "zh": "发布 v1.0.0"
+      },
+      "title": {
+        "en": "v1.0.0",
+        "zh": "v1.0.0"
+      },
+      "version": "v1.0.0"
     }
   ],
   "schemaVersion": 1
