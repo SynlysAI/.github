@@ -103,11 +103,11 @@
 <text x="796" y="127" text-anchor="start" class="command-note">1 public tracked</text>
 <rect x="1066" y="70" width="258" height="62" rx="18" class="panel-soft" />
 <text x="1082" y="90" text-anchor="start" class="command-label">signal</text>
-<text x="1082" y="112" text-anchor="start" class="command-value">436 / 30d</text>
-<text x="1082" y="127" text-anchor="start" class="command-note">757 commits in rolling 12 weeks</text>
+<text x="1082" y="112" text-anchor="start" class="command-value">468 / 30d</text>
+<text x="1082" y="127" text-anchor="start" class="command-note">756 commits in rolling 12 weeks</text>
 <rect x="780" y="148" width="258" height="62" rx="18" class="panel-soft" />
 <text x="796" y="168" text-anchor="start" class="command-label">surface</text>
-<text x="796" y="190" text-anchor="start" class="command-value">25.1 MB</text>
+<text x="796" y="190" text-anchor="start" class="command-value">25.2 MB</text>
 <text x="796" y="205" text-anchor="start" class="command-note">Python is the dominant language</text>
 <rect x="1066" y="148" width="258" height="62" rx="18" class="panel-soft" />
 <text x="1082" y="168" text-anchor="start" class="command-label">community</text>
@@ -115,7 +115,7 @@
 <text x="1082" y="205" text-anchor="start" class="command-note">0 forks · 0 watchers</text>
 <rect x="52" y="284" width="206" height="70" rx="18" class="panel" />
 <text x="68" y="308" text-anchor="start" class="metric-label">COMMIT MASS</text>
-<text x="68" y="338" text-anchor="start" class="metric-value">1.3k</text>
+<text x="68" y="338" text-anchor="start" class="metric-value">1.4k</text>
 <rect x="275" y="284" width="206" height="70" rx="18" class="panel" />
 <text x="291" y="308" text-anchor="start" class="metric-label">ACTIVE REPOS</text>
 <text x="291" y="338" text-anchor="start" class="metric-value">9</text>
@@ -138,27 +138,27 @@
 <text x="130" y="468" text-anchor="start" class="table-name">xx5921</text>
 <text x="130" y="488" text-anchor="start" class="table-meta">12 repos wired in</text>
 <rect x="254" y="457" width="160.0" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
-<text x="454" y="468" text-anchor="end" class="table-value">503</text>
+<text x="454" y="468" text-anchor="end" class="table-value">538</text>
 <text x="454" y="488" text-anchor="end" class="table-meta">commits</text>
 <line x1="80" y1="500" x2="454" y2="500" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
 <text x="80" y="526" text-anchor="start" class="rank">#02</text>
 <text x="130" y="526" text-anchor="start" class="table-name">FangYikaii</text>
 <text x="130" y="546" text-anchor="start" class="table-meta">11 repos wired in</text>
-<rect x="254" y="515" width="150.5" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
-<text x="454" y="526" text-anchor="end" class="table-value">473</text>
+<rect x="254" y="515" width="141.6" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<text x="454" y="526" text-anchor="end" class="table-value">476</text>
 <text x="454" y="546" text-anchor="end" class="table-meta">commits</text>
 <line x1="80" y1="558" x2="454" y2="558" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
 <text x="80" y="584" text-anchor="start" class="rank">#03</text>
 <text x="130" y="584" text-anchor="start" class="table-name">Crucifixion-Fxl</text>
 <text x="130" y="604" text-anchor="start" class="table-meta">2 repos wired in</text>
-<rect x="254" y="573" width="39.4" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<rect x="254" y="573" width="36.9" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
 <text x="454" y="584" text-anchor="end" class="table-value">124</text>
 <text x="454" y="604" text-anchor="end" class="table-meta">commits</text>
 <line x1="80" y1="616" x2="454" y2="616" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
 <text x="80" y="642" text-anchor="start" class="rank">#04</text>
 <text x="130" y="642" text-anchor="start" class="table-name">yzfswt</text>
 <text x="130" y="662" text-anchor="start" class="table-meta">2 repos wired in</text>
-<rect x="254" y="631" width="20.4" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<rect x="254" y="631" width="19.0" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
 <text x="454" y="642" text-anchor="end" class="table-value">64</text>
 <text x="454" y="662" text-anchor="end" class="table-meta">commits</text>
 <line x1="80" y1="674" x2="454" y2="674" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
@@ -166,13 +166,13 @@
 <text x="130" y="700" text-anchor="start" class="table-name">github-actions[bot]</text>
 <text x="130" y="720" text-anchor="start" class="table-meta">1 repos wired in</text>
 <rect x="254" y="689" width="18.4" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
-<text x="454" y="700" text-anchor="end" class="table-value">58</text>
+<text x="454" y="700" text-anchor="end" class="table-value">62</text>
 <text x="454" y="720" text-anchor="end" class="table-meta">commits</text>
 <line x1="80" y1="732" x2="454" y2="732" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
 <text x="80" y="758" text-anchor="start" class="rank">#06</text>
 <text x="130" y="758" text-anchor="start" class="table-name">lyt0615</text>
 <text x="130" y="778" text-anchor="start" class="table-meta">3 repos wired in</text>
-<rect x="254" y="747" width="15.3" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<rect x="254" y="747" width="14.3" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
 <text x="454" y="758" text-anchor="end" class="table-value">48</text>
 <text x="454" y="778" text-anchor="end" class="table-meta">commits</text>
 <line x1="80" y1="790" x2="454" y2="790" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
@@ -183,8 +183,8 @@
 <text x="548" y="486" text-anchor="start" class="badge-title">Poly_Agent</text>
 <text x="926" y="486" text-anchor="end" class="stream-state">PRIVATE</text>
 <text x="548" y="508" text-anchor="start" class="badge-meta">Private repository</text>
-<text x="548" y="548" text-anchor="start" class="repo-card-mono">Python · 6.2 MB · 248 commits</text>
-<text x="548" y="566" text-anchor="start" class="badge-meta">+180 / 30d · updated today</text>
+<text x="548" y="548" text-anchor="start" class="repo-card-mono">Python · 6.2 MB · 256 commits</text>
+<text x="548" y="566" text-anchor="start" class="badge-meta">+185 / 30d · updated today</text>
 <text x="926" y="548" text-anchor="end" class="badge-meta">0★  0 forks</text>
 <text x="926" y="566" text-anchor="end" class="badge-meta">No license · hidden</text>
 <rect x="548" y="586" width="81" height="24" rx="12" class="badge-chip" />
@@ -197,8 +197,8 @@
 <text x="980" y="486" text-anchor="start" class="badge-title">.github</text>
 <text x="1358" y="486" text-anchor="end" class="stream-state">PUBLIC</text>
 <text x="980" y="508" text-anchor="start" class="badge-meta">No description available.</text>
-<text x="980" y="548" text-anchor="start" class="repo-card-mono">Python · 327.0 KB · 212 commits</text>
-<text x="980" y="566" text-anchor="start" class="badge-meta">+150 / 30d · updated today</text>
+<text x="980" y="548" text-anchor="start" class="repo-card-mono">Python · 328.5 KB · 223 commits</text>
+<text x="980" y="566" text-anchor="start" class="badge-meta">+161 / 30d · updated today</text>
 <text x="1358" y="548" text-anchor="end" class="badge-meta">0★  0 forks</text>
 <text x="1358" y="566" text-anchor="end" class="badge-meta">No license · main</text>
 <rect x="980" y="586" width="81" height="24" rx="12" class="badge-chip" />
@@ -211,8 +211,8 @@
 <text x="548" y="680" text-anchor="start" class="badge-title">Spec_Agent</text>
 <text x="926" y="680" text-anchor="end" class="stream-state">PRIVATE</text>
 <text x="548" y="702" text-anchor="start" class="badge-meta">Private repository</text>
-<text x="548" y="742" text-anchor="start" class="repo-card-mono">Python · 1.4 MB · 154 commits</text>
-<text x="548" y="760" text-anchor="start" class="badge-meta">+13 / 30d · updated today</text>
+<text x="548" y="742" text-anchor="start" class="repo-card-mono">Python · 1.4 MB · 158 commits</text>
+<text x="548" y="760" text-anchor="start" class="badge-meta">+17 / 30d · updated today</text>
 <text x="926" y="742" text-anchor="end" class="badge-meta">0★  0 forks</text>
 <text x="926" y="760" text-anchor="end" class="badge-meta">No license · hidden</text>
 <rect x="548" y="780" width="81" height="24" rx="12" class="badge-chip" />
@@ -226,7 +226,7 @@
 <text x="1358" y="680" text-anchor="end" class="stream-state">PRIVATE</text>
 <text x="980" y="702" text-anchor="start" class="badge-meta">Private repository</text>
 <text x="980" y="742" text-anchor="start" class="repo-card-mono">Python · 1.2 MB · 152 commits</text>
-<text x="980" y="760" text-anchor="start" class="badge-meta">+6 / 30d · updated 1 day ago</text>
+<text x="980" y="760" text-anchor="start" class="badge-meta">+6 / 30d · updated 2 days ago</text>
 <text x="1358" y="742" text-anchor="end" class="badge-meta">0★  0 forks</text>
 <text x="1358" y="760" text-anchor="end" class="badge-meta">No license · hidden</text>
 <rect x="980" y="780" width="81" height="24" rx="12" class="badge-chip" />
@@ -243,11 +243,11 @@
 <text x="454" y="940" text-anchor="end" class="table-value" font-size="14">52.8%</text>
 <text x="454" y="956" text-anchor="end" class="table-meta">12.7 MB</text>
 <text x="80" y="984" text-anchor="start" class="table-name" font-size="15">C#</text>
-<rect x="208" y="973" width="90.5" height="9" rx="4" fill="url(#signal)" />
+<rect x="208" y="973" width="90.4" height="9" rx="4" fill="url(#signal)" />
 <text x="454" y="984" text-anchor="end" class="table-value" font-size="14">28.1%</text>
 <text x="454" y="1000" text-anchor="end" class="table-meta">6.8 MB</text>
 <text x="80" y="1028" text-anchor="start" class="table-name" font-size="15">Vue</text>
-<rect x="208" y="1017" width="27.9" height="9" rx="4" fill="url(#signal)" />
+<rect x="208" y="1017" width="28.1" height="9" rx="4" fill="url(#signal)" />
 <text x="454" y="1028" text-anchor="end" class="table-value" font-size="14">8.7%</text>
 <text x="454" y="1044" text-anchor="end" class="table-meta">2.1 MB</text>
 <text x="80" y="1072" text-anchor="start" class="table-name" font-size="15">Go</text>
@@ -255,9 +255,9 @@
 <text x="454" y="1072" text-anchor="end" class="table-value" font-size="14">5.4%</text>
 <text x="454" y="1088" text-anchor="end" class="table-meta">1.3 MB</text>
 <text x="80" y="1116" text-anchor="start" class="table-name" font-size="15">JavaScript</text>
-<rect x="208" y="1105" width="9.6" height="9" rx="4" fill="url(#signal)" />
+<rect x="208" y="1105" width="9.7" height="9" rx="4" fill="url(#signal)" />
 <text x="454" y="1116" text-anchor="end" class="table-value" font-size="14">3.0%</text>
-<text x="454" y="1132" text-anchor="end" class="table-meta">736.0 KB</text>
+<text x="454" y="1132" text-anchor="end" class="table-meta">741.4 KB</text>
 <text x="80" y="1160" text-anchor="start" class="table-name" font-size="15">Jupyter Notebook</text>
 <rect x="208" y="1149" width="6.6" height="9" rx="4" fill="url(#signal)" />
 <text x="454" y="1160" text-anchor="end" class="table-value" font-size="14">2.0%</text>
@@ -287,9 +287,9 @@
 <text x="1205.818181818182" y="1170" text-anchor="middle" class="tiny">Jul 27</text>
 <text x="1278.909090909091" y="1170" text-anchor="middle" class="tiny">Aug 03</text>
 <text x="1352.0" y="1170" text-anchor="middle" class="tiny">Aug 10</text>
-<polygon points="548.0,1142.0 548.0,1134.3 621.1,1112.0 694.2,1062.2 767.3,1106.8 840.4,1090.5 913.5,1110.2 986.5,1105.1 1059.6,1099.9 1132.7,1093.1 1205.8,1099.9 1278.9,1092.2 1352.0,948.0 1352.0,1142.0" fill="url(#signal)" fill-opacity="0.14" />
-<polyline points="548.0,1134.3 621.1,1112.0 694.2,1062.2 767.3,1106.8 840.4,1090.5 913.5,1110.2 986.5,1105.1 1059.6,1099.9 1132.7,1093.1 1205.8,1099.9 1278.9,1092.2 1352.0,948.0" fill="none" stroke="url(#signal)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)" />
-<circle cx="548.0" cy="1134.3" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<polygon points="548.0,1142.0 548.0,1135.1 621.1,1112.0 694.2,1062.2 767.3,1106.8 840.4,1090.5 913.5,1110.2 986.5,1105.1 1059.6,1099.9 1132.7,1093.1 1205.8,1099.9 1278.9,1092.2 1352.0,948.0 1352.0,1142.0" fill="url(#signal)" fill-opacity="0.14" />
+<polyline points="548.0,1135.1 621.1,1112.0 694.2,1062.2 767.3,1106.8 840.4,1090.5 913.5,1110.2 986.5,1105.1 1059.6,1099.9 1132.7,1093.1 1205.8,1099.9 1278.9,1092.2 1352.0,948.0" fill="none" stroke="url(#signal)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)" />
+<circle cx="548.0" cy="1135.1" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="621.1" cy="1112.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="694.2" cy="1062.2" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="767.3" cy="1106.8" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
@@ -301,7 +301,7 @@
 <circle cx="1205.8" cy="1099.9" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="1278.9" cy="1092.2" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="1352.0" cy="948.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<text x="1346" y="928" text-anchor="end" class="table-value" font-size="16">757 commits / 12 weeks</text>
+<text x="1346" y="928" text-anchor="end" class="table-value" font-size="16">756 commits / 12 weeks</text>
 <text x="1346" y="946" text-anchor="end" class="table-meta">peak week 226</text>
 <rect x="52" y="1244" width="668" height="372" rx="28" class="panel" />
 <text x="80" y="1284" text-anchor="start" class="panel-title">Issue + PR Stream</text>
@@ -309,46 +309,46 @@
 <line x1="80" y1="1320" x2="692" y2="1320" stroke="rgba(148, 163, 184, 0.07)" stroke-width="1" />
 <text x="80" y="1338" text-anchor="start" class="stream-state">Poly_Agent · issue #65</text>
 <text x="80" y="1360" text-anchor="start" class="stream-label">private issue #65</text>
-<text x="80" y="1380" text-anchor="start" class="stream-copy">closed · updated 3 days ago</text>
-<text x="392" y="1338" text-anchor="start" class="stream-state">.github · pr #35</text>
+<text x="80" y="1380" text-anchor="start" class="stream-copy">closed · updated 4 days ago</text>
+<text x="392" y="1338" text-anchor="start" class="stream-state">.github · pr #38</text>
 <text x="392" y="1360" text-anchor="start" class="stream-label">chore: 审核 Release Portal 候选数据</text>
 <text x="392" y="1380" text-anchor="start" class="stream-copy">closed · updated today</text>
 <line x1="80" y1="1408" x2="692" y2="1408" stroke="rgba(148, 163, 184, 0.07)" stroke-width="1" />
 <text x="80" y="1446" text-anchor="start" class="stream-state">ISSUE CHANNEL</text>
 <text x="80" y="1468" text-anchor="start" class="stream-copy">Awaiting issue traffic</text>
-<text x="392" y="1426" text-anchor="start" class="stream-state">.github · pr #34</text>
-<text x="392" y="1448" text-anchor="start" class="stream-label">chore: 审核 Release Portal 候选数据</text>
+<text x="392" y="1426" text-anchor="start" class="stream-state">Poly_Agent · pr #79</text>
+<text x="392" y="1448" text-anchor="start" class="stream-label">private pr #79</text>
 <text x="392" y="1468" text-anchor="start" class="stream-copy">closed · updated today</text>
 <line x1="80" y1="1496" x2="692" y2="1496" stroke="rgba(148, 163, 184, 0.07)" stroke-width="1" />
 <text x="80" y="1534" text-anchor="start" class="stream-state">ISSUE CHANNEL</text>
 <text x="80" y="1556" text-anchor="start" class="stream-copy">Awaiting issue traffic</text>
-<text x="392" y="1514" text-anchor="start" class="stream-state">.github · pr #33</text>
-<text x="392" y="1536" text-anchor="start" class="stream-label">chore(deps): update boto3 requirement fro...</text>
-<text x="392" y="1556" text-anchor="start" class="stream-copy">closed · updated today</text>
+<text x="392" y="1514" text-anchor="start" class="stream-state">.github · pr #37</text>
+<text x="392" y="1536" text-anchor="start" class="stream-label">chore: 审核 Release Portal 候选数据</text>
+<text x="392" y="1556" text-anchor="start" class="stream-copy">closed · updated 1 day ago</text>
 <rect x="740" y="1244" width="648" height="372" rx="28" class="panel" />
 <text x="768" y="1284" text-anchor="start" class="panel-title">Release Lane + Roadmap</text>
 <text x="768" y="1308" text-anchor="start" class="panel-subtitle">Latest release artifacts and milestone intent from repository data.</text>
-<text x="768" y="1336" text-anchor="start" class="stream-state">Poly_Agent · release</text>
+<text x="768" y="1336" text-anchor="start" class="stream-state">SpecLabOS · release</text>
 <text x="768" y="1358" text-anchor="start" class="stream-label">private release</text>
-<text x="768" y="1378" text-anchor="start" class="stream-copy">hidden · published today</text>
+<text x="768" y="1378" text-anchor="start" class="stream-copy">hidden · published 1 day ago</text>
 <text x="1060" y="1356" text-anchor="start" class="stream-state">ROADMAP SLOT</text>
 <text x="1060" y="1378" text-anchor="start" class="stream-copy">Awaiting milestone configuration</text>
-<text x="768" y="1404" text-anchor="start" class="stream-state">RAGPortal · release</text>
+<text x="768" y="1404" text-anchor="start" class="stream-state">Spec_Agent · release</text>
 <text x="768" y="1426" text-anchor="start" class="stream-label">private release</text>
-<text x="768" y="1446" text-anchor="start" class="stream-copy">hidden · published 6 days ago</text>
+<text x="768" y="1446" text-anchor="start" class="stream-copy">hidden · published 1 day ago</text>
 <text x="1060" y="1424" text-anchor="start" class="stream-state">ROADMAP SLOT</text>
 <text x="1060" y="1446" text-anchor="start" class="stream-copy">Awaiting milestone configuration</text>
-<text x="768" y="1472" text-anchor="start" class="stream-state">.github · release</text>
-<text x="768" y="1494" text-anchor="start" class="stream-label">SmartAccess V1.0.0</text>
-<text x="768" y="1514" text-anchor="start" class="stream-copy">SmartAccess · published 15 days ago</text>
+<text x="768" y="1472" text-anchor="start" class="stream-state">AI4MS · release</text>
+<text x="768" y="1494" text-anchor="start" class="stream-label">private release</text>
+<text x="768" y="1514" text-anchor="start" class="stream-copy">hidden · published 1 day ago</text>
 <text x="1060" y="1492" text-anchor="start" class="stream-state">ROADMAP SLOT</text>
 <text x="1060" y="1514" text-anchor="start" class="stream-copy">Awaiting milestone configuration</text>
-<text x="768" y="1540" text-anchor="start" class="stream-state">SmartAccess · release</text>
+<text x="768" y="1540" text-anchor="start" class="stream-state">Poly_Agent · release</text>
 <text x="768" y="1562" text-anchor="start" class="stream-label">private release</text>
-<text x="768" y="1582" text-anchor="start" class="stream-copy">hidden · published 20 days ago</text>
+<text x="768" y="1582" text-anchor="start" class="stream-copy">hidden · published 1 day ago</text>
 <text x="1060" y="1560" text-anchor="start" class="stream-state">ROADMAP SLOT</text>
 <text x="1060" y="1582" text-anchor="start" class="stream-copy">Awaiting milestone configuration</text>
 <rect x="52" y="1640" width="1336" height="62" rx="20" class="panel-bright" />
 <text x="74" y="1678" text-anchor="start" class="footer">Telemetry source: GitHub REST API. Scope=all; owner=SynlysAI; forks=included. People panels reflect public contributors.</text>
-<text x="1362" y="1678" text-anchor="end" class="footer">private names masked · refreshed 2026-08-19 12:04 UTC</text>
+<text x="1362" y="1678" text-anchor="end" class="footer">private names masked · refreshed 2026-08-21 01:48 UTC</text>
 </svg>
