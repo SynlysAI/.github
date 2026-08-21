@@ -1172,24 +1172,54 @@
       "id": "poly-agent:commit:2026-08-17:feature:general",
       "level": "commit",
       "module": "general",
-      "occurredAt": "2026-08-20T03:30:31Z",
+      "occurredAt": "2026-08-20T08:47:35Z",
       "pinned": false,
       "productId": "poly-agent",
       "source": {
         "commitShas": [
           "e77e0d4",
-          "3ce2685"
+          "3ce2685",
+          "9dc54c2"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
       },
       "summary": {
-        "en": "新增顶栏意见反馈入口",
-        "zh": "新增顶栏意见反馈入口"
+        "en": "新增大装置 Agent 借鉴设计文档",
+        "zh": "新增大装置 Agent 借鉴设计文档"
       },
       "title": {
-        "en": "新增顶栏意见反馈入口",
-        "zh": "新增顶栏意见反馈入口"
+        "en": "新增大装置 Agent 借鉴设计文档",
+        "zh": "新增大装置 Agent 借鉴设计文档"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-17:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-20T08:50:04Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "c990691"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "调整大装置 Agent 设计文档标题",
+        "zh": "调整大装置 Agent 设计文档标题"
+      },
+      "title": {
+        "en": "调整大装置 Agent 设计文档标题",
+        "zh": "调整大装置 Agent 设计文档标题"
       },
       "version": null
     },
@@ -1344,6 +1374,36 @@
       "title": {
         "en": "优化仪表盘排行钻取 and 4 more",
         "zh": "优化仪表盘排行钻取 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增窗口图标\n- 新增知识库申请附加配置与登录体验优化",
+        "zh": "- 新增窗口图标\n- 新增知识库申请附加配置与登录体验优化"
+      },
+      "id": "ragportal:aggregate:2026-08-17:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-17T08:00:00Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "5ca02fd",
+          "88c3371"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增窗口图标 and 2 more",
+        "zh": "新增窗口图标 等 2 项"
       },
       "version": null
     },

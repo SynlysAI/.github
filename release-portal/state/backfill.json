@@ -58,9 +58,9 @@
     },
     "SynlysAI/Poly_Agent": {
       "completed": false,
-      "cursor": "3ce2685406c132b29f687fe8f25659d1b4dc9534",
+      "cursor": "9dc54c29bf9bdd2bd7b786f00484eeac6f6ba257",
       "page": 1,
-      "processed": 250,
+      "processed": 256,
       "processedShas": [
         "7481771e83a937865c72a4ad87334f7fe5f2592a",
         "a1cec5207d42cd467c444b99dffeabddcd4cefa8",
@@ -311,18 +311,24 @@
         "deee6dc12dd3f7e8a783ef859f686df01857c46b",
         "e77e0d49781c6cbf8ab7e7a98266565d81dda6f5",
         "b76872ea82e53a7db03c63bca4fa8c9fb0716a6b",
-        "3ce2685406c132b29f687fe8f25659d1b4dc9534"
+        "3ce2685406c132b29f687fe8f25659d1b4dc9534",
+        "304aea1715fdfd81617107c079d634beddfa1ed2",
+        "282783b5119c35bad00ac390b83fe8c6041c8521",
+        "1700189b1a98d60bf2ecf5229feee82ffeccb6f8",
+        "71331f0d7634f0ab409da2c9591caf03b354c867",
+        "c990691946488e036bb8b4550a388b8402ee6919",
+        "9dc54c29bf9bdd2bd7b786f00484eeac6f6ba257"
       ],
       "watermark": {
-        "publishedAt": "2026-08-20T03:32:21Z",
-        "sha": "b76872ea82e53a7db03c63bca4fa8c9fb0716a6b"
+        "publishedAt": "2026-08-20T11:59:43Z",
+        "sha": "304aea1715fdfd81617107c079d634beddfa1ed2"
       }
     },
     "SynlysAI/RAGPortal": {
       "completed": false,
-      "cursor": "2e84c8354d857e4cebd095e0c36c39e5dea856e0",
+      "cursor": "28e1a360c541a0ae5329f8e0a200dbdc4ef7d375",
       "page": 1,
-      "processed": 26,
+      "processed": 29,
       "processedShas": [
         "1d96237ee1285401c6ae32d16ed62ee817f289cb",
         "5010753faa727f73bd806450c91abd6cb832a353",
@@ -349,11 +355,14 @@
         "210708fc76eb8f5efb2a31382ffd1664ede943bf",
         "02ee527631a31ca08b2d6fd6e313ca85b0008e3d",
         "620181f56cc0d8570e21efdca2bcb65fff6cd615",
-        "2e84c8354d857e4cebd095e0c36c39e5dea856e0"
+        "2e84c8354d857e4cebd095e0c36c39e5dea856e0",
+        "88c33719aa1e5761aff7db721cbb86be0dc6afd0",
+        "5ca02fd4ebf6ab53d78890f924bba52a5c0df783",
+        "28e1a360c541a0ae5329f8e0a200dbdc4ef7d375"
       ],
       "watermark": {
-        "publishedAt": "2026-08-20T03:35:51Z",
-        "sha": "2e84c8354d857e4cebd095e0c36c39e5dea856e0"
+        "publishedAt": "2026-08-21T01:29:41Z",
+        "sha": "88c33719aa1e5761aff7db721cbb86be0dc6afd0"
       }
     },
     "SynlysAI/SmartAccess": {
@@ -497,9 +506,9 @@
     },
     "SynlysAI/SpecLabOS": {
       "completed": false,
-      "cursor": "e1df813ed36a6dbdbda41cc86fdcb36152f0019d",
+      "cursor": "efad98264ca08d9ffb173cb2fc40dd2412cd9795",
       "page": 1,
-      "processed": 89,
+      "processed": 90,
       "processedShas": [
         "7f02f7cd18528cfa80cf843440afff50c595b173",
         "eca4b7ad2e3337a3c5fe52a306c7095002a98ab1",
@@ -589,18 +598,19 @@
         "4d041e0c75c4808f371d6bfbcf971d0cacf267d4",
         "fb790c570763d2f1c0ac2b14ae6342427296daac",
         "9068baf070dfd94ec3219aa448baef651b630214",
-        "e1df813ed36a6dbdbda41cc86fdcb36152f0019d"
+        "e1df813ed36a6dbdbda41cc86fdcb36152f0019d",
+        "efad98264ca08d9ffb173cb2fc40dd2412cd9795"
       ],
       "watermark": {
-        "publishedAt": "2026-08-20T03:35:44Z",
-        "sha": "9068baf070dfd94ec3219aa448baef651b630214"
+        "publishedAt": "2026-08-20T11:57:09Z",
+        "sha": "efad98264ca08d9ffb173cb2fc40dd2412cd9795"
       }
     },
     "SynlysAI/Spec_Agent": {
       "completed": false,
-      "cursor": "80a7b313e2f45e65629ed8d6e1e0c938af00e821",
+      "cursor": "1dd4dedca89f5b9f0e6d24e59640c5481ef1ecea",
       "page": 1,
-      "processed": 156,
+      "processed": 158,
       "processedShas": [
         "5830bdcdf8fd94071c83ac8a0c70c4a613065b5d",
         "c2f45e4fe11a3e8a7fdfd9c9ddb840013d9e4f27",
@@ -757,11 +767,13 @@
         "6b34596260dc221fbbb87cacc808acc7b75db07e",
         "7c11892a9be5a10ff1de7c7ea2f0845e49377cab",
         "66656622b032405fcc9358c76db626d78bc74e74",
-        "80a7b313e2f45e65629ed8d6e1e0c938af00e821"
+        "80a7b313e2f45e65629ed8d6e1e0c938af00e821",
+        "3e2c59018397c21452dcf842acf9a163fbe9efe5",
+        "1dd4dedca89f5b9f0e6d24e59640c5481ef1ecea"
       ],
       "watermark": {
-        "publishedAt": "2026-08-20T03:37:42Z",
-        "sha": "66656622b032405fcc9358c76db626d78bc74e74"
+        "publishedAt": "2026-08-20T11:59:26Z",
+        "sha": "3e2c59018397c21452dcf842acf9a163fbe9efe5"
       }
     }
   },
