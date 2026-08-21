@@ -144,12 +144,6 @@ jobs:
           --after release-portal/candidates/timeline.json
           --output "$RUNNER_TEMP/release-portal-pr-body.md"
 
-      - name: 调试检查候选文件
-        run: |
-          echo "=== 候选目录内容 ==="
-          ls -la release-portal/candidates/
-          echo "=== git status ==="
-          git status release-portal/candidates/
       - name: 创建或更新候选审核 PR
         env:
           GH_TOKEN: ${{ steps.portal-token.outputs.token }}
