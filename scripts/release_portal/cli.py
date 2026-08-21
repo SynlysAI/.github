@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 from io import BytesIO
 import json
 import os
@@ -39,6 +40,7 @@ ROOT = Path(__file__).resolve().parents[2]
 MANIFEST_CANDIDATE_PATH = ROOT / "release-portal" / "candidates" / "manifest.json"
 CANDIDATE_TIMELINE_PATH = ROOT / "release-portal" / "candidates" / "timeline.json"
 CANDIDATE_RELEASES_PATH = ROOT / "release-portal" / "candidates" / "releases.json"
+CANDIDATE_READMES_PATH = ROOT / "release-portal" / "candidates" / "readmes.json"
 BACKFILL_STATE_PATH = ROOT / "release-portal" / "state" / "backfill.json"
 PUBLISHED_ROOT = ROOT / "release-portal" / "published"
 PUBLIC_COLLECTION_FILENAMES = (
@@ -46,6 +48,7 @@ PUBLIC_COLLECTION_FILENAMES = (
     "releases.json",
     "timeline.json",
     "faqs.json",
+    "readmes.json",
     "meta.json",
     "manifest.json",
 )
@@ -83,6 +86,7 @@ def _parser() -> argparse.ArgumentParser:
     _add_storage_arguments(sync)
     sync.add_argument("--candidates", default=str(CANDIDATE_RELEASES_PATH))
     sync.add_argument("--timeline", default=str(CANDIDATE_TIMELINE_PATH))
+    sync.add_argument("--readmes", default=str(CANDIDATE_READMES_PATH))
     sync.add_argument("--state", default=str(BACKFILL_STATE_PATH))
 
     backfill = commands.add_parser("backfill", help="回填并生成待审核 Commit 候选")
@@ -94,6 +98,7 @@ def _parser() -> argparse.ArgumentParser:
     publish = commands.add_parser("publish", help="校验并按原子顺序发布公开数据")
     publish.add_argument("--candidates", default=str(CANDIDATE_TIMELINE_PATH))
     publish.add_argument("--releases", default=str(CANDIDATE_RELEASES_PATH))
+    publish.add_argument("--readmes", default=str(CANDIDATE_READMES_PATH))
     publish.add_argument("--state", default=str(BACKFILL_STATE_PATH))
     publish.add_argument("--output", default=str(PUBLISHED_ROOT))
     publish.add_argument("--prefix", default="portal/v1")
@@ -569,6 +574,21 @@ def _sync(args: argparse.Namespace, *, object_store: Any | None = None, github_c
         timeline["events"] = _merge_candidate_events(timeline["events"], timeline_additions)
         _atomic_write_json(args.timeline, timeline)
         save_backfill_state(state, args.state)
+        readmes_path = getattr(args, "readmes", CANDIDATE_READMES_PATH)
+        readme_records = _load_collection(readmes_path, "readmes")
+        existing_readmes = {item.get("productId"): dict(item) for item in readme_records["readmes"] if isinstance(item, dict) and item.get("productId")}
+        for product in products:
+            try:
+                content = client.fetch_readme(product.repository)
+            except Exception:
+                content = existing_readmes.get(product.product_id, {}).get("content", "")
+            existing_readmes[product.product_id] = {
+                "productId": product.product_id,
+                "content": content,
+                "fetchedAt": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            }
+        readme_records["readmes"] = sorted(existing_readmes.values(), key=lambda item: str(item.get("productId", "")))
+        _atomic_write_json(readmes_path, readme_records)
     except Exception as exc:
         elapsed = int((time.perf_counter() - started) * 1000)
         _log(run_id=run_id, product_id=args.product_id, stage="sync", count=0, duration_ms=elapsed, status="failed", error=type(exc).__name__)
@@ -885,6 +905,8 @@ def _publish(args: argparse.Namespace, *, object_store: Any | None = None) -> in
     try:
         events = load_candidate_events(args.candidates)
         releases = _load_collection(args.releases, "releases")
+        readmes_path = getattr(args, "readmes", CANDIDATE_READMES_PATH)
+        readmes = _load_collection(readmes_path, "readmes")
         collections = build_public_collections(
             events,
             overrides=load_overrides(ROOT / "release-portal" / "overrides.yml"),
@@ -898,6 +920,7 @@ def _publish(args: argparse.Namespace, *, object_store: Any | None = None) -> in
             client = object_store if object_store is not None else build_object_store(args, require_remote=True)
             prefix = _safe_public_prefix(args.prefix)
             output = Path(args.output)
+            (output / "readmes.json").write_bytes(_canonical_json_bytes(readmes))
             generation_prefix = f"{prefix}/generations/{run_id}"
             manifest = _generation_manifest(collections, generation_prefix)
             for filename in PUBLIC_COLLECTION_FILENAMES[:-1]:

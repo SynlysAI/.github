@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import re
 import time
 from dataclasses import asdict, dataclass, field
@@ -469,6 +470,31 @@ Returns:
             )
             for item in items
         ]
+
+    def fetch_readme(self, repository: str, *, catalog: Catalog | None = None) -> str:
+        """读取仓库默认分支的 README 原始内容。
+
+        Args:
+            repository: ``owner/name`` 仓库名。
+            catalog: 可选产品注册表，默认读取正式 catalog。
+
+        Returns:
+            README 的原始 Markdown 文本；仓库无 README 时返回空字符串。
+        """
+        self._check_repository(repository, catalog or load_catalog(CATALOG_PATH))
+        try:
+            data = self._json(f"/repos/{repository}/readme")
+        except GitHubError as exc:
+            if exc.status == 404:
+                return ""
+            raise
+        content = str(data.get("content", ""))
+        if not content:
+            return ""
+        try:
+            return base64.b64decode(content).decode("utf-8", errors="replace")
+        except (ValueError, TypeError):
+            return ""
 
     def collect_catalog(self, catalog: Catalog | None = None) -> dict[str, dict[str, list[Any]]]:
         """采集 catalog 六仓库。

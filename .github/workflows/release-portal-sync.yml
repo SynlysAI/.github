@@ -80,7 +80,7 @@ jobs:
           if git ls-remote --exit-code --heads origin "$CANDIDATE_BRANCH" >/dev/null 2>&1; then
             git fetch origin "$CANDIDATE_BRANCH:refs/remotes/origin/$CANDIDATE_BRANCH"
             echo "CANDIDATE_EXPECTED_SHA=$(git rev-parse "refs/remotes/origin/$CANDIDATE_BRANCH")" >> "$GITHUB_ENV"
-            for path in release-portal/candidates/timeline.json release-portal/candidates/releases.json release-portal/state/backfill.json; do
+            for path in release-portal/candidates/timeline.json release-portal/candidates/releases.json release-portal/candidates/readmes.json release-portal/state/backfill.json; do
               if git cat-file -e "refs/remotes/origin/$CANDIDATE_BRANCH:$path"; then
                 git checkout "refs/remotes/origin/$CANDIDATE_BRANCH" -- "$path"
               fi
@@ -106,6 +106,7 @@ jobs:
           python -m scripts.release_portal.cli sync
           --product "${{ inputs.product || 'all' }}"
           --timeline release-portal/candidates/timeline.json
+          --readmes release-portal/candidates/readmes.json
           --state release-portal/state/backfill.json
 
       - name: 处理同步失败告警
@@ -161,7 +162,7 @@ jobs:
           else
             git checkout -B "$CANDIDATE_BRANCH" "refs/remotes/origin/$CANDIDATE_BRANCH"
           fi
-          for path in release-portal/candidates/timeline.json release-portal/candidates/releases.json release-portal/state/backfill.json; do
+          for path in release-portal/candidates/timeline.json release-portal/candidates/releases.json release-portal/candidates/readmes.json release-portal/state/backfill.json; do
             if git cat-file -e "$stash_ref:$path"; then
               git checkout "$stash_ref" -- "$path"
             fi
