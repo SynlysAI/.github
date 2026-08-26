@@ -228,6 +228,35 @@
     {
       "changeType": "feature",
       "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ai4ms:commit:2026-08-24:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-26T08:47:10Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "7de5e2f"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "顶栏新增操作指导跳转入口",
+        "zh": "顶栏新增操作指导跳转入口"
+      },
+      "title": {
+        "en": "顶栏新增操作指导跳转入口",
+        "zh": "顶栏新增操作指导跳转入口"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
         "en": "AI⁴MS 统一研发门户首个正式版本。\n\nAI⁴MS(AI for Molecular Science)是材料研发的统一入口,以深空科技风格 Web 门户承载各子平台的导航、统一认证与应用管理。\n\n## 主要功能\n\n- **统一门户**:集中入口,承载智能谱学分析、高分子研发、实验自动化监控三大子平台的应用卡片与导航\n- **单点登录(SSO)**:点击子平台卡片自动携带 Token 跳转,子平台校验通过后直接登录,无需重复认证\n- **用户体系**:账号密码登录、邀请码注册、admin / user 角色权限模型\n- **管理后台**:用户管理(启用/禁用)、邀请码管理(创建/禁用)",
         "zh": "AI⁴MS 统一研发门户首个正式版本。\n\nAI⁴MS(AI for Molecular Science)是材料研发的统一入口,以深空科技风格 Web 门户承载各子平台的导航、统一认证与应用管理。\n\n## 主要功能\n\n- **统一门户**:集中入口,承载智能谱学分析、高分子研发、实验自动化监控三大子平台的应用卡片与导航\n- **单点登录(SSO)**:点击子平台卡片自动携带 Token 跳转,子平台校验通过后直接登录,无需重复认证\n- **用户体系**:账号密码登录、邀请码注册、admin / user 角色权限模型\n- **管理后台**:用户管理(启用/禁用)、邀请码管理(创建/禁用)"
       },
@@ -1020,6 +1049,37 @@
     {
       "changeType": "algorithm",
       "detailsMarkdown": {
+        "en": "- 修复垂类模型 sandbox 启动失败\n- 合并垂类模型 sandbox 修复\n- 记录垂类模型 sandbox 修复完成状态",
+        "zh": "- 修复垂类模型 sandbox 启动失败\n- 合并垂类模型 sandbox 修复\n- 记录垂类模型 sandbox 修复完成状态"
+      },
+      "id": "poly-agent:aggregate:2026-08-24:algorithm:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-24T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "37afbef",
+          "79545d1",
+          "c7f9404"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Algorithm improvement (general)",
+        "zh": "算法改进（general）"
+      },
+      "title": {
+        "en": "修复垂类模型 sandbox 启动失败 and 3 more",
+        "zh": "修复垂类模型 sandbox 启动失败 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "algorithm",
+      "detailsMarkdown": {
         "en": "",
         "zh": ""
       },
@@ -1172,25 +1232,26 @@
       "id": "poly-agent:commit:2026-08-17:feature:general",
       "level": "commit",
       "module": "general",
-      "occurredAt": "2026-08-20T08:47:35Z",
+      "occurredAt": "2026-08-21T09:56:47Z",
       "pinned": false,
       "productId": "poly-agent",
       "source": {
         "commitShas": [
           "e77e0d4",
           "3ce2685",
-          "9dc54c2"
+          "9dc54c2",
+          "c2d7e56"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/Poly_Agent"
       },
       "summary": {
-        "en": "新增大装置 Agent 借鉴设计文档",
-        "zh": "新增大装置 Agent 借鉴设计文档"
+        "en": "新增操作指导页面截图脚本与产物",
+        "zh": "新增操作指导页面截图脚本与产物"
       },
       "title": {
-        "en": "新增大装置 Agent 借鉴设计文档",
-        "zh": "新增大装置 Agent 借鉴设计文档"
+        "en": "新增操作指导页面截图脚本与产物",
+        "zh": "新增操作指导页面截图脚本与产物"
       },
       "version": null
     },
@@ -1220,6 +1281,64 @@
       "title": {
         "en": "调整大装置 Agent 设计文档标题",
         "zh": "调整大装置 Agent 设计文档标题"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-24:bugfix:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-26T08:23:39Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "acb0ac1"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "合并 sandbox 修复完成记录",
+        "zh": "合并 sandbox 修复完成记录"
+      },
+      "title": {
+        "en": "合并 sandbox 修复完成记录",
+        "zh": "合并 sandbox 修复完成记录"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-24:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-26T08:47:18Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "7b22c61"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "新增顶栏操作指导入口",
+        "zh": "新增顶栏操作指导入口"
+      },
+      "title": {
+        "en": "新增顶栏操作指导入口",
+        "zh": "新增顶栏操作指导入口"
       },
       "version": null
     },
@@ -1491,6 +1610,35 @@
       "title": {
         "en": "新增顶栏意见反馈入口",
         "zh": "新增顶栏意见反馈入口"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ragportal:commit:2026-08-24:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-26T08:47:23Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "3e3bcb0"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "新增顶栏操作指导入口",
+        "zh": "新增顶栏操作指导入口"
+      },
+      "title": {
+        "en": "新增顶栏操作指导入口",
+        "zh": "新增顶栏操作指导入口"
       },
       "version": null
     },
@@ -3183,6 +3331,35 @@
     {
       "changeType": "feature",
       "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-08-24:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-26T08:47:13Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "41891ee"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "新增顶栏操作指导入口",
+        "zh": "新增顶栏操作指导入口"
+      },
+      "title": {
+        "en": "新增顶栏操作指导入口",
+        "zh": "新增顶栏操作指导入口"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
         "en": "Spec Agent 首个正式版本。\n\nSpec Agent 是面向表征实验谱图的智能解析与分析平台,支持 GPC、NMR、IR、Raman、LCMS 等多种谱图的智能解析、任务管理与评测。\n\n## 主要功能\n\n- **谱图智能解析**:GPC / NMR / IR / Raman / LCMS 任务提交、异步执行、结果查看\n- **报告问答**:基于 LLM 的报告内容问答对话\n- **NMRServer 工具**:谱图正向预测、反向预测、数据库搜索\n- **拉曼批量采集**:光谱仪远程采集,含信噪比指标与谱图下载\n- **LCMS 数据转化**:原始数据格式转化\n- **评测中心**:解析准确性评测、设备重复性评测、Markdown 报告下载\n- **实验数据管理**:共享目录采集、样本主档管理、分子资产统计\n- **登录鉴权**:账号密码登录、邀请码注册、管理员权限控制",
         "zh": "Spec Agent 首个正式版本。\n\nSpec Agent 是面向表征实验谱图的智能解析与分析平台,支持 GPC、NMR、IR、Raman、LCMS 等多种谱图的智能解析、任务管理与评测。\n\n## 主要功能\n\n- **谱图智能解析**:GPC / NMR / IR / Raman / LCMS 任务提交、异步执行、结果查看\n- **报告问答**:基于 LLM 的报告内容问答对话\n- **NMRServer 工具**:谱图正向预测、反向预测、数据库搜索\n- **拉曼批量采集**:光谱仪远程采集,含信噪比指标与谱图下载\n- **LCMS 数据转化**:原始数据格式转化\n- **评测中心**:解析准确性评测、设备重复性评测、Markdown 报告下载\n- **实验数据管理**:共享目录采集、样本主档管理、分子资产统计\n- **登录鉴权**:账号密码登录、邀请码注册、管理员权限控制"
       },
@@ -3818,6 +3995,35 @@
       "title": {
         "en": "新增顶栏意见反馈入口",
         "zh": "新增顶栏意见反馈入口"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-08-24:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-08-26T08:47:20Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "b346508"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "新增顶栏操作指导入口",
+        "zh": "新增顶栏操作指导入口"
+      },
+      "title": {
+        "en": "新增顶栏操作指导入口",
+        "zh": "新增顶栏操作指导入口"
       },
       "version": null
     },
