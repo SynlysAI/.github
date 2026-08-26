@@ -2,9 +2,9 @@
   "repositories": {
     "SynlysAI/AI4MS": {
       "completed": false,
-      "cursor": "050fcc3e44a9c50670a1be0a510342c3bc3cdee6",
+      "cursor": "7de5e2ff2def2c364946bc7ab6f5e786fc728fb6",
       "page": 1,
-      "processed": 44,
+      "processed": 46,
       "processedShas": [
         "7004c601e6da828fe28850eaafc7337e63980b80",
         "6c0eb5655b00f100ed184867ec04d780b753d807",
@@ -49,18 +49,20 @@
         "de2eb61c7412ebfa6bd4ca8eaa6c16242e694f51",
         "726032bc5db01a91c8ee24768f39395007939221",
         "489b1370ce91784b0ecb928ee015d4621c9f0c70",
-        "050fcc3e44a9c50670a1be0a510342c3bc3cdee6"
+        "050fcc3e44a9c50670a1be0a510342c3bc3cdee6",
+        "fa4fb2938324c7843619bb77d07526e6ee414651",
+        "7de5e2ff2def2c364946bc7ab6f5e786fc728fb6"
       ],
       "watermark": {
-        "publishedAt": "2026-08-20T07:12:25Z",
-        "sha": "489b1370ce91784b0ecb928ee015d4621c9f0c70"
+        "publishedAt": "2026-08-26T09:20:57Z",
+        "sha": "fa4fb2938324c7843619bb77d07526e6ee414651"
       }
     },
     "SynlysAI/Poly_Agent": {
       "completed": false,
-      "cursor": "9dc54c29bf9bdd2bd7b786f00484eeac6f6ba257",
+      "cursor": "c2d7e56dffd824f33a003cbd3e542331984d8ef9",
       "page": 1,
-      "processed": 256,
+      "processed": 264,
       "processedShas": [
         "7481771e83a937865c72a4ad87334f7fe5f2592a",
         "a1cec5207d42cd467c444b99dffeabddcd4cefa8",
@@ -317,18 +319,26 @@
         "1700189b1a98d60bf2ecf5229feee82ffeccb6f8",
         "71331f0d7634f0ab409da2c9591caf03b354c867",
         "c990691946488e036bb8b4550a388b8402ee6919",
-        "9dc54c29bf9bdd2bd7b786f00484eeac6f6ba257"
+        "9dc54c29bf9bdd2bd7b786f00484eeac6f6ba257",
+        "43cfef67986c970307351ce902aab8dd00e19e0b",
+        "7b22c61f596b9d14ebd0eafaa22fb626551082f5",
+        "acb0ac1126205625dbbe04645da26102362d9999",
+        "c7f9404392e64ca860ba4d4c83d46c9ec582a616",
+        "79545d1822ff5d0a0e0d0afa5260883763dc6574",
+        "37afbef24542dea4b1beb58bfa2d8a27d165a500",
+        "302368d2e69e4a5f6d03a8871e354c230e21c111",
+        "c2d7e56dffd824f33a003cbd3e542331984d8ef9"
       ],
       "watermark": {
-        "publishedAt": "2026-08-20T11:59:43Z",
-        "sha": "304aea1715fdfd81617107c079d634beddfa1ed2"
+        "publishedAt": "2026-08-26T08:49:44Z",
+        "sha": "43cfef67986c970307351ce902aab8dd00e19e0b"
       }
     },
     "SynlysAI/RAGPortal": {
       "completed": false,
-      "cursor": "28e1a360c541a0ae5329f8e0a200dbdc4ef7d375",
+      "cursor": "3e3bcb04b816a24ed1f2d577d0dcf0fd83910f99",
       "page": 1,
-      "processed": 29,
+      "processed": 30,
       "processedShas": [
         "1d96237ee1285401c6ae32d16ed62ee817f289cb",
         "5010753faa727f73bd806450c91abd6cb832a353",
@@ -358,11 +368,12 @@
         "2e84c8354d857e4cebd095e0c36c39e5dea856e0",
         "88c33719aa1e5761aff7db721cbb86be0dc6afd0",
         "5ca02fd4ebf6ab53d78890f924bba52a5c0df783",
-        "28e1a360c541a0ae5329f8e0a200dbdc4ef7d375"
+        "28e1a360c541a0ae5329f8e0a200dbdc4ef7d375",
+        "3e3bcb04b816a24ed1f2d577d0dcf0fd83910f99"
       ],
       "watermark": {
-        "publishedAt": "2026-08-21T01:29:41Z",
-        "sha": "88c33719aa1e5761aff7db721cbb86be0dc6afd0"
+        "publishedAt": "2026-08-26T08:47:23Z",
+        "sha": "3e3bcb04b816a24ed1f2d577d0dcf0fd83910f99"
       }
     },
     "SynlysAI/SmartAccess": {
@@ -506,9 +517,9 @@
     },
     "SynlysAI/SpecLabOS": {
       "completed": false,
-      "cursor": "efad98264ca08d9ffb173cb2fc40dd2412cd9795",
+      "cursor": "b34650875f8642119863c81dffb89a63bcf5e7ea",
       "page": 1,
-      "processed": 90,
+      "processed": 92,
       "processedShas": [
         "7f02f7cd18528cfa80cf843440afff50c595b173",
         "eca4b7ad2e3337a3c5fe52a306c7095002a98ab1",
@@ -599,18 +610,20 @@
         "fb790c570763d2f1c0ac2b14ae6342427296daac",
         "9068baf070dfd94ec3219aa448baef651b630214",
         "e1df813ed36a6dbdbda41cc86fdcb36152f0019d",
-        "efad98264ca08d9ffb173cb2fc40dd2412cd9795"
+        "efad98264ca08d9ffb173cb2fc40dd2412cd9795",
+        "f403c2a8592a0ddbe8e7b0e6102e2b5c66b902c0",
+        "b34650875f8642119863c81dffb89a63bcf5e7ea"
       ],
       "watermark": {
-        "publishedAt": "2026-08-20T11:57:09Z",
-        "sha": "efad98264ca08d9ffb173cb2fc40dd2412cd9795"
+        "publishedAt": "2026-08-26T08:49:30Z",
+        "sha": "f403c2a8592a0ddbe8e7b0e6102e2b5c66b902c0"
       }
     },
     "SynlysAI/Spec_Agent": {
       "completed": false,
-      "cursor": "1dd4dedca89f5b9f0e6d24e59640c5481ef1ecea",
+      "cursor": "41891ee132bbd4c19418bcf003916e2262e9d8c5",
       "page": 1,
-      "processed": 158,
+      "processed": 160,
       "processedShas": [
         "5830bdcdf8fd94071c83ac8a0c70c4a613065b5d",
         "c2f45e4fe11a3e8a7fdfd9c9ddb840013d9e4f27",
@@ -769,11 +782,13 @@
         "66656622b032405fcc9358c76db626d78bc74e74",
         "80a7b313e2f45e65629ed8d6e1e0c938af00e821",
         "3e2c59018397c21452dcf842acf9a163fbe9efe5",
-        "1dd4dedca89f5b9f0e6d24e59640c5481ef1ecea"
+        "1dd4dedca89f5b9f0e6d24e59640c5481ef1ecea",
+        "d15ec8f66bbeb8524b0051781cfe5d58af0785db",
+        "41891ee132bbd4c19418bcf003916e2262e9d8c5"
       ],
       "watermark": {
-        "publishedAt": "2026-08-20T11:59:26Z",
-        "sha": "3e2c59018397c21452dcf842acf9a163fbe9efe5"
+        "publishedAt": "2026-08-26T08:49:24Z",
+        "sha": "d15ec8f66bbeb8524b0051781cfe5d58af0785db"
       }
     }
   },
