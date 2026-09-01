@@ -257,6 +257,35 @@
     {
       "changeType": "feature",
       "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ai4ms:commit:2026-08-31:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-09-01T02:16:09Z",
+      "pinned": false,
+      "productId": "ai4ms",
+      "source": {
+        "commitShas": [
+          "9a40d67"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/AI4MS"
+      },
+      "summary": {
+        "en": "首页图标 URL 添加版本号",
+        "zh": "首页图标 URL 添加版本号"
+      },
+      "title": {
+        "en": "首页图标 URL 添加版本号",
+        "zh": "首页图标 URL 添加版本号"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
         "en": "AI⁴MS 统一研发门户首个正式版本。\n\nAI⁴MS(AI for Molecular Science)是材料研发的统一入口,以深空科技风格 Web 门户承载各子平台的导航、统一认证与应用管理。\n\n## 主要功能\n\n- **统一门户**:集中入口,承载智能谱学分析、高分子研发、实验自动化监控三大子平台的应用卡片与导航\n- **单点登录(SSO)**:点击子平台卡片自动携带 Token 跳转,子平台校验通过后直接登录,无需重复认证\n- **用户体系**:账号密码登录、邀请码注册、admin / user 角色权限模型\n- **管理后台**:用户管理(启用/禁用)、邀请码管理(创建/禁用)",
         "zh": "AI⁴MS 统一研发门户首个正式版本。\n\nAI⁴MS(AI for Molecular Science)是材料研发的统一入口,以深空科技风格 Web 门户承载各子平台的导航、统一认证与应用管理。\n\n## 主要功能\n\n- **统一门户**:集中入口,承载智能谱学分析、高分子研发、实验自动化监控三大子平台的应用卡片与导航\n- **单点登录(SSO)**:点击子平台卡片自动携带 Token 跳转,子平台校验通过后直接登录,无需重复认证\n- **用户体系**:账号密码登录、邀请码注册、admin / user 角色权限模型\n- **管理后台**:用户管理(启用/禁用)、邀请码管理(创建/禁用)"
       },
