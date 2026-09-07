@@ -103,8 +103,8 @@
 <text x="796" y="127" text-anchor="start" class="command-note">6 public tracked</text>
 <rect x="1066" y="70" width="258" height="62" rx="18" class="panel-soft" />
 <text x="1082" y="90" text-anchor="start" class="command-label">signal</text>
-<text x="1082" y="112" text-anchor="start" class="command-value">159 / 30d</text>
-<text x="1082" y="127" text-anchor="start" class="command-note">384 commits in rolling 12 weeks</text>
+<text x="1082" y="112" text-anchor="start" class="command-value">156 / 30d</text>
+<text x="1082" y="127" text-anchor="start" class="command-note">381 commits in rolling 12 weeks</text>
 <rect x="780" y="148" width="258" height="62" rx="18" class="panel-soft" />
 <text x="796" y="168" text-anchor="start" class="command-label">surface</text>
 <text x="796" y="190" text-anchor="start" class="command-value">9.2 MB</text>
@@ -170,7 +170,7 @@
 <text x="926" y="486" text-anchor="end" class="stream-state">PUBLIC</text>
 <text x="548" y="508" text-anchor="start" class="badge-meta">高分子研发平台</text>
 <text x="548" y="548" text-anchor="start" class="repo-card-mono">Python · 6.2 MB · 265 commits</text>
-<text x="548" y="566" text-anchor="start" class="badge-meta">+120 / 30d · updated 5 days ago</text>
+<text x="548" y="566" text-anchor="start" class="badge-meta">+117 / 30d · updated 5 days ago</text>
 <text x="926" y="548" text-anchor="end" class="badge-meta">0★  0 forks</text>
 <text x="926" y="566" text-anchor="end" class="badge-meta">MIT · main</text>
 <rect x="548" y="586" width="81" height="24" rx="12" class="badge-chip" />
@@ -198,7 +198,7 @@
 <text x="926" y="680" text-anchor="end" class="stream-state">PUBLIC</text>
 <text x="548" y="702" text-anchor="start" class="badge-meta">实验自动化管理平台</text>
 <text x="548" y="742" text-anchor="start" class="repo-card-mono">Python · 678.8 KB · 93 commits</text>
-<text x="548" y="760" text-anchor="start" class="badge-meta">+8 / 30d · updated 4 days ago</text>
+<text x="548" y="760" text-anchor="start" class="badge-meta">+8 / 30d · updated 5 days ago</text>
 <text x="926" y="742" text-anchor="end" class="badge-meta">0★  0 forks</text>
 <text x="926" y="760" text-anchor="end" class="badge-meta">MIT · main</text>
 <rect x="548" y="780" width="81" height="24" rx="12" class="badge-chip" />
@@ -273,9 +273,9 @@
 <text x="1205.818181818182" y="1170" text-anchor="middle" class="tiny">Aug 17</text>
 <text x="1278.909090909091" y="1170" text-anchor="middle" class="tiny">Aug 24</text>
 <text x="1352.0" y="1170" text-anchor="middle" class="tiny">Aug 31</text>
-<polygon points="548.0,1142.0 548.0,1133.7 621.1,1100.4 694.2,1050.5 767.3,1069.9 840.4,1069.9 913.5,1047.8 986.5,1014.5 1059.6,1017.3 1132.7,948.0 1205.8,972.9 1278.9,1106.0 1352.0,1108.7 1352.0,1142.0" fill="url(#signal)" fill-opacity="0.14" />
-<polyline points="548.0,1133.7 621.1,1100.4 694.2,1050.5 767.3,1069.9 840.4,1069.9 913.5,1047.8 986.5,1014.5 1059.6,1017.3 1132.7,948.0 1205.8,972.9 1278.9,1106.0 1352.0,1108.7" fill="none" stroke="url(#signal)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)" />
-<circle cx="548.0" cy="1133.7" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<polygon points="548.0,1142.0 548.0,1142.0 621.1,1100.4 694.2,1050.5 767.3,1069.9 840.4,1069.9 913.5,1047.8 986.5,1014.5 1059.6,1017.3 1132.7,948.0 1205.8,972.9 1278.9,1106.0 1352.0,1108.7 1352.0,1142.0" fill="url(#signal)" fill-opacity="0.14" />
+<polyline points="548.0,1142.0 621.1,1100.4 694.2,1050.5 767.3,1069.9 840.4,1069.9 913.5,1047.8 986.5,1014.5 1059.6,1017.3 1132.7,948.0 1205.8,972.9 1278.9,1106.0 1352.0,1108.7" fill="none" stroke="url(#signal)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)" />
+<circle cx="548.0" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="621.1" cy="1100.4" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="694.2" cy="1050.5" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="767.3" cy="1069.9" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
@@ -287,7 +287,7 @@
 <circle cx="1205.8" cy="972.9" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="1278.9" cy="1106.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
 <circle cx="1352.0" cy="1108.7" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<text x="1346" y="928" text-anchor="end" class="table-value" font-size="16">384 commits / 12 weeks</text>
+<text x="1346" y="928" text-anchor="end" class="table-value" font-size="16">381 commits / 12 weeks</text>
 <text x="1346" y="946" text-anchor="end" class="table-meta">peak week 70</text>
 <rect x="52" y="1244" width="668" height="372" rx="28" class="panel" />
 <text x="80" y="1284" text-anchor="start" class="panel-title">Issue + PR Stream</text>
@@ -295,7 +295,7 @@
 <line x1="80" y1="1320" x2="692" y2="1320" stroke="rgba(148, 163, 184, 0.07)" stroke-width="1" />
 <text x="80" y="1338" text-anchor="start" class="stream-state">Poly_Agent · issue #65</text>
 <text x="80" y="1360" text-anchor="start" class="stream-label">工作台问答中，AI填写垂类模型调用参数时不知道参数模板</text>
-<text x="80" y="1380" text-anchor="start" class="stream-copy">closed · updated 21 days ago</text>
+<text x="80" y="1380" text-anchor="start" class="stream-copy">closed · updated 22 days ago</text>
 <text x="392" y="1338" text-anchor="start" class="stream-state">Spec_Agent · pr #6</text>
 <text x="392" y="1360" text-anchor="start" class="stream-label">修改模型api地址</text>
 <text x="392" y="1380" text-anchor="start" class="stream-copy">closed · updated 3 days ago</text>
@@ -310,7 +310,7 @@
 <text x="80" y="1556" text-anchor="start" class="stream-copy">Awaiting issue traffic</text>
 <text x="392" y="1514" text-anchor="start" class="stream-state">Poly_Agent · pr #79</text>
 <text x="392" y="1536" text-anchor="start" class="stream-label">新增顶栏意见反馈入口</text>
-<text x="392" y="1556" text-anchor="start" class="stream-copy">closed · updated 17 days ago</text>
+<text x="392" y="1556" text-anchor="start" class="stream-copy">closed · updated 18 days ago</text>
 <rect x="740" y="1244" width="648" height="372" rx="28" class="panel" />
 <text x="768" y="1284" text-anchor="start" class="panel-title">Release Lane + Roadmap</text>
 <text x="768" y="1308" text-anchor="start" class="panel-subtitle">Latest release artifacts and milestone intent from repository data.</text>
@@ -336,5 +336,5 @@
 <text x="1060" y="1582" text-anchor="start" class="stream-copy">Awaiting milestone configuration</text>
 <rect x="52" y="1640" width="1336" height="62" rx="20" class="panel-bright" />
 <text x="74" y="1678" text-anchor="start" class="footer">Telemetry source: GitHub REST API. Scope=all; owner=SynlysAI; forks=included; skipped 15 non-tracked repos. People panels reflect public contributors.</text>
-<text x="1362" y="1678" text-anchor="end" class="footer">private names masked · refreshed 2026-09-07 02:23 UTC</text>
+<text x="1362" y="1678" text-anchor="end" class="footer">private names masked · refreshed 2026-09-07 07:24 UTC</text>
 </svg>
