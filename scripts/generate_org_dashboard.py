@@ -87,6 +87,23 @@ def catalog_repository_allowlist(path: str | Path = CATALOG_PATH) -> set[str]:
     return repositories
 
 
+def parse_repo_allowlist(value: str | None) -> set[str]:
+    """解析逗号分隔的仓库 allowlist 环境变量。
+
+    Args:
+        value: 环境变量原始值，逗号分隔仓库名；``all`` 或 ``*`` 表示不过滤。
+
+    Returns:
+        仓库名称集合；空集合表示不按 allowlist 过滤。
+    """
+    if not value or not value.strip():
+        return set()
+    stripped = value.strip()
+    if stripped.lower() in {"all", "*"}:
+        return set()
+    return {name.strip() for name in stripped.split(",") if name.strip()}
+
+
 def xml_escape(value: str) -> str:
     return html.escape(value, quote=True)
 
@@ -219,12 +236,7 @@ def collect_org_analytics(
         max_pages=4,
     )
     normalized_org = org.casefold()
-    requested_allowlist = {name.casefold() for name in repo_allowlist}
-    catalog_allowlist = catalog_repository_allowlist() if requested_allowlist else set()
-    effective_allowlist = {
-        name for name in catalog_allowlist if name.casefold() in requested_allowlist
-    }
-    repo_allowlist_normalized = {name.casefold() for name in effective_allowlist}
+    repo_allowlist_normalized = {name.casefold() for name in repo_allowlist}
     skipped_repos = Counter()
     filtered_repos = []
     for repo in repos_payload:
@@ -446,7 +458,7 @@ def collect_org_analytics(
             "hide_private_repo_names": hide_private_repo_names,
             "owner": org,
             "include_forks": include_forks,
-            "repo_allowlist": sorted(effective_allowlist),
+            "repo_allowlist": sorted(repo_allowlist),
             "skipped_repos": dict(skipped_repos),
         },
     }
@@ -743,6 +755,20 @@ def env_flag(name: str, default: bool) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def resolve_repo_allowlist() -> set[str]:
+    """根据环境变量或 catalog 解析看板展示的仓库 allowlist。
+
+    Returns:
+        仓库名称集合；空集合表示展示组织全部仓库。
+    """
+    allowlist = parse_repo_allowlist(os.getenv("REPO_ALLOWLIST"))
+    if allowlist:
+        return allowlist
+    if os.getenv("REPO_ALLOWLIST", "").strip().lower() in {"all", "*"}:
+        return set()
+    return catalog_repository_allowlist()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a GitHub organization analytics SVG dashboard.")
     parser.add_argument("--org", default=os.getenv("GITHUB_REPOSITORY_OWNER") or "SynlysAI")
@@ -756,7 +782,7 @@ def main() -> None:
         repo_visibility = "public"
     hide_private_repo_names = env_flag("HIDE_PRIVATE_REPO_NAMES", True)
     include_forks = env_flag("INCLUDE_FORKS", False)
-    repo_allowlist = set()
+    repo_allowlist = resolve_repo_allowlist()
 
     client = GitHubClient(token=token)
     data = collect_org_analytics(
