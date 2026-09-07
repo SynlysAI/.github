@@ -263,23 +263,24 @@
       "id": "ai4ms:commit:2026-08-31:feature:general",
       "level": "commit",
       "module": "general",
-      "occurredAt": "2026-09-01T02:16:09Z",
+      "occurredAt": "2026-09-02T02:17:47Z",
       "pinned": false,
       "productId": "ai4ms",
       "source": {
         "commitShas": [
-          "9a40d67"
+          "9a40d67",
+          "4c2a137"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/AI4MS"
       },
       "summary": {
-        "en": "首页图标 URL 添加版本号",
-        "zh": "首页图标 URL 添加版本号"
+        "en": "添加 MIT 开源协议",
+        "zh": "添加 MIT 开源协议"
       },
       "title": {
-        "en": "首页图标 URL 添加版本号",
-        "zh": "首页图标 URL 添加版本号"
+        "en": "添加 MIT 开源协议",
+        "zh": "添加 MIT 开源协议"
       },
       "version": null
     },
@@ -1374,6 +1375,35 @@
     {
       "changeType": "feature",
       "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "poly-agent:commit:2026-08-31:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-09-02T02:17:50Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "1797aa2"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "添加 MIT 开源协议",
+        "zh": "添加 MIT 开源协议"
+      },
+      "title": {
+        "en": "添加 MIT 开源协议",
+        "zh": "添加 MIT 开源协议"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
         "en": "Poly Agent 首个正式版本。\n\nPoly Agent 是 AI⁴MS 门户下的高分子材料智能研发平台,把材料研发中的问题定义、实验设计、计算任务、垂类预测、文献证据和研发报告组织到同一条可追溯工作流中。\n\n## 主要功能\n\n- **ResearchEngine 研发引擎**:统一管理研发问题定义与追溯链,支持人工算法工作流编排与 AutoResearch 自动闭环,关键节点提供人工审批(Gate)机制\n- **ComputeEngine 计算智能**:计算任务提交、状态追踪与产物管理,内置 3D 结构生成、xTB/CREST 粗优化、ORCA DFT 高精度计算等递进工作流\n- **Alchemist 实验设计与优化**:面向高成本多变量实验,提供变量定义、DoE/OED 实验设计、贝叶斯/GP 建模、采集函数推荐与可视化诊断\n- **垂类预测模型**:支持算法包上传与远程模型接口接入,提供契约校验、版本治理、在线测试与运行记录追溯\n- **知识库与数据目录**:基于 WeKnora 提供可核查证据链与图谱检索;提供材料数据资产目录、记录下钻与数据分析\n- **受控 LUI 助手与报告**:提供 /dialogue 交互界面,支持 Slash Command 控制、动态算法调用、上下文压缩、事件回放与结构化研发报告生成\n- **任务中心与工具服务**:全局聚合计算、算法与引擎任务,实时监控服务、计算工具链及 LLM 服务健康状态",
         "zh": "Poly Agent 首个正式版本。\n\nPoly Agent 是 AI⁴MS 门户下的高分子材料智能研发平台,把材料研发中的问题定义、实验设计、计算任务、垂类预测、文献证据和研发报告组织到同一条可追溯工作流中。\n\n## 主要功能\n\n- **ResearchEngine 研发引擎**:统一管理研发问题定义与追溯链,支持人工算法工作流编排与 AutoResearch 自动闭环,关键节点提供人工审批(Gate)机制\n- **ComputeEngine 计算智能**:计算任务提交、状态追踪与产物管理,内置 3D 结构生成、xTB/CREST 粗优化、ORCA DFT 高精度计算等递进工作流\n- **Alchemist 实验设计与优化**:面向高成本多变量实验,提供变量定义、DoE/OED 实验设计、贝叶斯/GP 建模、采集函数推荐与可视化诊断\n- **垂类预测模型**:支持算法包上传与远程模型接口接入,提供契约校验、版本治理、在线测试与运行记录追溯\n- **知识库与数据目录**:基于 WeKnora 提供可核查证据链与图谱检索;提供材料数据资产目录、记录下钻与数据分析\n- **受控 LUI 助手与报告**:提供 /dialogue 交互界面,支持 Slash Command 控制、动态算法调用、上下文压缩、事件回放与结构化研发报告生成\n- **任务中心与工具服务**:全局聚合计算、算法与引擎任务,实时监控服务、计算工具链及 LLM 服务健康状态"
       },
@@ -1674,6 +1704,35 @@
     {
       "changeType": "feature",
       "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "ragportal:commit:2026-08-31:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-09-02T02:17:55Z",
+      "pinned": false,
+      "productId": "ragportal",
+      "source": {
+        "commitShas": [
+          "20586ce"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/RAGPortal"
+      },
+      "summary": {
+        "en": "添加 MIT 开源协议",
+        "zh": "添加 MIT 开源协议"
+      },
+      "title": {
+        "en": "添加 MIT 开源协议",
+        "zh": "添加 MIT 开源协议"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
         "en": "RAGPortal 首个发布版本。\n\nRAGPortal 是 AI⁴MS 门户下的独立知识库文档上传门户,作为研发知识资产的统一入口,底层对接 WeKnora 知识库引擎。\n\n## 主要功能\n\n- **知识库文档上传**:面向 WeKnora 知识库的独立文档上传入口,支持研发文档的集中上传与知识库管理\n- **门户单点登录(SSO)**:复用 AI4MS 统一认证体系,从门户卡片一键免登录进入",
         "zh": "RAGPortal 首个发布版本。\n\nRAGPortal 是 AI⁴MS 门户下的独立知识库文档上传门户,作为研发知识资产的统一入口,底层对接 WeKnora 知识库引擎。\n\n## 主要功能\n\n- **知识库文档上传**:面向 WeKnora 知识库的独立文档上传入口,支持研发文档的集中上传与知识库管理\n- **门户单点登录(SSO)**:复用 AI4MS 统一认证体系,从门户卡片一键免登录进入"
       },
@@ -1714,7 +1773,10 @@
         "commitShas": [
           "37f54a1",
           "843ffcc",
-          "41b21ea"
+          "41b21ea",
+          "13bfc64",
+          "c869062",
+          "300d2c0"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/SmartAccess"
@@ -1752,7 +1814,17 @@
           "cb564fa",
           "f28c652",
           "a70d51c",
-          "315ca2e"
+          "315ca2e",
+          "cb9e0ed",
+          "18ad5b8",
+          "2c41156",
+          "a6c95a3",
+          "a870a2f",
+          "a6dbc07",
+          "8e122e1",
+          "26c4ed5",
+          "adc4630",
+          "49310d5"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/SmartAccess"
@@ -1785,7 +1857,12 @@
           "85c780e",
           "e132695",
           "d72eed9",
-          "47f7aff"
+          "47f7aff",
+          "d6a13c4",
+          "2c6d8bb",
+          "cb2bb34",
+          "c988a95",
+          "5cccadd"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/SmartAccess"
@@ -1837,8 +1914,8 @@
     {
       "changeType": "feature",
       "detailsMarkdown": {
-        "en": "- 优化顶栏切换按钮为图标按钮并新增 Ghost 样式\n- 添加 environment.yml 依赖版本信息\n- 新增 API 视觉提供者 ApiVisionProvider\n- 增强 PaddleOCR 导入失败处理，添加详细错误信息并更新测试用例\n- 支持弹窗截图与锚点点击\n- Enhance multiview support in anchors and workflows\n- Add capture metadata handling and improve window focus management\n- Enhance workflow validation and step handling\n- 支持多窗口联合截图标定\n- Implement incrementing input rules for workflow steps",
-        "zh": "- 优化顶栏切换按钮为图标按钮并新增 Ghost 样式\n- 添加 environment.yml 依赖版本信息\n- 新增 API 视觉提供者 ApiVisionProvider\n- 增强 PaddleOCR 导入失败处理，添加详细错误信息并更新测试用例\n- 支持弹窗截图与锚点点击\n- Enhance multiview support in anchors and workflows\n- Add capture metadata handling and improve window focus management\n- Enhance workflow validation and step handling\n- 支持多窗口联合截图标定\n- Implement incrementing input rules for workflow steps"
+        "en": "- 优化顶栏切换按钮为图标按钮并新增 Ghost 样式\n- 添加 environment.yml 依赖版本信息\n- 新增 API 视觉提供者 ApiVisionProvider",
+        "zh": "- 优化顶栏切换按钮为图标按钮并新增 Ghost 样式\n- 添加 environment.yml 依赖版本信息\n- 新增 API 视觉提供者 ApiVisionProvider"
       },
       "id": "smartaccess:aggregate:2026-06-15:feature:general",
       "level": "aggregate",
@@ -1857,7 +1934,10 @@
           "b2f05a5",
           "605d5d5",
           "8996ae2",
-          "3a771c7"
+          "3a771c7",
+          "a1b6ca1",
+          "fa886af",
+          "3698e69"
         ],
         "releaseUrl": null,
         "repository": "SynlysAI/SmartAccess"
@@ -1867,8 +1947,8 @@
         "zh": "新增功能（general）"
       },
       "title": {
-        "en": "优化顶栏切换按钮为图标按钮并新增 Ghost 样式 and 10 more",
-        "zh": "优化顶栏切换按钮为图标按钮并新增 Ghost 样式 等 10 项"
+        "en": "优化顶栏切换按钮为图标按钮并新增 Ghost 样式 and 3 more",
+        "zh": "优化顶栏切换按钮为图标按钮并新增 Ghost 样式 等 3 项"
       },
       "version": null
     },
@@ -2132,6 +2212,35 @@
       "version": null
     },
     {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:commit:2026-06-15:bugfix:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-06-15T02:16:33Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "115a4ba"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "修正 v2 OCR 观察区域与配置读取",
+        "zh": "修正 v2 OCR 观察区域与配置读取"
+      },
+      "title": {
+        "en": "修正 v2 OCR 观察区域与配置读取",
+        "zh": "修正 v2 OCR 观察区域与配置读取"
+      },
+      "version": null
+    },
+    {
       "changeType": "algorithm",
       "detailsMarkdown": {
         "en": "",
@@ -2331,6 +2440,35 @@
       "title": {
         "en": "优化登录界面，添加版本信息",
         "zh": "优化登录界面，添加版本信息"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "smartaccess:commit:2026-08-31:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-09-02T02:35:12Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "bbf87da"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "添加 MIT 开源协议",
+        "zh": "添加 MIT 开源协议"
+      },
+      "title": {
+        "en": "添加 MIT 开源协议",
+        "zh": "添加 MIT 开源协议"
       },
       "version": null
     },
@@ -3389,6 +3527,35 @@
     {
       "changeType": "feature",
       "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "spec-agent:commit:2026-08-31:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-09-02T03:17:10Z",
+      "pinned": false,
+      "productId": "spec-agent",
+      "source": {
+        "commitShas": [
+          "eab44f2"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Spec_Agent"
+      },
+      "summary": {
+        "en": "新增 MIT 开源协议",
+        "zh": "新增 MIT 开源协议"
+      },
+      "title": {
+        "en": "新增 MIT 开源协议",
+        "zh": "新增 MIT 开源协议"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
         "en": "Spec Agent 首个正式版本。\n\nSpec Agent 是面向表征实验谱图的智能解析与分析平台,支持 GPC、NMR、IR、Raman、LCMS 等多种谱图的智能解析、任务管理与评测。\n\n## 主要功能\n\n- **谱图智能解析**:GPC / NMR / IR / Raman / LCMS 任务提交、异步执行、结果查看\n- **报告问答**:基于 LLM 的报告内容问答对话\n- **NMRServer 工具**:谱图正向预测、反向预测、数据库搜索\n- **拉曼批量采集**:光谱仪远程采集,含信噪比指标与谱图下载\n- **LCMS 数据转化**:原始数据格式转化\n- **评测中心**:解析准确性评测、设备重复性评测、Markdown 报告下载\n- **实验数据管理**:共享目录采集、样本主档管理、分子资产统计\n- **登录鉴权**:账号密码登录、邀请码注册、管理员权限控制",
         "zh": "Spec Agent 首个正式版本。\n\nSpec Agent 是面向表征实验谱图的智能解析与分析平台,支持 GPC、NMR、IR、Raman、LCMS 等多种谱图的智能解析、任务管理与评测。\n\n## 主要功能\n\n- **谱图智能解析**:GPC / NMR / IR / Raman / LCMS 任务提交、异步执行、结果查看\n- **报告问答**:基于 LLM 的报告内容问答对话\n- **NMRServer 工具**:谱图正向预测、反向预测、数据库搜索\n- **拉曼批量采集**:光谱仪远程采集,含信噪比指标与谱图下载\n- **LCMS 数据转化**:原始数据格式转化\n- **评测中心**:解析准确性评测、设备重复性评测、Markdown 报告下载\n- **实验数据管理**:共享目录采集、样本主档管理、分子资产统计\n- **登录鉴权**:账号密码登录、邀请码注册、管理员权限控制"
       },
@@ -4053,6 +4220,35 @@
       "title": {
         "en": "新增顶栏操作指导入口",
         "zh": "新增顶栏操作指导入口"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-08-31:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-09-02T03:17:30Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "628fd59"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "新增 MIT 开源协议",
+        "zh": "新增 MIT 开源协议"
+      },
+      "title": {
+        "en": "新增 MIT 开源协议",
+        "zh": "新增 MIT 开源协议"
       },
       "version": null
     },
