@@ -1108,6 +1108,97 @@
       "version": null
     },
     {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 支持 Codex 独立配置目录\n- 新增核心功能体验指南",
+        "zh": "- 支持 Codex 独立配置目录\n- 新增核心功能体验指南"
+      },
+      "id": "poly-agent:aggregate:2026-08-31:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-08-31T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "7cc6610",
+          "8e20fcd"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "支持 Codex 独立配置目录 and 2 more",
+        "zh": "支持 Codex 独立配置目录 等 2 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "- 新增 Plan 17 工具服务统一入口与 Agent 执行生产化收口\n- 新增 LUI 评测任务闭环与版本发布入口\n- 新增前端版本号动态读取 GitHub Release",
+        "zh": "- 新增 Plan 17 工具服务统一入口与 Agent 执行生产化收口\n- 新增 LUI 评测任务闭环与版本发布入口\n- 新增前端版本号动态读取 GitHub Release"
+      },
+      "id": "poly-agent:aggregate:2026-09-07:feature:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-09-07T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "679773a",
+          "d3aebcf",
+          "91006ca"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "New feature (general)",
+        "zh": "新增功能（general）"
+      },
+      "title": {
+        "en": "新增 Plan 17 工具服务统一入口与 Agent 执行生产化收口 and 3 more",
+        "zh": "新增 Plan 17 工具服务统一入口与 Agent 执行生产化收口 等 3 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "- 优化垂类结果长文本展示\n- 优化垂类预测结果紧凑指标展示",
+        "zh": "- 优化垂类结果长文本展示\n- 优化垂类预测结果紧凑指标展示"
+      },
+      "id": "poly-agent:aggregate:2026-09-07:performance:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-09-07T08:00:00Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [
+          "1c08242",
+          "aa5705e"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Performance improvement (general)",
+        "zh": "性能优化（general）"
+      },
+      "title": {
+        "en": "优化垂类结果长文本展示 and 2 more",
+        "zh": "优化垂类结果长文本展示 等 2 项"
+      },
+      "version": null
+    },
+    {
       "changeType": "algorithm",
       "detailsMarkdown": {
         "en": "",
@@ -1427,6 +1518,60 @@
         "zh": "v1.0.0"
       },
       "version": "v1.0.0"
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "## 变更内容\n\n- 新增紧凑卡片值判断，长文本不再挤占加粗大字号指标卡\n- 非紧凑字符串字段改为结构化可读卡片展示\n- 补充紧凑卡片值判断的单元测试\n- 前端版本号升至 1.0.1\n\n**完整变更**: https://github.com/SynlysAI/Poly_Agent/pull/83",
+        "zh": "## 变更内容\n\n- 新增紧凑卡片值判断，长文本不再挤占加粗大字号指标卡\n- 非紧凑字符串字段改为结构化可读卡片展示\n- 补充紧凑卡片值判断的单元测试\n- 前端版本号升至 1.0.1\n\n**完整变更**: https://github.com/SynlysAI/Poly_Agent/pull/83"
+      },
+      "id": "poly-agent:release:384392578",
+      "level": "release",
+      "module": "release",
+      "occurredAt": "2026-09-08T01:32:12Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [],
+        "releaseUrl": "https://github.com/SynlysAI/Poly_Agent/releases/tag/v1.0.1",
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Release v1.0.1",
+        "zh": "发布 v1.0.1"
+      },
+      "title": {
+        "en": "v1.0.1",
+        "zh": "v1.0.1"
+      },
+      "version": "v1.0.1"
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "## 变更内容\n\n- 新增紧凑卡片值判断，长文本不再挤占加粗大字号指标卡（v1.0.1）\n- 前端版本号动态读取 GitHub Release，挂载时自动刷新为云端最新版本\n- 请求带超时与容错，失败时保留构建时 Git 标签版本\n- 补充动态版本读取的单元测试\n\n**完整变更**: https://github.com/SynlysAI/Poly_Agent/pull/84",
+        "zh": "## 变更内容\n\n- 新增紧凑卡片值判断，长文本不再挤占加粗大字号指标卡（v1.0.1）\n- 前端版本号动态读取 GitHub Release，挂载时自动刷新为云端最新版本\n- 请求带超时与容错，失败时保留构建时 Git 标签版本\n- 补充动态版本读取的单元测试\n\n**完整变更**: https://github.com/SynlysAI/Poly_Agent/pull/84"
+      },
+      "id": "poly-agent:release:384394446",
+      "level": "release",
+      "module": "release",
+      "occurredAt": "2026-09-08T01:39:07Z",
+      "pinned": false,
+      "productId": "poly-agent",
+      "source": {
+        "commitShas": [],
+        "releaseUrl": "https://github.com/SynlysAI/Poly_Agent/releases/tag/v1.1.0",
+        "repository": "SynlysAI/Poly_Agent"
+      },
+      "summary": {
+        "en": "Release v1.1.0",
+        "zh": "发布 v1.1.0"
+      },
+      "title": {
+        "en": "v1.1.0",
+        "zh": "v1.1.0"
+      },
+      "version": "v1.1.0"
     },
     {
       "changeType": "feature",
@@ -2208,6 +2353,36 @@
       "title": {
         "en": "完善数据采集失败重试控制 and 4 more",
         "zh": "完善数据采集失败重试控制 等 4 项"
+      },
+      "version": null
+    },
+    {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复执行端长时间运行后心跳与发布 401 问题\n- 修复系统设置保存被 .env 覆盖不生效问题",
+        "zh": "- 修复执行端长时间运行后心跳与发布 401 问题\n- 修复系统设置保存被 .env 覆盖不生效问题"
+      },
+      "id": "smartaccess:aggregate:2026-09-07:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-09-07T08:00:00Z",
+      "pinned": false,
+      "productId": "smartaccess",
+      "source": {
+        "commitShas": [
+          "6eb5bf7",
+          "8cb046b"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SmartAccess"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复执行端长时间运行后心跳与发布 401 问题 and 2 more",
+        "zh": "修复执行端长时间运行后心跳与发布 401 问题 等 2 项"
       },
       "version": null
     },
@@ -3962,6 +4137,37 @@
       "version": null
     },
     {
+      "changeType": "bugfix",
+      "detailsMarkdown": {
+        "en": "- 修复设备详情参数名换行问题\n- 修复不同执行端同名模板互相覆盖问题\n- 修复 SmartAccess 静态令牌与生产跨服务令牌不一致导致发布 401",
+        "zh": "- 修复设备详情参数名换行问题\n- 修复不同执行端同名模板互相覆盖问题\n- 修复 SmartAccess 静态令牌与生产跨服务令牌不一致导致发布 401"
+      },
+      "id": "speclabos:aggregate:2026-09-07:bugfix:general",
+      "level": "aggregate",
+      "module": "general",
+      "occurredAt": "2026-09-07T08:00:00Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "886003c",
+          "861f505",
+          "4be84e0"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "Bug fix (general)",
+        "zh": "问题修复（general）"
+      },
+      "title": {
+        "en": "修复设备详情参数名换行问题 and 3 more",
+        "zh": "修复设备详情参数名换行问题 等 3 项"
+      },
+      "version": null
+    },
+    {
       "changeType": "feature",
       "detailsMarkdown": {
         "en": "",
@@ -4249,6 +4455,64 @@
       "title": {
         "en": "新增 MIT 开源协议",
         "zh": "新增 MIT 开源协议"
+      },
+      "version": null
+    },
+    {
+      "changeType": "feature",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-09-07:feature:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-09-09T06:38:21Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "e681bbd"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "发布人识别与静态令牌发布授权支持",
+        "zh": "发布人识别与静态令牌发布授权支持"
+      },
+      "title": {
+        "en": "发布人识别与静态令牌发布授权支持",
+        "zh": "发布人识别与静态令牌发布授权支持"
+      },
+      "version": null
+    },
+    {
+      "changeType": "performance",
+      "detailsMarkdown": {
+        "en": "",
+        "zh": ""
+      },
+      "id": "speclabos:commit:2026-09-07:performance:general",
+      "level": "commit",
+      "module": "general",
+      "occurredAt": "2026-09-07T09:19:15Z",
+      "pinned": false,
+      "productId": "speclabos",
+      "source": {
+        "commitShas": [
+          "292b9c2"
+        ],
+        "releaseUrl": null,
+        "repository": "SynlysAI/SpecLabOS"
+      },
+      "summary": {
+        "en": "调整 SmartAccess 设备名称显示为锚点配置ID",
+        "zh": "调整 SmartAccess 设备名称显示为锚点配置ID"
+      },
+      "title": {
+        "en": "调整 SmartAccess 设备名称显示为锚点配置ID",
+        "zh": "调整 SmartAccess 设备名称显示为锚点配置ID"
       },
       "version": null
     },

@@ -63,9 +63,9 @@
     },
     "SynlysAI/Poly_Agent": {
       "completed": false,
-      "cursor": "1797aa281c23d550db850bba028ca6df91854608",
+      "cursor": "7cc66109a13d3c081a098f5865278e1b2593c4ef",
       "page": 1,
-      "processed": 265,
+      "processed": 283,
       "processedShas": [
         "7481771e83a937865c72a4ad87334f7fe5f2592a",
         "a1cec5207d42cd467c444b99dffeabddcd4cefa8",
@@ -331,11 +331,29 @@
         "37afbef24542dea4b1beb58bfa2d8a27d165a500",
         "302368d2e69e4a5f6d03a8871e354c230e21c111",
         "c2d7e56dffd824f33a003cbd3e542331984d8ef9",
-        "1797aa281c23d550db850bba028ca6df91854608"
+        "1797aa281c23d550db850bba028ca6df91854608",
+        "36820e8e06c009275fef329a0acbc858aca4abec",
+        "91006ca13efa0981f6eb26acc0902920fc639460",
+        "b9d7affd254e68c80dfe515c6bcf60a51539f7f3",
+        "aa5705e57dba4601bd867676b11c8e6341010760",
+        "aaa52f20276f65312377a4729ff4c7751979215c",
+        "c39d3f0044b8d6cfc55c37d7ca3a822ed6e5faf1",
+        "a0e35474f913936cc0570dbc32ca942d47d5f937",
+        "d3aebcf7680b3dc5849138665e23d406312949a8",
+        "ebdf36353830c37473c0fc28f2fdc14308823770",
+        "1c082427a0477de03223ab8e9116f466e640ab53",
+        "94fde0319bbcce345c6c7e529902216122835ef8",
+        "4dd21b35acdaea951aad5d1855606dab965f5d0d",
+        "11cbf545f4744e1fe8dea59b5ad27e5d0f2f1ac3",
+        "5aaa2811892f23bec7ed65724eda4325bdb61e8b",
+        "f27bc98eafbbe28082e31aee921b9e73c75ebcba",
+        "679773a4389dc9984b69dd8a4167377093126da3",
+        "8e20fcddb2fb732057855f8917df2c8cc56b9ab5",
+        "7cc66109a13d3c081a098f5865278e1b2593c4ef"
       ],
       "watermark": {
-        "publishedAt": "2026-09-02T02:17:50Z",
-        "sha": "1797aa281c23d550db850bba028ca6df91854608"
+        "publishedAt": "2026-09-08T01:38:56Z",
+        "sha": "36820e8e06c009275fef329a0acbc858aca4abec"
       }
     },
     "SynlysAI/RAGPortal": {
@@ -383,9 +401,9 @@
     },
     "SynlysAI/SmartAccess": {
       "completed": false,
-      "cursor": "cb9e0ed0e136cddc70b409a2ff8e9b57289a77fd",
+      "cursor": "a51b6b49c4ada18eafb65f5efb90ba78319c7b82",
       "page": 1,
-      "processed": 163,
+      "processed": 173,
       "processedShas": [
         "a372f68547f901b093218169dd664d1b27487149",
         "1af1a37ba16ce420f20e1c1f1733558f5ac33dd7",
@@ -549,18 +567,28 @@
         "18ad5b81798ed1e45dc2f6d29100ad2a778aff3f",
         "55d2332a581496fad38a51c175f2b89868706d79",
         "e1a577d5763fdc99e616fd36c918ab476ccd741a",
-        "cb9e0ed0e136cddc70b409a2ff8e9b57289a77fd"
+        "cb9e0ed0e136cddc70b409a2ff8e9b57289a77fd",
+        "7d144ca796931e0955b309c9148d28d2da7fa0b0",
+        "8cb046b6323b362770b43f056511033c505eaaf9",
+        "680d50bc95010843ef54e87576a9600ebdec07e7",
+        "6eb5bf789980acfe95f8265ad19887b2a136b3b6",
+        "68fe7da8057ff1d8f73ac34e9932bd684da47aa5",
+        "77d2f47442c66a0a126ddd1b604de1a4c8b1db34",
+        "2d6cbf295135e032741346e4bb789a9638b4e983",
+        "f2ee09c3ad086b8b52550d31980609b1f408f4c3",
+        "235a10e2eae959fa733f095a5025dbc8562546cc",
+        "a51b6b49c4ada18eafb65f5efb90ba78319c7b82"
       ],
       "watermark": {
-        "publishedAt": "2026-09-02T02:35:12Z",
-        "sha": "bbf87dabf3d21767a57ad26c56080138dc10d2e4"
+        "publishedAt": "2026-09-09T09:42:35Z",
+        "sha": "7d144ca796931e0955b309c9148d28d2da7fa0b0"
       }
     },
     "SynlysAI/SpecLabOS": {
       "completed": false,
-      "cursor": "628fd596d1222ff4034ff0a429623556b1a47f0c",
+      "cursor": "292b9c2e657af6ea357c709fa86d06445ef6f7ed",
       "page": 1,
-      "processed": 94,
+      "processed": 106,
       "processedShas": [
         "7f02f7cd18528cfa80cf843440afff50c595b173",
         "eca4b7ad2e3337a3c5fe52a306c7095002a98ab1",
@@ -655,11 +683,23 @@
         "f403c2a8592a0ddbe8e7b0e6102e2b5c66b902c0",
         "b34650875f8642119863c81dffb89a63bcf5e7ea",
         "4db1d67e35a17a2738fb3b65de3670def50c9feb",
-        "628fd596d1222ff4034ff0a429623556b1a47f0c"
+        "628fd596d1222ff4034ff0a429623556b1a47f0c",
+        "f8936175fe7f268ef87915d3caba52ffd0d0d8ff",
+        "4be84e0f4fb2b40e4e0709ace920c9441418890e",
+        "d337b475239a4a2970d354410caf4ca9113e1dae",
+        "e681bbd11059f8a124de0f149954d51a797d8f69",
+        "89ab85e54698592077696e4ac7e82cdcd3ffa7a6",
+        "861f505f7c0dc35bffb1c199bb8489debe48b491",
+        "6aa46faadd1b17d0ee53d17d43faa0ab2c2b71d3",
+        "38c0263f59d3b88625e3a9d2f94e078e74b82427",
+        "cdcce0b94170cb70c06dccc514dea1b0d35f078d",
+        "886003c7de3f0c288fb0ac76681e07685d780c1f",
+        "b138febc39d8bb8abbdaf63c8bd55413831ae234",
+        "292b9c2e657af6ea357c709fa86d06445ef6f7ed"
       ],
       "watermark": {
-        "publishedAt": "2026-09-02T03:17:40Z",
-        "sha": "4db1d67e35a17a2738fb3b65de3670def50c9feb"
+        "publishedAt": "2026-09-09T06:53:18Z",
+        "sha": "f8936175fe7f268ef87915d3caba52ffd0d0d8ff"
       }
     },
     "SynlysAI/Spec_Agent": {
