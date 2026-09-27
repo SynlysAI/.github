@@ -1,7 +1,10 @@
 """组织看板与 Release Portal CLI 兼容性测试。"""
 
 import json
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
+
+import pytest
 
 from scripts import generate_org_dashboard as dashboard
 from scripts.release_portal import cli
@@ -57,8 +60,15 @@ class FakeClient:
         self._repos = repos
 
     def get_json(self, path):
-        """返回组织元数据。"""
-        del path
+        """返回组织元数据；fork 详情带上上游默认分支。"""
+        if str(path).rsplit("/", 1)[-1] == "ForkedProject":
+            return {
+                "fork": True,
+                "parent": {
+                    "clone_url": "https://example.invalid/upstream.git",
+                    "default_branch": "preview",
+                },
+            }
         return {"login": "SynlysAI", "name": "SynlysAI"}
 
     def get_json_safe(self, path, default):
@@ -71,12 +81,18 @@ class FakeClient:
         del path
         return {}, SimpleNamespace(headers={})
 
-    def paginate(self, path, *, max_pages=10):
+    def paginate(self, path, *, max_pages=10, strict=False):
         """返回配置的仓库列表，其余接口返回空。"""
-        del max_pages
+        del max_pages, strict
         if path.startswith("/orgs/SynlysAI/repos"):
             return self._repos
         return []
+
+
+def _empty_history(repo, parent):
+    """测试夹具：不读取真实 Git 历史。"""
+    del repo, parent
+    return []
 
 
 def test_dashboard_counts_all_repos_by_default():
@@ -85,11 +101,11 @@ def test_dashboard_counts_all_repos_by_default():
     data = dashboard.collect_org_analytics(
         "SynlysAI",
         client,
-        max_commit_pages=1,
         repo_visibility="all",
         hide_private_repo_names=True,
         include_forks=True,
         repo_allowlist=set(),
+        commit_source=_empty_history,
     )
 
     assert [repo.name for repo in data["repos"]] == [
@@ -111,11 +127,11 @@ def test_dashboard_excludes_forks_when_disabled_but_keeps_archived():
     data = dashboard.collect_org_analytics(
         "SynlysAI",
         client,
-        max_commit_pages=1,
         repo_visibility="all",
         hide_private_repo_names=True,
         include_forks=False,
         repo_allowlist=set(),
+        commit_source=_empty_history,
     )
 
     assert [repo.name for repo in data["repos"]] == [
@@ -141,31 +157,56 @@ def test_dashboard_optional_allowlist_filters_and_masks_private():
         "SmartAccess",
     }
 
+    def commits(repo, parent):
+        """只给私有仓库一条未关联 GitHub 账号的提交。"""
+        del parent
+        if repo["name"] != "SmartAccess":
+            return []
+        return [
+            dashboard.CommitRecord(
+                sha="a" * 40,
+                author_name="Local Dev",
+                author_email="local@example.com",
+                authored_at=datetime.now(UTC),
+            )
+        ]
+
     client = FakeClient(_fake_repo_payload())
     data = dashboard.collect_org_analytics(
         "SynlysAI",
         client,
-        max_commit_pages=1,
         repo_visibility="all",
         hide_private_repo_names=True,
         include_forks=True,
         repo_allowlist=allowlist,
+        commit_source=commits,
     )
 
-    assert [repo.name for repo in data["repos"]] == ["AI4MS", "SmartAccess"]
+    assert [repo.name for repo in data["repos"]] == ["SmartAccess", "AI4MS"]
     assert data["source_facts"]["skipped_repos"] == {"not_allowlisted": 3}
-    private_repo = data["repos"][1]
-    assert private_repo.display_name == "SmartAccess"
+    private_repo = next(repo for repo in data["repos"] if repo.name == "SmartAccess")
+    assert private_repo.display_name == "Private 01"
     assert private_repo.description == "Private repository"
     assert private_repo.default_branch == "hidden"
+    assert private_repo.total_commits == 1
+    assert data["summary"]["total_commits"] == 1
+    assert data["summary"]["contributor_count"] == 1
 
     svg = dashboard.render_dashboard(data)
     assert "InternalResearch" not in svg
     assert "ArchivedProject" not in svg
     assert "ForkedProject" not in svg
-    assert "SmartAccess" in svg
+    assert "SmartAccess" not in svg
+    assert "local@example.com" not in svg
+    assert "Local Dev" in svg
+    assert "Private 01" in svg
     assert "private-main" not in svg
     assert "secret-release" not in svg
+    assert "branches=all" in svg
+    assert "forks=incremental" in svg
+    assert "git authors" in svg
+    assert "visible org members" not in svg
+    assert "non-tracked" not in svg
 
 
 def test_backfill_cli_emits_json_log_without_private_error_text(tmp_path, monkeypatch, capsys):

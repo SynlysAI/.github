@@ -25,7 +25,7 @@ env:
 jobs:
   refresh-assets:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -51,6 +51,7 @@ jobs:
           REPO_VISIBILITY: all
           HIDE_PRIVATE_REPO_NAMES: "true"
           INCLUDE_FORKS: "true"
+          REPO_ALLOWLIST: "*"
         run: |
           python scripts/generate_org_dashboard.py --org "$ORG_NAME" --output github-analytics.svg
 

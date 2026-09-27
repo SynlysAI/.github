@@ -73,6 +73,7 @@ def test_commit_and_associated_pr_are_normalized():
     assert commits[0].sha.startswith("a")
     assert commits[0].message == "feat: add parser"
     assert commits[0].pull_requests[0].title == "Add parser"
+    assert "sha=" not in session.calls[0][0]
 
 
 def test_commit_batch_stops_at_limit_before_pr_enrichment():

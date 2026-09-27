@@ -3,9 +3,13 @@ from __future__ import annotations
 import argparse
 import html
 import os
+import re
+import subprocess
+import tempfile
 import textwrap
 import urllib.request
 from collections import Counter
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
@@ -64,13 +68,15 @@ def truncate(value: str, limit: int) -> str:
 
 
 def catalog_repository_allowlist(path: str | Path = CATALOG_PATH) -> set[str]:
-    """从 Release Portal catalog 读取公开看板允许的仓库名。
+    """从 Release Portal catalog 读取六个产品仓库名。
+
+    组织统计看板默认统计全部仓库，不使用这份名单。
 
     Args:
         path: 产品注册表路径，默认使用仓库内的 ``catalog.yml``。
 
     Returns:
-        catalog 中登记的六个 GitHub 仓库名称集合。
+        catalog 中登记的 GitHub 仓库名称集合。
     """
     try:
         from scripts.release_portal.config import load_catalog
@@ -182,16 +188,30 @@ class GitHubClient:
         except Exception:
             return default
 
-    def paginate(self, path: str, *, max_pages: int = 10) -> list[Any]:
+    def paginate(self, path: str, *, max_pages: int | None = 10, strict: bool = False) -> list[Any]:
+        """分页读取 GitHub 列表接口。
+
+        Args:
+            path: API 路径或完整 URL。
+            max_pages: 最多读取的页数；``None`` 表示直到没有下一页。
+            strict: 为真时，请求失败或响应不是列表会中止，而不是返回残缺结果。
+
+        Returns:
+            合并后的列表元素。
+        """
         url = path if path.startswith("http") else f"{API_ROOT}{path}"
         items: list[Any] = []
         page_count = 0
-        while url and page_count < max_pages:
+        while url and (max_pages is None or page_count < max_pages):
             try:
                 payload, response = self.get_json_response(url)
-            except Exception:
+            except Exception as exc:
+                if strict:
+                    raise HistoryError("GitHub 仓库列表读取失败") from exc
                 break
             if not isinstance(payload, list):
+                if strict:
+                    raise HistoryError("GitHub 仓库列表读取失败")
                 break
             items.extend(payload)
             url = self._parse_next_link(response.headers.get("Link"))
@@ -213,27 +233,332 @@ class GitHubClient:
         return None
 
 
+@dataclass(frozen=True)
+class CommitRecord:
+    """一条已去重的提交。"""
+
+    sha: str
+    author_name: str
+    author_email: str
+    authored_at: datetime | None
+
+
+class HistoryError(RuntimeError):
+    """仓库提交历史无法按既定口径完整读取。"""
+
+
+_NOREPLY_LOGIN = re.compile(r"^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$", re.IGNORECASE)
+_LOG_FORMAT = "%H%x1f%an%x1f%ae%x1f%aI"
+CommitSource = Callable[[Mapping[str, Any], Mapping[str, Any] | None], list[CommitRecord]]
+
+
+def _git_env(token: str | None) -> dict[str, str]:
+    """构造不把令牌写入命令行的 Git 环境。
+
+    Args:
+        token: GitHub 令牌；为空时不设置认证头。
+
+    Returns:
+        供 ``git`` 子进程使用的环境变量。
+    """
+    env = os.environ.copy()
+    for key in list(env):
+        if key == "GIT_CONFIG_COUNT" or key.startswith("GIT_CONFIG_KEY_") or key.startswith("GIT_CONFIG_VALUE_"):
+            env.pop(key, None)
+    config = [("protocol.file.allow", "always")]
+    if token:
+        config.append(("http.extraheader", f"AUTHORIZATION: bearer {token}"))
+    env["GIT_CONFIG_COUNT"] = str(len(config))
+    for index, (key, value) in enumerate(config):
+        env[f"GIT_CONFIG_KEY_{index}"] = key
+        env[f"GIT_CONFIG_VALUE_{index}"] = value
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    return env
+
+
+def _run_git(args: list[str], *, env: dict[str, str], repo_name: str) -> str:
+    """执行 Git 命令，失败时只抛出不含令牌和远程输出的错误。
+
+    Args:
+        args: 不含 ``git`` 本身的参数。
+        env: 子进程环境。
+        repo_name: 用于错误信息的仓库名。
+
+    Returns:
+        标准输出文本。
+    """
+    try:
+        completed = subprocess.run(
+            ["git", *args],
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=600,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise HistoryError(f"{repo_name}: git history failed") from exc
+    if completed.returncode != 0:
+        raise HistoryError(f"{repo_name}: git history failed ({completed.returncode})")
+    return completed.stdout
+
+
+def _require_remote(url: str, repo_name: str) -> str:
+    """拒绝可能被当成参数或夹带空白的远程地址。
+
+    Args:
+        url: Git 远程地址。
+        repo_name: 仓库名。
+
+    Returns:
+        原样返回的远程地址。
+    """
+    if not url or url.startswith("-") or any(char.isspace() for char in url):
+        raise HistoryError(f"{repo_name}: git history failed")
+    return url
+
+
+def _require_branch(name: str, repo_name: str) -> str:
+    """拒绝会破坏 refspec 的上游分支名。
+
+    Args:
+        name: 上游默认分支名。
+        repo_name: 仓库名。
+
+    Returns:
+        原样返回的分支名。
+    """
+    invalid = set(" \t\n\r:~^:?*[\\")
+    if not name or name.startswith("-") or any(char in invalid for char in name):
+        raise HistoryError(f"{repo_name}: fork 上游信息缺失")
+    return name
+
+
+def _parse_commit_log(output: str) -> list[CommitRecord]:
+    """把 ``git log`` 输出解析为按 SHA 去重的提交。
+
+    Args:
+        output: 使用单位分隔符的日志文本。
+
+    Returns:
+        去重后的提交记录。
+    """
+    records: list[CommitRecord] = []
+    seen: set[str] = set()
+    for line in output.splitlines():
+        if not line.strip():
+            continue
+        sha, separator, remainder = line.partition("\x1f")
+        author_name, separator, remainder = remainder.partition("\x1f")
+        author_email, separator, authored_at = remainder.partition("\x1f")
+        if not separator or not sha or sha in seen:
+            continue
+        seen.add(sha)
+        records.append(
+            CommitRecord(
+                sha=sha,
+                author_name=author_name or "unknown",
+                author_email=author_email,
+                authored_at=parse_iso8601(authored_at),
+            )
+        )
+    return records
+
+
+def collect_commits_with_git(
+    clone_url: str,
+    *,
+    token: str | None = None,
+    upstream_clone_url: str | None = None,
+    upstream_default_branch: str | None = None,
+    repo_name: str,
+    is_fork: bool,
+) -> list[CommitRecord]:
+    """用无 blob 的 Git 历史统计全部分支提交。
+
+    Args:
+        clone_url: 仓库克隆地址。
+        token: 可选 GitHub 令牌，只通过 ``http.extraheader`` 传递。
+        upstream_clone_url: fork 的上游克隆地址。
+        upstream_default_branch: fork 上游的默认分支，不能假定为 ``main``。
+        repo_name: 出错时展示的仓库名。
+        is_fork: 为真时只保留相对上游默认分支不可达的提交。
+
+    Returns:
+        按 SHA 去重的提交。没有分支时返回空列表。
+    """
+    remote = _require_remote(clone_url, repo_name)
+    env = _git_env(token)
+    heads = _run_git(["ls-remote", "--heads", remote], env=env, repo_name=repo_name)
+    if not heads.strip():
+        return []
+    upstream_remote = None
+    upstream_branch = None
+    if is_fork:
+        if not upstream_clone_url or not upstream_default_branch:
+            raise HistoryError(f"{repo_name}: fork 上游信息缺失")
+        upstream_remote = _require_remote(upstream_clone_url, repo_name)
+        upstream_branch = _require_branch(upstream_default_branch, repo_name)
+    with tempfile.TemporaryDirectory(prefix="org-dashboard-") as temporary:
+        bare = str(Path(temporary) / "repo.git")
+        _run_git(["init", "--bare", bare], env=env, repo_name=repo_name)
+        _run_git(["-C", bare, "remote", "add", "origin", remote], env=env, repo_name=repo_name)
+        _run_git(
+            ["-C", bare, "fetch", "--filter=blob:none", "--no-tags", "origin", "+refs/heads/*:refs/heads/*"],
+            env=env,
+            repo_name=repo_name,
+        )
+        log_args = ["-C", bare, "log", "--branches", f"--format={_LOG_FORMAT}"]
+        if upstream_remote and upstream_branch:
+            _run_git(["-C", bare, "remote", "add", "upstream", upstream_remote], env=env, repo_name=repo_name)
+            _run_git(
+                [
+                    "-C",
+                    bare,
+                    "fetch",
+                    "--filter=blob:none",
+                    "--no-tags",
+                    "upstream",
+                    f"+refs/heads/{upstream_branch}:refs/upstream/default",
+                ],
+                env=env,
+                repo_name=repo_name,
+            )
+            log_args.extend(["--not", "refs/upstream/default"])
+        return _parse_commit_log(_run_git(log_args, env=env, repo_name=repo_name))
+
+
+def _load_fork_parent(client: GitHubClient, org: str, repo_name: str) -> dict[str, Any]:
+    """读取 fork 上游仓库，缺少默认分支或克隆地址时失败。
+
+    Args:
+        client: GitHub API 客户端。
+        org: 组织登录名。
+        repo_name: fork 仓库名。
+
+    Returns:
+        含 ``clone_url`` 和 ``default_branch`` 的上游对象。
+    """
+    try:
+        detail = client.get_json(f"/repos/{org}/{repo_name}")
+    except Exception as exc:
+        raise HistoryError(f"{repo_name}: fork 上游信息缺失") from exc
+    parent = detail.get("parent") if isinstance(detail, dict) else None
+    clone_url = str(parent.get("clone_url") or "") if isinstance(parent, dict) else ""
+    default_branch = str(parent.get("default_branch") or "") if isinstance(parent, dict) else ""
+    if not clone_url or not default_branch:
+        raise HistoryError(f"{repo_name}: fork 上游信息缺失")
+    return {"clone_url": clone_url, "default_branch": default_branch}
+
+
+def _dedupe_commits(commits: list[CommitRecord]) -> list[CommitRecord]:
+    """按 SHA 去掉同一仓库内的重复提交。
+
+    Args:
+        commits: 可能含重复 SHA 的提交。
+
+    Returns:
+        保留首次出现顺序的提交列表。
+    """
+    unique: list[CommitRecord] = []
+    seen: set[str] = set()
+    for commit in commits:
+        if not commit.sha or commit.sha in seen:
+            continue
+        seen.add(commit.sha)
+        unique.append(commit)
+    return unique
+
+
+def _author_key(email: str) -> str:
+    """用小写邮箱作为作者主键，空邮箱单独归入未知作者。
+
+    Args:
+        email: Git 作者邮箱。
+
+    Returns:
+        聚合用的作者键。
+    """
+    normalized = email.strip().casefold()
+    return normalized or "unknown"
+
+
+def _noreply_login(email: str) -> str | None:
+    """从 GitHub noreply 邮箱提取登录名。
+
+    Args:
+        email: Git 作者邮箱。
+
+    Returns:
+        登录名；不是 noreply 邮箱时返回 ``None``。
+    """
+    match = _NOREPLY_LOGIN.fullmatch(email.strip())
+    if not match:
+        return None
+    return match.group(1)
+
+
+def _default_commit_source(client: GitHubClient) -> CommitSource:
+    """绑定当前令牌，生成默认的 Git 历史读取器。
+
+    Args:
+        client: 提供令牌的 GitHub 客户端。
+
+    Returns:
+        供仓库循环调用的提交读取函数。
+    """
+
+    def source(repo: Mapping[str, Any], parent: Mapping[str, Any] | None) -> list[CommitRecord]:
+        upstream = parent or {}
+        return collect_commits_with_git(
+            str(repo.get("clone_url") or ""),
+            token=client.token,
+            upstream_clone_url=str(upstream.get("clone_url") or "") or None,
+            upstream_default_branch=str(upstream.get("default_branch") or "") or None,
+            repo_name=str(repo.get("name") or ""),
+            is_fork=bool(repo.get("fork")),
+        )
+
+    return source
+
+
 def collect_org_analytics(
     org: str,
     client: GitHubClient,
     *,
-    max_commit_pages: int,
     repo_visibility: str,
     hide_private_repo_names: bool,
     include_forks: bool,
     repo_allowlist: set[str],
+    commit_source: CommitSource | None = None,
 ) -> dict[str, Any]:
+    """汇总组织仓库的全分支提交、作者和公开看板数据。
+
+    Args:
+        org: 组织登录名。
+        client: GitHub API 客户端。
+        repo_visibility: ``public``、``private`` 或 ``all``。
+        hide_private_repo_names: 为真时脱敏私有仓库名称、描述和分支。
+        include_forks: 为真时纳入 fork，并只统计相对上游默认分支的增量提交。
+        repo_allowlist: 仓库名集合；空集合表示不过滤。
+        commit_source: 可选提交读取器，缺省时用 Git 抓取全部分支。
+
+    Returns:
+        供 SVG 渲染的统计结果。
+    """
     now = datetime.now(UTC)
     since_30 = now - timedelta(days=30)
     since_84 = now - timedelta(days=84)
     week_anchor = (since_84 - timedelta(days=since_84.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
     week_buckets = [week_anchor + timedelta(days=7 * index) for index in range(12)]
     weekly_totals = Counter({bucket: 0 for bucket in week_buckets})
+    source = commit_source or _default_commit_source(client)
 
     org_payload = client.get_json(f"/orgs/{org}")
     repos_payload = client.paginate(
         f"/orgs/{org}/repos?per_page=100&type={repo_visibility}&sort=updated",
-        max_pages=4,
+        max_pages=None,
+        strict=True,
     )
     normalized_org = org.casefold()
     repo_allowlist_normalized = {name.casefold() for name in repo_allowlist}
@@ -261,34 +586,48 @@ def collect_org_analytics(
     pr_items: list[dict[str, Any]] = []
     release_items: list[dict[str, Any]] = []
     roadmap_items: list[dict[str, Any]] = []
-    visible_member_logins = [
-        member["login"]
-        for member in client.paginate(f"/orgs/{org}/members?per_page=100", max_pages=2)
-        if member.get("login")
-    ]
+    private_labels: dict[str, str] = {}
+    if hide_private_repo_names:
+        private_names = sorted(str(repo.get("name") or "") for repo in repos_payload if repo.get("private"))
+        private_labels = {name: f"Private {index:02d}" for index, name in enumerate(private_names, start=1)}
 
-    private_index = 0
     for repo in repos_payload:
         repo_name = repo["name"]
         is_private = bool(repo.get("private", False))
-        if is_private:
-            private_index += 1
-        private_mask = is_private
-        display_name = repo_name
-        display_description = "Private repository" if private_mask else (repo.get("description") or "No description available.")
-        display_default_branch = "hidden" if private_mask else repo.get("default_branch", "main")
-
-        contributors = client.paginate(f"/repos/{org}/{repo_name}/contributors?per_page=100", max_pages=4)
-        repo_commit_total = 0
-        for contributor in contributors:
-            login = contributor.get("login") or contributor.get("name")
-            if not login:
-                continue
-            entry = contributor_totals.setdefault(login, {"login": login, "commits": 0, "repos": set()})
-            commits = int(contributor.get("contributions", 0))
-            entry["commits"] += commits
+        private_mask = is_private and hide_private_repo_names
+        if private_mask:
+            display_name = private_labels[repo_name]
+            display_description = "Private repository"
+            display_default_branch = "hidden"
+        else:
+            display_name = repo_name
+            display_description = repo.get("description") or "No description available."
+            display_default_branch = repo.get("default_branch", "main")
+        parent = _load_fork_parent(client, org, repo_name) if repo.get("fork") else None
+        commits = _dedupe_commits(source(repo, parent))
+        repo_commit_total = len(commits)
+        repo_recent_30 = 0
+        for commit in commits:
+            author_email = commit.author_email or ""
+            entry = contributor_totals.setdefault(
+                _author_key(author_email),
+                {"login": "", "commits": 0, "repos": set(), "names": Counter(), "noreply_login": None},
+            )
+            entry["commits"] += 1
             entry["repos"].add(display_name)
-            repo_commit_total += commits
+            noreply_login = _noreply_login(author_email)
+            if noreply_login:
+                entry["noreply_login"] = noreply_login
+            else:
+                entry["names"][commit.author_name or "unknown"] += 1
+            authored_at = commit.authored_at
+            if authored_at is None:
+                continue
+            if authored_at >= since_30:
+                repo_recent_30 += 1
+            bucket = (authored_at - timedelta(days=authored_at.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+            if bucket in weekly_totals:
+                weekly_totals[bucket] += 1
 
         languages = client.get_json_safe(f"/repos/{org}/{repo_name}/languages", {})
         if not isinstance(languages, dict):
@@ -297,23 +636,6 @@ def collect_org_analytics(
         for language, size in languages.items():
             language_totals[language] += int(size)
         dominant_language = max(languages.items(), key=lambda item: item[1])[0] if languages else "n/a"
-
-        commits = client.paginate(
-            f"/repos/{org}/{repo_name}/commits?per_page=100&since={since_84.replace(microsecond=0).isoformat().replace('+00:00', 'Z')}",
-            max_pages=max_commit_pages,
-        )
-        repo_recent_30 = 0
-        for commit in commits:
-            commit_meta = commit.get("commit", {})
-            author_block = commit_meta.get("author") or commit_meta.get("committer") or {}
-            committed_at = parse_iso8601(author_block.get("date"))
-            if not committed_at:
-                continue
-            if committed_at >= since_30:
-                repo_recent_30 += 1
-            bucket = (committed_at - timedelta(days=committed_at.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
-            if bucket in weekly_totals:
-                weekly_totals[bucket] += 1
 
         issues = client.paginate(f"/repos/{org}/{repo_name}/issues?state=all&per_page=10&sort=updated&direction=desc", max_pages=1)
         for issue in issues:
@@ -398,6 +720,15 @@ def collect_org_analytics(
 
     for entry in contributor_totals.values():
         entry["repo_count"] = len(entry["repos"])
+        if entry.get("noreply_login"):
+            entry["login"] = entry["noreply_login"]
+        elif entry["names"]:
+            entry["login"] = entry["names"].most_common(1)[0][0]
+        else:
+            entry["login"] = "unknown"
+        entry.pop("repos", None)
+        entry.pop("names", None)
+        entry.pop("noreply_login", None)
 
     contributors_sorted = sorted(contributor_totals.values(), key=lambda item: (-item["commits"], item["login"].lower()))
     repo_stats.sort(key=lambda item: (-item.total_commits, -item.recent_commits_30d, item.display_name.lower()))
@@ -451,7 +782,6 @@ def collect_org_analytics(
         "weekly_totals": [{"week": bucket, "count": weekly_totals[bucket]} for bucket in week_buckets],
         "generated_at": datetime.now(UTC),
         "source_facts": {
-            "member_mode": "visible-members" if visible_member_logins else "public-contributors",
             "api_date": parsedate_to_datetime(last_updated_header).astimezone(UTC) if last_updated_header else None,
             "rate_reset": rate_reset,
             "repo_visibility": repo_visibility,
@@ -494,8 +824,6 @@ def render_dashboard(data: dict[str, Any]) -> str:
     roadmap_open = sum(1 for item in roadmap if item["state"] == "open")
     visibility_mode = data["source_facts"]["repo_visibility"]
     include_forks = data["source_facts"]["include_forks"]
-    skipped_repos = data["source_facts"]["skipped_repos"]
-    skipped_count = sum(skipped_repos.values())
 
     parts.append(
         f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
@@ -730,14 +1058,15 @@ def render_dashboard(data: dict[str, Any]) -> str:
             parts.append(svg_text(1060, item_y + 20, "ROADMAP SLOT", cls="stream-state"))
             parts.append(svg_text(1060, item_y + 42, "Awaiting milestone configuration", cls="stream-copy"))
 
-    member_mode = data["source_facts"]["member_mode"]
-    member_label = "visible org members" if member_mode == "visible-members" else "public contributors"
-    scope_note = f"Scope={visibility_mode}; owner={data['source_facts']['owner']}; forks={'included' if include_forks else 'excluded'}"
-    if skipped_count:
-        scope_note += f"; skipped {skipped_count} non-tracked repos"
+    fork_label = "incremental" if include_forks else "excluded"
+    scope_note = (
+        f"Scope={visibility_mode}; owner={data['source_facts']['owner']}; "
+        f"branches=all; forks={fork_label}; deduped by SHA; git authors"
+    )
     parts.append(svg_rect(52, 1640, 1336, 62, cls="panel-bright", rx=20))
-    parts.append(svg_text(74, 1678, f"Telemetry source: GitHub REST API. {scope_note}. People panels reflect {member_label}.", cls="footer"))
-    parts.append(svg_text(1362, 1678, f"private names masked · refreshed {generated_at.strftime('%Y-%m-%d %H:%M UTC')}", cls="footer", anchor="end"))
+    parts.append(svg_text(74, 1678, f"Telemetry source: git history. {scope_note}.", cls="footer"))
+    privacy_note = "private names masked · " if data["source_facts"]["hide_private_repo_names"] else ""
+    parts.append(svg_text(1362, 1678, f"{privacy_note}refreshed {generated_at.strftime('%Y-%m-%d %H:%M UTC')}", cls="footer", anchor="end"))
     parts.append("</svg>")
     return "\n".join(parts)
 
@@ -756,24 +1085,21 @@ def env_flag(name: str, default: bool) -> bool:
 
 
 def resolve_repo_allowlist() -> set[str]:
-    """根据环境变量或 catalog 解析看板展示的仓库 allowlist。
+    """根据环境变量解析看板仓库 allowlist。
 
     Returns:
-        仓库名称集合；空集合表示展示组织全部仓库。
+        仓库名称集合；未设置、空值、``all`` 或 ``*`` 都表示不过滤。
     """
-    allowlist = parse_repo_allowlist(os.getenv("REPO_ALLOWLIST"))
-    if allowlist:
-        return allowlist
-    if os.getenv("REPO_ALLOWLIST", "").strip().lower() in {"all", "*"}:
+    raw = os.getenv("REPO_ALLOWLIST")
+    if raw is None or not raw.strip() or raw.strip().lower() in {"all", "*"}:
         return set()
-    return catalog_repository_allowlist()
+    return parse_repo_allowlist(raw)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a GitHub organization analytics SVG dashboard.")
     parser.add_argument("--org", default=os.getenv("GITHUB_REPOSITORY_OWNER") or "SynlysAI")
     parser.add_argument("--output", default="github-analytics.svg")
-    parser.add_argument("--max-commit-pages", type=int, default=3)
     args = parser.parse_args()
 
     token = os.getenv("METRICS_TOKEN") or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
@@ -788,7 +1114,6 @@ def main() -> None:
     data = collect_org_analytics(
         args.org,
         client,
-        max_commit_pages=args.max_commit_pages,
         repo_visibility=repo_visibility,
         hide_private_repo_names=hide_private_repo_names,
         include_forks=include_forks,
