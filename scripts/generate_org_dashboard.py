@@ -249,6 +249,12 @@ class HistoryError(RuntimeError):
 
 
 _NOREPLY_LOGIN = re.compile(r"^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$", re.IGNORECASE)
+_CONTRIBUTOR_ALIASES = {
+    "fyk": "FangYikaii",
+    "fangyikaii": "FangYikaii",
+    "fangyikai": "FangYikaii",
+    "yikai fang": "FangYikaii",
+}
 _LOG_FORMAT = "%H%x1f%an%x1f%ae%x1f%aI"
 CommitSource = Callable[[Mapping[str, Any], Mapping[str, Any] | None], list[CommitRecord]]
 
@@ -559,6 +565,18 @@ def _dedupe_commits(commits: list[CommitRecord]) -> list[CommitRecord]:
     return unique
 
 
+def _canonical_contributor_login(login: str) -> str:
+    """把同一人的已知作者名归并成一个贡献者。
+
+    Args:
+        login: noreply 登录名，或该邮箱下最常见的作者名。
+
+    Returns:
+        归并后的展示名。没有别名时原样返回。
+    """
+    return _CONTRIBUTOR_ALIASES.get(login.strip().casefold(), login)
+
+
 def _author_key(email: str) -> str:
     """用小写邮箱作为作者主键，空邮箱单独归入未知作者。
 
@@ -807,19 +825,26 @@ def collect_org_analytics(
             )
         )
 
+    merged_contributors: dict[str, dict[str, Any]] = {}
     for entry in contributor_totals.values():
-        entry["repo_count"] = len(entry["repos"])
         if entry.get("noreply_login"):
-            entry["login"] = entry["noreply_login"]
+            login = str(entry["noreply_login"])
         elif entry["names"]:
-            entry["login"] = entry["names"].most_common(1)[0][0]
+            login = str(entry["names"].most_common(1)[0][0])
         else:
-            entry["login"] = "unknown"
+            login = "unknown"
+        canonical = _canonical_contributor_login(login)
+        bucket = merged_contributors.setdefault(
+            canonical.casefold(),
+            {"login": canonical, "commits": 0, "repos": set()},
+        )
+        bucket["commits"] += entry["commits"]
+        bucket["repos"].update(entry["repos"])
+    for entry in merged_contributors.values():
+        entry["repo_count"] = len(entry["repos"])
         entry.pop("repos", None)
-        entry.pop("names", None)
-        entry.pop("noreply_login", None)
 
-    contributors_sorted = sorted(contributor_totals.values(), key=lambda item: (-item["commits"], item["login"].lower()))
+    contributors_sorted = sorted(merged_contributors.values(), key=lambda item: (-item["commits"], item["login"].lower()))
     repo_stats.sort(key=lambda item: (-item.total_commits, -item.recent_commits_30d, item.display_name.lower()))
     issue_items.sort(key=lambda item: item["updated_at"] or datetime.min.replace(tzinfo=UTC), reverse=True)
     pr_items.sort(key=lambda item: item["updated_at"] or datetime.min.replace(tzinfo=UTC), reverse=True)
@@ -851,7 +876,7 @@ def collect_org_analytics(
             "repo_count": len(repo_stats),
             "public_repo_count": sum(1 for repo in repo_stats if not repo.is_private),
             "private_repo_count": sum(1 for repo in repo_stats if repo.is_private),
-            "contributor_count": len(contributor_totals),
+            "contributor_count": len(merged_contributors),
             "total_commits": sum(repo.total_commits for repo in repo_stats),
             "recent_commits_30d": sum(repo.recent_commits_30d for repo in repo_stats),
             "active_repos": sum(1 for repo in repo_stats if repo.recent_commits_30d > 0),

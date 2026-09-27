@@ -209,6 +209,54 @@ def test_dashboard_optional_allowlist_filters_and_masks_private():
     assert "non-tracked" not in svg
 
 
+def test_fyk_and_fangyikaii_merge_into_one_contributor():
+    """fyk 与 FangYikaii 的不同邮箱提交合并为同一个贡献者。"""
+
+    def commits(repo, parent):
+        """按仓库返回需要归并的作者提交。"""
+        del parent
+        now = datetime.now(UTC)
+        if repo["name"] == "AI4MS":
+            return [
+                dashboard.CommitRecord(sha="a" * 40, author_name="fyk", author_email="fyk@example.com", authored_at=now),
+                dashboard.CommitRecord(sha="b" * 40, author_name="Yikai Fang", author_email="fyk@example.com", authored_at=now),
+            ]
+        if repo["name"] == "ArchivedProject":
+            return [
+                dashboard.CommitRecord(
+                    sha="c" * 40,
+                    author_name="Yikai Fang",
+                    author_email="342363948+FangYikaii@users.noreply.github.com",
+                    authored_at=now,
+                )
+            ]
+        if repo["name"] == "ForkedProject":
+            return [
+                dashboard.CommitRecord(sha="d" * 40, author_name="Other", author_email="other@example.com", authored_at=now)
+            ]
+        return []
+
+    data = dashboard.collect_org_analytics(
+        "SynlysAI",
+        FakeClient(_fake_repo_payload()),
+        repo_visibility="all",
+        hide_private_repo_names=True,
+        include_forks=True,
+        repo_allowlist=set(),
+        commit_source=commits,
+    )
+    contributors = {item["login"]: item for item in data["contributors"]}
+
+    assert "fyk" not in contributors
+    assert contributors["FangYikaii"]["commits"] == 3
+    assert contributors["FangYikaii"]["repo_count"] == 2
+    assert contributors["Other"]["commits"] == 1
+    assert data["summary"]["contributor_count"] == 2
+    svg = dashboard.render_dashboard(data)
+    assert ">fyk<" not in svg
+    assert "FangYikaii" in svg
+
+
 def test_backfill_cli_emits_json_log_without_private_error_text(tmp_path, monkeypatch, capsys):
     """回填命令失败时也只能输出结构化字段和错误类型。"""
     state = tmp_path / "backfill.json"
