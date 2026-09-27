@@ -253,7 +253,7 @@ CommitSource = Callable[[Mapping[str, Any], Mapping[str, Any] | None], list[Comm
 
 
 def _git_env(token: str | None) -> dict[str, str]:
-    """构造不把令牌写入命令行的 Git 环境。
+    """构造不继承 Actions 全局认证、且不把令牌写入命令行的 Git 环境。
 
     Args:
         token: GitHub 令牌；为空时不设置认证头。
@@ -263,26 +263,53 @@ def _git_env(token: str | None) -> dict[str, str]:
     """
     env = os.environ.copy()
     for key in list(env):
-        if key == "GIT_CONFIG_COUNT" or key.startswith("GIT_CONFIG_KEY_") or key.startswith("GIT_CONFIG_VALUE_"):
+        if key in {"GIT_CONFIG_COUNT", "GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM"} or key.startswith("GIT_CONFIG_KEY_") or key.startswith("GIT_CONFIG_VALUE_"):
             env.pop(key, None)
-    config = [("protocol.file.allow", "always")]
+    env["GIT_CONFIG_NOSYSTEM"] = "1"
+    env["GIT_CONFIG_GLOBAL"] = os.devnull
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    env["GCM_INTERACTIVE"] = "never"
+    config = [
+        ("protocol.file.allow", "always"),
+        ("http.version", "HTTP/1.1"),
+        ("safe.directory", "*"),
+    ]
     if token:
         config.append(("http.extraheader", f"AUTHORIZATION: bearer {token}"))
     env["GIT_CONFIG_COUNT"] = str(len(config))
     for index, (key, value) in enumerate(config):
         env[f"GIT_CONFIG_KEY_{index}"] = key
         env[f"GIT_CONFIG_VALUE_{index}"] = value
-    env["GIT_TERMINAL_PROMPT"] = "0"
     return env
 
 
-def _run_git(args: list[str], *, env: dict[str, str], repo_name: str) -> str:
-    """执行 Git 命令，失败时只抛出不含令牌和远程输出的错误。
+def _redact_git_error(text: str, token: str | None) -> str:
+    """去掉 Git 错误中的令牌，只保留简短原因。
+
+    Args:
+        text: Git 标准错误或标准输出。
+        token: 需要抹掉的令牌。
+
+    Returns:
+        最多四行、且不含令牌的错误摘要。
+    """
+    redacted = text or ""
+    if token:
+        redacted = redacted.replace(token, "***")
+    redacted = re.sub(r"(?i)(authorization:\s*(?:basic|bearer)\s+)\S+", r"\1***", redacted)
+    redacted = re.sub(r"(?i)\b((?:gh[pousr]|github_pat)_[A-Za-z0-9_]+)", "***", redacted)
+    lines = [line.strip() for line in redacted.splitlines() if line.strip() and not line.strip().startswith("提示：")]
+    return " | ".join(lines[-4:])[:300]
+
+
+def _run_git(args: list[str], *, env: dict[str, str], repo_name: str, token: str | None = None) -> str:
+    """执行 Git 命令，失败时抛出已脱敏的错误。
 
     Args:
         args: 不含 ``git`` 本身的参数。
         env: 子进程环境。
         repo_name: 用于错误信息的仓库名。
+        token: 需要从错误摘要中移除的令牌。
 
     Returns:
         标准输出文本。
@@ -299,7 +326,11 @@ def _run_git(args: list[str], *, env: dict[str, str], repo_name: str) -> str:
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise HistoryError(f"{repo_name}: git history failed") from exc
     if completed.returncode != 0:
-        raise HistoryError(f"{repo_name}: git history failed ({completed.returncode})")
+        reason = _redact_git_error(completed.stderr or completed.stdout, token)
+        message = f"{repo_name}: git history failed ({completed.returncode})"
+        if reason:
+            message = f"{message}: {reason}"
+        raise HistoryError(message)
     return completed.stdout
 
 
@@ -365,6 +396,33 @@ def _parse_commit_log(output: str) -> list[CommitRecord]:
     return records
 
 
+def _fetch_ref(bare: str, remote_name: str, refspec: str, *, env: dict[str, str], repo_name: str, token: str | None) -> None:
+    """抓取指定 refspec；无 blob 抓取失败时退回完整历史。
+
+    Args:
+        bare: 裸仓库路径。
+        remote_name: 已添加的远程名。
+        refspec: Git refspec。
+        env: Git 环境。
+        repo_name: 出错时展示的仓库名。
+        token: 需要从错误摘要中移除的令牌。
+    """
+    try:
+        _run_git(
+            ["-C", bare, "fetch", "--filter=blob:none", "--no-tags", remote_name, refspec],
+            env=env,
+            repo_name=repo_name,
+            token=token,
+        )
+    except HistoryError:
+        _run_git(
+            ["-C", bare, "fetch", "--no-tags", remote_name, refspec],
+            env=env,
+            repo_name=repo_name,
+            token=token,
+        )
+
+
 def collect_commits_with_git(
     clone_url: str,
     *,
@@ -389,7 +447,7 @@ def collect_commits_with_git(
     """
     remote = _require_remote(clone_url, repo_name)
     env = _git_env(token)
-    heads = _run_git(["ls-remote", "--heads", remote], env=env, repo_name=repo_name)
+    heads = _run_git(["ls-remote", "--heads", remote], env=env, repo_name=repo_name, token=token)
     if not heads.strip():
         return []
     upstream_remote = None
@@ -401,31 +459,22 @@ def collect_commits_with_git(
         upstream_branch = _require_branch(upstream_default_branch, repo_name)
     with tempfile.TemporaryDirectory(prefix="org-dashboard-") as temporary:
         bare = str(Path(temporary) / "repo.git")
-        _run_git(["init", "--bare", bare], env=env, repo_name=repo_name)
-        _run_git(["-C", bare, "remote", "add", "origin", remote], env=env, repo_name=repo_name)
-        _run_git(
-            ["-C", bare, "fetch", "--filter=blob:none", "--no-tags", "origin", "+refs/heads/*:refs/heads/*"],
-            env=env,
-            repo_name=repo_name,
-        )
+        _run_git(["init", "--bare", bare], env=env, repo_name=repo_name, token=token)
+        _run_git(["-C", bare, "remote", "add", "origin", remote], env=env, repo_name=repo_name, token=token)
+        _fetch_ref(bare, "origin", "+refs/heads/*:refs/heads/*", env=env, repo_name=repo_name, token=token)
         log_args = ["-C", bare, "log", "--branches", f"--format={_LOG_FORMAT}"]
         if upstream_remote and upstream_branch:
-            _run_git(["-C", bare, "remote", "add", "upstream", upstream_remote], env=env, repo_name=repo_name)
-            _run_git(
-                [
-                    "-C",
-                    bare,
-                    "fetch",
-                    "--filter=blob:none",
-                    "--no-tags",
-                    "upstream",
-                    f"+refs/heads/{upstream_branch}:refs/upstream/default",
-                ],
+            _run_git(["-C", bare, "remote", "add", "upstream", upstream_remote], env=env, repo_name=repo_name, token=token)
+            _fetch_ref(
+                bare,
+                "upstream",
+                f"+refs/heads/{upstream_branch}:refs/upstream/default",
                 env=env,
                 repo_name=repo_name,
+                token=token,
             )
             log_args.extend(["--not", "refs/upstream/default"])
-        return _parse_commit_log(_run_git(log_args, env=env, repo_name=repo_name))
+        return _parse_commit_log(_run_git(log_args, env=env, repo_name=repo_name, token=token))
 
 
 def _load_fork_parent(client: GitHubClient, org: str, repo_name: str) -> dict[str, Any]:

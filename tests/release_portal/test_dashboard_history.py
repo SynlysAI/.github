@@ -154,3 +154,26 @@ def test_repository_without_branches_has_no_commits(tmp_path: Path):
     repo = tmp_path / "empty"
     _init_repo(repo)
     assert dashboard.collect_commits_with_git(str(repo), repo_name="empty", is_fork=False) == []
+
+
+def test_git_env_ignores_actions_global_credentials(monkeypatch):
+    """生成任务不继承 Actions checkout 写入的全局认证头，并固定 HTTP/1.1。"""
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", "/tmp/actions.gitconfig")
+    env = dashboard._git_env("ghp_supersecret_token")
+
+    assert env["GIT_CONFIG_GLOBAL"] == os.devnull
+    assert env["GIT_CONFIG_NOSYSTEM"] == "1"
+    values = [env[key] for key in sorted(env) if key.startswith("GIT_CONFIG_VALUE_")]
+    assert "HTTP/1.1" in values
+    assert "AUTHORIZATION: bearer ghp_supersecret_token" in values
+
+
+def test_git_error_redacts_tokens():
+    """失败摘要不能带回令牌。"""
+    message = dashboard._redact_git_error(
+        "fatal: auth ghp_supersecret_token\nremote: github_pat_abcdefghijklmnopqrstuvwxyz",
+        "ghp_supersecret_token",
+    )
+    assert "ghp_supersecret_token" not in message
+    assert "github_pat_abcdefghijklmnopqrstuvwxyz" not in message
+    assert "fatal: auth ***" in message
