@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import html
 import os
 import re
@@ -252,8 +253,23 @@ _LOG_FORMAT = "%H%x1f%an%x1f%ae%x1f%aI"
 CommitSource = Callable[[Mapping[str, Any], Mapping[str, Any] | None], list[CommitRecord]]
 
 
+def _authorization_header(token: str) -> str:
+    """构造 GitHub Git 协议接受的 Basic 认证头。
+
+    Git 智能协议只接受 Basic。Bearer 会得到 401，Git 随后因无法交互输入用户名而失败。
+
+    Args:
+        token: GitHub 令牌。
+
+    Returns:
+        写入 ``http.extraheader`` 的认证头。原始令牌只出现在 Base64 中。
+    """
+    encoded = base64.b64encode(f"x-access-token:{token}".encode()).decode("ascii")
+    return f"AUTHORIZATION: basic {encoded}"
+
+
 def _git_env(token: str | None) -> dict[str, str]:
-    """构造不继承 Actions 全局认证、且不把令牌写入命令行的 Git 环境。
+    """构造不继承 Actions 认证配置、且不把令牌写入命令行的 Git 环境。
 
     Args:
         token: GitHub 令牌；为空时不设置认证头。
@@ -262,8 +278,16 @@ def _git_env(token: str | None) -> dict[str, str]:
         供 ``git`` 子进程使用的环境变量。
     """
     env = os.environ.copy()
+    inherited = {
+        "GIT_CONFIG_COUNT",
+        "GIT_CONFIG_GLOBAL",
+        "GIT_CONFIG_SYSTEM",
+        "GIT_CONFIG_PARAMETERS",
+        "GIT_DIR",
+        "GIT_WORK_TREE",
+    }
     for key in list(env):
-        if key in {"GIT_CONFIG_COUNT", "GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM"} or key.startswith("GIT_CONFIG_KEY_") or key.startswith("GIT_CONFIG_VALUE_"):
+        if key in inherited or key.startswith("GIT_CONFIG_KEY_") or key.startswith("GIT_CONFIG_VALUE_"):
             env.pop(key, None)
     env["GIT_CONFIG_NOSYSTEM"] = "1"
     env["GIT_CONFIG_GLOBAL"] = os.devnull
@@ -275,12 +299,23 @@ def _git_env(token: str | None) -> dict[str, str]:
         ("safe.directory", "*"),
     ]
     if token:
-        config.append(("http.extraheader", f"AUTHORIZATION: bearer {token}"))
+        config.append(("http.extraheader", _authorization_header(token)))
     env["GIT_CONFIG_COUNT"] = str(len(config))
     for index, (key, value) in enumerate(config):
         env[f"GIT_CONFIG_KEY_{index}"] = key
         env[f"GIT_CONFIG_VALUE_{index}"] = value
     return env
+
+
+def _isolated_git_cwd() -> str:
+    """返回不在任何仓库内的工作目录，避免合并 checkout 的本地认证头。
+
+    Returns:
+        临时目录路径。
+    """
+    path = Path(tempfile.gettempdir()) / "org-dashboard-git"
+    path.mkdir(exist_ok=True)
+    return str(path)
 
 
 def _redact_git_error(text: str, token: str | None) -> str:
@@ -296,6 +331,8 @@ def _redact_git_error(text: str, token: str | None) -> str:
     redacted = text or ""
     if token:
         redacted = redacted.replace(token, "***")
+        encoded = base64.b64encode(f"x-access-token:{token}".encode()).decode("ascii")
+        redacted = redacted.replace(encoded, "***")
     redacted = re.sub(r"(?i)(authorization:\s*(?:basic|bearer)\s+)\S+", r"\1***", redacted)
     redacted = re.sub(r"(?i)\b((?:gh[pousr]|github_pat)_[A-Za-z0-9_]+)", "***", redacted)
     lines = [line.strip() for line in redacted.splitlines() if line.strip() and not line.strip().startswith("提示：")]
@@ -304,6 +341,8 @@ def _redact_git_error(text: str, token: str | None) -> str:
 
 def _run_git(args: list[str], *, env: dict[str, str], repo_name: str, token: str | None = None) -> str:
     """执行 Git 命令，失败时抛出已脱敏的错误。
+
+    工作目录隔离在临时目录中，避免 checkout 写入的本地认证头与本次认证头同时送出。
 
     Args:
         args: 不含 ``git`` 本身的参数。
@@ -318,6 +357,7 @@ def _run_git(args: list[str], *, env: dict[str, str], repo_name: str, token: str
         completed = subprocess.run(
             ["git", *args],
             env=env,
+            cwd=_isolated_git_cwd(),
             capture_output=True,
             text=True,
             timeout=600,

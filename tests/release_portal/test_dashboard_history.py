@@ -1,5 +1,6 @@
 """组织看板的 Git 全分支历史测试。"""
 
+import base64
 import os
 import subprocess
 from pathlib import Path
@@ -156,24 +157,66 @@ def test_repository_without_branches_has_no_commits(tmp_path: Path):
     assert dashboard.collect_commits_with_git(str(repo), repo_name="empty", is_fork=False) == []
 
 
-def test_git_env_ignores_actions_global_credentials(monkeypatch):
-    """生成任务不继承 Actions checkout 写入的全局认证头，并固定 HTTP/1.1。"""
+def test_git_env_uses_basic_header_without_inherited_actions_config(monkeypatch):
+    """Git 协议使用 Basic 认证头，且不继承 Actions 的全局或本地配置。"""
     monkeypatch.setenv("GIT_CONFIG_GLOBAL", "/tmp/actions.gitconfig")
+    monkeypatch.setenv("GIT_DIR", "/tmp/actions-checkout")
     env = dashboard._git_env("ghp_supersecret_token")
 
     assert env["GIT_CONFIG_GLOBAL"] == os.devnull
     assert env["GIT_CONFIG_NOSYSTEM"] == "1"
+    assert "GIT_DIR" not in env
     values = [env[key] for key in sorted(env) if key.startswith("GIT_CONFIG_VALUE_")]
     assert "HTTP/1.1" in values
-    assert "AUTHORIZATION: bearer ghp_supersecret_token" in values
+    assert "AUTHORIZATION: bearer ghp_supersecret_token" not in values
+    assert dashboard._authorization_header("ghp_supersecret_token") in values
+    assert "ghp_supersecret_token" not in "".join(values)
+
+
+def test_authorization_header_is_github_basic_token():
+    """认证头是 x-access-token 的 Basic 值，不明文放置令牌。"""
+    header = dashboard._authorization_header("ghp_supersecret_token")
+    scheme, encoded = header.split(" ", 1)
+    assert scheme == "AUTHORIZATION:"
+    assert header.split(" ", 2)[1] == "basic"
+    assert base64.b64decode(encoded.split(" ", 1)[-1]).decode() == "x-access-token:ghp_supersecret_token"
+    assert "ghp_supersecret_token" not in header
+
+
+def test_git_commands_run_outside_checkout_repository(monkeypatch, tmp_path: Path):
+    """命令不在 checkout 仓库内执行，避免两条 Authorization 头同时送出。"""
+    checkout = tmp_path / "checkout"
+    checkout.mkdir()
+    (checkout / ".git").mkdir()
+    monkeypatch.chdir(checkout)
+    calls = []
+
+    def fake_run(args, **kwargs):
+        calls.append(kwargs)
+
+        class Result:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        return Result()
+
+    monkeypatch.setattr(dashboard.subprocess, "run", fake_run)
+    dashboard._run_git(["--version"], env=dashboard._git_env(None), repo_name="repo")
+
+    cwd = Path(calls[0]["cwd"])
+    assert cwd != checkout
+    assert not (cwd / ".git").exists()
 
 
 def test_git_error_redacts_tokens():
-    """失败摘要不能带回令牌。"""
+    """失败摘要不能带回令牌或其 Basic 编码。"""
+    encoded = base64.b64encode(b"x-access-token:ghp_supersecret_token").decode()
     message = dashboard._redact_git_error(
-        "fatal: auth ghp_supersecret_token\nremote: github_pat_abcdefghijklmnopqrstuvwxyz",
+        f"fatal: auth ghp_supersecret_token\nheader {encoded}\nremote: github_pat_abcdefghijklmnopqrstuvwxyz",
         "ghp_supersecret_token",
     )
     assert "ghp_supersecret_token" not in message
+    assert encoded not in message
     assert "github_pat_abcdefghijklmnopqrstuvwxyz" not in message
     assert "fatal: auth ***" in message
