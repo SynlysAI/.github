@@ -2,6 +2,30 @@
   "releases": [
     {
       "assets": [],
+      "body": "## 变更内容\n\n- 新增紧凑卡片值判断，长文本不再挤占加粗大字号指标卡（v1.0.1）\n- 前端版本号动态读取 GitHub Release，挂载时自动刷新为云端最新版本\n- 请求带超时与容错，失败时保留构建时 Git 标签版本\n- 补充动态版本读取的单元测试\n\n**完整变更**: https://github.com/SynlysAI/Poly_Agent/pull/84",
+      "draft": false,
+      "id": "poly-agent:384394446",
+      "name": "v1.1.0",
+      "prerelease": false,
+      "productId": "poly-agent",
+      "publishedAt": "2026-09-08T01:39:07Z",
+      "releaseUrl": "https://github.com/SynlysAI/Poly_Agent/releases/tag/v1.1.0",
+      "version": "v1.1.0"
+    },
+    {
+      "assets": [],
+      "body": "## 变更内容\n\n- 新增紧凑卡片值判断，长文本不再挤占加粗大字号指标卡\n- 非紧凑字符串字段改为结构化可读卡片展示\n- 补充紧凑卡片值判断的单元测试\n- 前端版本号升至 1.0.1\n\n**完整变更**: https://github.com/SynlysAI/Poly_Agent/pull/83",
+      "draft": false,
+      "id": "poly-agent:384392578",
+      "name": "v1.0.1",
+      "prerelease": false,
+      "productId": "poly-agent",
+      "publishedAt": "2026-09-08T01:32:12Z",
+      "releaseUrl": "https://github.com/SynlysAI/Poly_Agent/releases/tag/v1.0.1",
+      "version": "v1.0.1"
+    },
+    {
+      "assets": [],
       "body": "SpecLabOS 首个正式版本。\n\nSpecLabOS 用于统一管理实验设备、工作流编排与任务运行,并集成模板远程下发与设备数据入库能力。\n\n## 主要功能\n\n- **统一管理**:实验设备、工作流、工作流运行任务的统一管理与查看\n- **SmartAccess 模板中心**:接收 SmartAccess 桌面端发布的工作流模板,一键发起远程运行任务,任务自动投递到指定执行端电脑并回传运行状态\n- **SmartDataHub 数据入库**:接收设备端 Collector 上报的文件,自动写入对象存储与数据库,支持资产列表与文件明细查询\n",
       "draft": false,
       "id": "speclabos:373435281",
@@ -59,27 +83,6 @@
       "publishedAt": "2026-08-13T08:44:55Z",
       "releaseUrl": "https://github.com/SynlysAI/RAGPortal/releases/tag/v0.0.1",
       "version": "v0.0.1"
-    },
-    {
-      "assets": [
-        {
-          "architecture": "unknown",
-          "downloadPath": "assets/smartaccess/v1.0.0/SmartAccess-v0817.zip",
-          "name": "SmartAccess-v0817.zip",
-          "platform": "unknown",
-          "sha256": "64a83a76d581cbbf90c6435afb1c9cd88dc067b03bc3625a797ae2b2b4a625f4",
-          "size": 336090468
-        }
-      ],
-      "body": "SmartAccess 首个正式版本。\n\nSmartAccess 是面向科学仪器上位机软件的非侵入式实验接入与执行助手,通过 AI Agent + UI 自动化 + OCR 观测 + 平台适配的组合,把分散、手工、异构的实验操作流程沉淀为可执行、可回放、可审计的标准工作流。\n\n## 主要功能\n\n- **非侵入式接入**:不改动现有上位机软件与实验流程,不依赖仪器 SDK 或私有 API\n- **AI 辅助工作流配置**:单 prompt 对话生成标准工作流,结合已保存锚点与运行时知识库\n- **锚点与 UI 自动化执行**:以锚点定位界面可操作区域,通过真实 UI 模拟完成点击、输入、快捷键等操作原语\n- **OCR 观测闭环**:截图、裁剪、OCR 读取与文本匹配,自动判断每一步执行结果\n- **模板发布与远程运行**:工作流模板发布至 SpecLabOS 模板中心,接收远程运行任务并回传运行状态\n- **运行可追溯**:步骤级运行轨迹记录与结果统一回传平台,支持回放与审计\n",
-      "draft": false,
-      "id": "smartaccess:362125923",
-      "name": "v1.0.0",
-      "prerelease": false,
-      "productId": "smartaccess",
-      "publishedAt": "2026-07-30T00:55:08Z",
-      "releaseUrl": "https://github.com/SynlysAI/SmartAccess/releases/tag/v1.0.0",
-      "version": "v1.0.0"
     }
   ],
   "schemaVersion": 1
