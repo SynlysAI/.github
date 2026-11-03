@@ -103,8 +103,8 @@
 <text x="796" y="127" text-anchor="start" class="command-note">13 public tracked</text>
 <rect x="1066" y="70" width="258" height="62" rx="18" class="panel-soft" />
 <text x="1082" y="90" text-anchor="start" class="command-label">signal</text>
-<text x="1082" y="112" text-anchor="start" class="command-value">0 / 30d</text>
-<text x="1082" y="127" text-anchor="start" class="command-note">0 commits in rolling 12 weeks</text>
+<text x="1082" y="112" text-anchor="start" class="command-value">538 / 30d</text>
+<text x="1082" y="127" text-anchor="start" class="command-note">1.6k commits in rolling 12 weeks</text>
 <rect x="780" y="148" width="258" height="62" rx="18" class="panel-soft" />
 <text x="796" y="168" text-anchor="start" class="command-label">surface</text>
 <text x="796" y="190" text-anchor="start" class="command-value">69.2 MB</text>
@@ -115,10 +115,10 @@
 <text x="1082" y="205" text-anchor="start" class="command-note">0 forks · 0 watchers</text>
 <rect x="52" y="284" width="206" height="70" rx="18" class="panel" />
 <text x="68" y="308" text-anchor="start" class="metric-label">COMMIT MASS</text>
-<text x="68" y="338" text-anchor="start" class="metric-value">0</text>
+<text x="68" y="338" text-anchor="start" class="metric-value">3.0k</text>
 <rect x="275" y="284" width="206" height="70" rx="18" class="panel" />
 <text x="291" y="308" text-anchor="start" class="metric-label">ACTIVE REPOS</text>
-<text x="291" y="338" text-anchor="start" class="metric-value">0</text>
+<text x="291" y="338" text-anchor="start" class="metric-value">9</text>
 <rect x="498" y="284" width="206" height="70" rx="18" class="panel" />
 <text x="514" y="308" text-anchor="start" class="metric-label">OPEN ISSUES</text>
 <text x="514" y="338" text-anchor="start" class="metric-value">0</text>
@@ -134,32 +134,74 @@
 <rect x="52" y="376" width="430" height="448" rx="28" class="panel" />
 <text x="80" y="416" text-anchor="start" class="panel-title">Contributor Radar</text>
 <text x="80" y="440" text-anchor="start" class="panel-subtitle">Cross-repository contributor aggregation.</text>
-<text x="80" y="488" text-anchor="start" class="table-meta">Awaiting contributor activity.</text>
+<text x="80" y="468" text-anchor="start" class="rank">#01</text>
+<text x="130" y="468" text-anchor="start" class="table-name">xx5921</text>
+<text x="130" y="488" text-anchor="start" class="table-meta">15 repos wired in</text>
+<rect x="254" y="457" width="160.0" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<text x="454" y="468" text-anchor="end" class="table-value">1.3k</text>
+<text x="454" y="488" text-anchor="end" class="table-meta">commits</text>
+<line x1="80" y1="500" x2="454" y2="500" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
+<text x="80" y="526" text-anchor="start" class="rank">#02</text>
+<text x="130" y="526" text-anchor="start" class="table-name">FangYikaii</text>
+<text x="130" y="546" text-anchor="start" class="table-meta">18 repos wired in</text>
+<rect x="254" y="515" width="151.3" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<text x="454" y="526" text-anchor="end" class="table-value">1.2k</text>
+<text x="454" y="546" text-anchor="end" class="table-meta">commits</text>
+<line x1="80" y1="558" x2="454" y2="558" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
+<text x="80" y="584" text-anchor="start" class="rank">#03</text>
+<text x="130" y="584" text-anchor="start" class="table-name">yzfswt</text>
+<text x="130" y="604" text-anchor="start" class="table-meta">5 repos wired in</text>
+<rect x="254" y="573" width="31.8" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<text x="454" y="584" text-anchor="end" class="table-value">255</text>
+<text x="454" y="604" text-anchor="end" class="table-meta">commits</text>
+<line x1="80" y1="616" x2="454" y2="616" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
+<text x="80" y="642" text-anchor="start" class="rank">#04</text>
+<text x="130" y="642" text-anchor="start" class="table-name">Crucifixion-Fxl</text>
+<text x="130" y="662" text-anchor="start" class="table-meta">2 repos wired in</text>
+<rect x="254" y="631" width="15.5" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<text x="454" y="642" text-anchor="end" class="table-value">124</text>
+<text x="454" y="662" text-anchor="end" class="table-meta">commits</text>
+<line x1="80" y1="674" x2="454" y2="674" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
+<text x="80" y="700" text-anchor="start" class="rank">#05</text>
+<text x="130" y="700" text-anchor="start" class="table-name">v587wxy</text>
+<text x="130" y="720" text-anchor="start" class="table-meta">5 repos wired in</text>
+<rect x="254" y="689" width="6.7" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<text x="454" y="700" text-anchor="end" class="table-value">54</text>
+<text x="454" y="720" text-anchor="end" class="table-meta">commits</text>
+<line x1="80" y1="732" x2="454" y2="732" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
+<text x="80" y="758" text-anchor="start" class="rank">#06</text>
+<text x="130" y="758" text-anchor="start" class="table-name">lyt0615</text>
+<text x="130" y="778" text-anchor="start" class="table-meta">3 repos wired in</text>
+<rect x="254" y="747" width="6.0" height="8" rx="4" fill="url(#signal)" filter="url(#softGlow)" />
+<text x="454" y="758" text-anchor="end" class="table-value">48</text>
+<text x="454" y="778" text-anchor="end" class="table-meta">commits</text>
+<line x1="80" y1="790" x2="454" y2="790" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
 <rect x="502" y="376" width="886" height="448" rx="28" class="panel" />
 <text x="530" y="416" text-anchor="start" class="panel-title">Project Pulse</text>
 <text x="530" y="440" text-anchor="start" class="panel-subtitle">Repository badges, commit pressure, and capability flags.</text>
 <rect x="530" y="458" width="414" height="176" rx="22" class="badge" />
-<text x="548" y="486" text-anchor="start" class="badge-title">.github</text>
+<text x="548" y="486" text-anchor="start" class="badge-title">plane</text>
 <text x="926" y="486" text-anchor="end" class="stream-state">PUBLIC</text>
-<text x="548" y="508" text-anchor="start" class="badge-meta">No description available.</text>
-<text x="548" y="548" text-anchor="start" class="repo-card-mono">Python · 364.1 KB · 0 commits</text>
-<text x="548" y="566" text-anchor="start" class="badge-meta">+0 / 30d · updated today</text>
-<text x="926" y="548" text-anchor="end" class="badge-meta">0★  0 forks</text>
-<text x="926" y="566" text-anchor="end" class="badge-meta">MIT · main</text>
-<rect x="548" y="586" width="81" height="24" rx="12" class="badge-chip" />
-<text x="558" y="603" text-anchor="start" class="badge-chip-text">issues:on</text>
-<rect x="637" y="586" width="95" height="24" rx="12" class="badge-chip" />
-<text x="647" y="603" text-anchor="start" class="badge-chip-text">projects:on</text>
-<rect x="740" y="586" width="74" height="24" rx="12" class="badge-chip" />
-<text x="750" y="603" text-anchor="start" class="badge-chip-text">wiki:on</text>
+<text x="548" y="508" text-anchor="start" class="badge-meta">项目管理与协作操作系统二次开发-&gt;🔥🔥🔥 Open-source Jira, Linear,</text>
+<text x="548" y="524" text-anchor="start" class="badge-meta">Monday, and ClickUp alternative. Plane is a</text>
+<text x="548" y="548" text-anchor="start" class="repo-card-mono">TypeScript · 23.6 MB · 695 commits</text>
+<text x="548" y="566" text-anchor="start" class="badge-meta">+457 / 30d · updated today</text>
+<text x="926" y="548" text-anchor="end" class="badge-meta">2★  0 forks</text>
+<text x="926" y="566" text-anchor="end" class="badge-meta">AGPL-3.0 · main</text>
+<rect x="548" y="586" width="88" height="24" rx="12" class="badge-chip" />
+<text x="558" y="603" text-anchor="start" class="badge-chip-text">issues:off</text>
+<rect x="644" y="586" width="95" height="24" rx="12" class="badge-chip" />
+<text x="654" y="603" text-anchor="start" class="badge-chip-text">projects:on</text>
+<rect x="747" y="586" width="74" height="24" rx="12" class="badge-chip" />
+<text x="757" y="603" text-anchor="start" class="badge-chip-text">wiki:on</text>
 <rect x="962" y="458" width="414" height="176" rx="22" class="badge" />
-<text x="980" y="486" text-anchor="start" class="badge-title">AI4MS</text>
+<text x="980" y="486" text-anchor="start" class="badge-title">Synlora</text>
 <text x="1358" y="486" text-anchor="end" class="stream-state">PUBLIC</text>
-<text x="980" y="508" text-anchor="start" class="badge-meta">AI for Molecular Science · 分子科学智能研发平台统一门户</text>
-<text x="980" y="548" text-anchor="start" class="repo-card-mono">TypeScript · 199.3 KB · 0 commits</text>
-<text x="980" y="566" text-anchor="start" class="badge-meta">+0 / 30d · updated 25 days ago</text>
+<text x="980" y="508" text-anchor="start" class="badge-meta">No description available.</text>
+<text x="980" y="548" text-anchor="start" class="repo-card-mono">Python · 2.2 MB · 496 commits</text>
+<text x="980" y="566" text-anchor="start" class="badge-meta">+47 / 30d · updated today</text>
 <text x="1358" y="548" text-anchor="end" class="badge-meta">0★  0 forks</text>
-<text x="1358" y="566" text-anchor="end" class="badge-meta">MIT · master</text>
+<text x="1358" y="566" text-anchor="end" class="badge-meta">No license · main</text>
 <rect x="980" y="586" width="81" height="24" rx="12" class="badge-chip" />
 <text x="990" y="603" text-anchor="start" class="badge-chip-text">issues:on</text>
 <rect x="1069" y="586" width="95" height="24" rx="12" class="badge-chip" />
@@ -167,27 +209,27 @@
 <rect x="1172" y="586" width="74" height="24" rx="12" class="badge-chip" />
 <text x="1182" y="603" text-anchor="start" class="badge-chip-text">wiki:off</text>
 <rect x="530" y="652" width="414" height="176" rx="22" class="badge" />
-<text x="548" y="680" text-anchor="start" class="badge-title">AutoMetalVisonSoftware</text>
+<text x="548" y="680" text-anchor="start" class="badge-title">Poly_Agent</text>
 <text x="926" y="680" text-anchor="end" class="stream-state">PUBLIC</text>
-<text x="548" y="702" text-anchor="start" class="badge-meta">No description available.</text>
-<text x="548" y="742" text-anchor="start" class="repo-card-mono">C# · 429.7 KB · 0 commits</text>
-<text x="548" y="760" text-anchor="start" class="badge-meta">+0 / 30d · updated 186 days ago</text>
+<text x="548" y="702" text-anchor="start" class="badge-meta">高分子研发平台</text>
+<text x="548" y="742" text-anchor="start" class="repo-card-mono">Python · 7.1 MB · 323 commits</text>
+<text x="548" y="760" text-anchor="start" class="badge-meta">+0 / 30d · updated 42 days ago</text>
 <text x="926" y="742" text-anchor="end" class="badge-meta">0★  0 forks</text>
-<text x="926" y="760" text-anchor="end" class="badge-meta">No license · main</text>
-<rect x="548" y="780" width="88" height="24" rx="12" class="badge-chip" />
-<text x="558" y="797" text-anchor="start" class="badge-chip-text">issues:off</text>
-<rect x="644" y="780" width="95" height="24" rx="12" class="badge-chip" />
-<text x="654" y="797" text-anchor="start" class="badge-chip-text">projects:on</text>
-<rect x="747" y="780" width="74" height="24" rx="12" class="badge-chip" />
-<text x="757" y="797" text-anchor="start" class="badge-chip-text">wiki:on</text>
+<text x="926" y="760" text-anchor="end" class="badge-meta">MIT · main</text>
+<rect x="548" y="780" width="81" height="24" rx="12" class="badge-chip" />
+<text x="558" y="797" text-anchor="start" class="badge-chip-text">issues:on</text>
+<rect x="637" y="780" width="95" height="24" rx="12" class="badge-chip" />
+<text x="647" y="797" text-anchor="start" class="badge-chip-text">projects:on</text>
+<rect x="740" y="780" width="74" height="24" rx="12" class="badge-chip" />
+<text x="750" y="797" text-anchor="start" class="badge-chip-text">wiki:off</text>
 <rect x="962" y="652" width="414" height="176" rx="22" class="badge" />
-<text x="980" y="680" text-anchor="start" class="badge-title">OfficalWebSite</text>
+<text x="980" y="680" text-anchor="start" class="badge-title">SmartAccess</text>
 <text x="1358" y="680" text-anchor="end" class="stream-state">PUBLIC</text>
-<text x="980" y="702" text-anchor="start" class="badge-meta">No description available.</text>
-<text x="980" y="742" text-anchor="start" class="repo-card-mono">JavaScript · 256.9 KB · 0 commits</text>
-<text x="980" y="760" text-anchor="start" class="badge-meta">+0 / 30d · updated 62 days ago</text>
-<text x="1358" y="742" text-anchor="end" class="badge-meta">0★  0 forks</text>
-<text x="1358" y="760" text-anchor="end" class="badge-meta">MIT · master</text>
+<text x="980" y="702" text-anchor="start" class="badge-meta">AI辅助科学仪器设备的非侵入式监控助手</text>
+<text x="980" y="742" text-anchor="start" class="repo-card-mono">Python · 999.4 KB · 259 commits</text>
+<text x="980" y="760" text-anchor="start" class="badge-meta">+0 / 30d · updated 54 days ago</text>
+<text x="1358" y="742" text-anchor="end" class="badge-meta">1★  0 forks</text>
+<text x="1358" y="760" text-anchor="end" class="badge-meta">MIT · main</text>
 <rect x="980" y="780" width="81" height="24" rx="12" class="badge-chip" />
 <text x="990" y="797" text-anchor="start" class="badge-chip-text">issues:on</text>
 <rect x="1069" y="780" width="95" height="24" rx="12" class="badge-chip" />
@@ -225,13 +267,13 @@
 <text x="530" y="888" text-anchor="start" class="panel-title">Activity Trail</text>
 <text x="530" y="912" text-anchor="start" class="panel-subtitle">Rolling 12-week commit signal rendered as a live operations trace.</text>
 <line x1="548" y1="948.0" x2="1352" y2="948.0" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
-<text x="536" y="952.0" text-anchor="end" class="tiny">1</text>
+<text x="536" y="952.0" text-anchor="end" class="tiny">320</text>
 <line x1="548" y1="996.5" x2="1352" y2="996.5" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
-<text x="536" y="1000.5" text-anchor="end" class="tiny">1</text>
+<text x="536" y="1000.5" text-anchor="end" class="tiny">240</text>
 <line x1="548" y1="1045.0" x2="1352" y2="1045.0" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
-<text x="536" y="1049.0" text-anchor="end" class="tiny">0</text>
+<text x="536" y="1049.0" text-anchor="end" class="tiny">160</text>
 <line x1="548" y1="1093.5" x2="1352" y2="1093.5" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
-<text x="536" y="1097.5" text-anchor="end" class="tiny">0</text>
+<text x="536" y="1097.5" text-anchor="end" class="tiny">80</text>
 <line x1="548" y1="1142.0" x2="1352" y2="1142.0" stroke="rgba(148, 163, 184, 0.08)" stroke-width="1" />
 <text x="536" y="1146.0" text-anchor="end" class="tiny">0</text>
 <text x="548.0" y="1170" text-anchor="middle" class="tiny">Aug 10</text>
@@ -246,22 +288,22 @@
 <text x="1205.818181818182" y="1170" text-anchor="middle" class="tiny">Oct 12</text>
 <text x="1278.909090909091" y="1170" text-anchor="middle" class="tiny">Oct 19</text>
 <text x="1352.0" y="1170" text-anchor="middle" class="tiny">Oct 26</text>
-<polygon points="548.0,1142.0 548.0,1142.0 621.1,1142.0 694.2,1142.0 767.3,1142.0 840.4,1142.0 913.5,1142.0 986.5,1142.0 1059.6,1142.0 1132.7,1142.0 1205.8,1142.0 1278.9,1142.0 1352.0,1142.0 1352.0,1142.0" fill="url(#signal)" fill-opacity="0.14" />
-<polyline points="548.0,1142.0 621.1,1142.0 694.2,1142.0 767.3,1142.0 840.4,1142.0 913.5,1142.0 986.5,1142.0 1059.6,1142.0 1132.7,1142.0 1205.8,1142.0 1278.9,1142.0 1352.0,1142.0" fill="none" stroke="url(#signal)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)" />
-<circle cx="548.0" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="621.1" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="694.2" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="767.3" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="840.4" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="913.5" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="986.5" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="1059.6" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="1132.7" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="1205.8" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="1278.9" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<circle cx="1352.0" cy="1142.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
-<text x="1346" y="928" text-anchor="end" class="table-value" font-size="16">0 commits / 12 weeks</text>
-<text x="1346" y="946" text-anchor="end" class="table-meta">peak week 1</text>
+<polygon points="548.0,1142.0 548.0,1025.6 621.1,1083.8 694.2,1109.3 767.3,1130.5 840.4,1020.1 913.5,948.0 986.5,1017.7 1059.6,1121.4 1132.7,1089.3 1205.8,1047.4 1278.9,1072.9 1352.0,1057.7 1352.0,1142.0" fill="url(#signal)" fill-opacity="0.14" />
+<polyline points="548.0,1025.6 621.1,1083.8 694.2,1109.3 767.3,1130.5 840.4,1020.1 913.5,948.0 986.5,1017.7 1059.6,1121.4 1132.7,1089.3 1205.8,1047.4 1278.9,1072.9 1352.0,1057.7" fill="none" stroke="url(#signal)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)" />
+<circle cx="548.0" cy="1025.6" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="621.1" cy="1083.8" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="694.2" cy="1109.3" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="767.3" cy="1130.5" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="840.4" cy="1020.1" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="913.5" cy="948.0" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="986.5" cy="1017.7" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="1059.6" cy="1121.4" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="1132.7" cy="1089.3" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="1205.8" cy="1047.4" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="1278.9" cy="1072.9" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<circle cx="1352.0" cy="1057.7" r="4.5" fill="#02060b" stroke="#67e8f9" stroke-width="2" />
+<text x="1346" y="928" text-anchor="end" class="table-value" font-size="16">1617 commits / 12 weeks</text>
+<text x="1346" y="946" text-anchor="end" class="table-meta">peak week 320</text>
 <rect x="52" y="1244" width="668" height="372" rx="28" class="panel" />
 <text x="80" y="1284" text-anchor="start" class="panel-title">Issue + PR Stream</text>
 <text x="80" y="1308" text-anchor="start" class="panel-subtitle">Latest collaboration events across repository surfaces.</text>
@@ -308,5 +350,5 @@
 <text x="1060" y="1582" text-anchor="start" class="stream-copy">Awaiting milestone configuration</text>
 <rect x="52" y="1640" width="1336" height="62" rx="20" class="panel-bright" />
 <text x="74" y="1678" text-anchor="start" class="footer">Telemetry source: git history. Scope=all; owner=SynlysAI; branches=all; forks=incremental; deduped by SHA; organization members only.</text>
-<text x="1362" y="1678" text-anchor="end" class="footer">private names masked · refreshed 2026-11-03 08:09 UTC</text>
+<text x="1362" y="1678" text-anchor="end" class="footer">private names masked · refreshed 2026-11-03 08:29 UTC</text>
 </svg>
