@@ -27,7 +27,9 @@ python scripts/generate_org_dashboard.py --org SynlysAI --output github-analytic
 2. 同步修改相关 Schema 或 FAQ 后运行 `python -m pytest tests/release_portal/test_config.py tests/release_portal/test_publish.py -q`。
 3. 提交 Pull Request。合并到 `main` 后，发布工作流会再次执行全量测试和 Schema 校验。
 
-组织统计看板独立于 Release Portal 发布链路，不再读取 catalog 的六仓库 allowlist。默认统计组织内全部可见仓库的全部分支；fork 只计入相对上游默认分支新增的提交，同一仓库内按 SHA 去重。提交只有在能确认作者是组织当前成员时才会计入仓库提交数、贡献者和趋势图；GitHub noreply 邮箱优先直接识别，其他邮箱通过提交详情 API 解析 GitHub 登录名，无法确认组织成员身份的提交会被过滤。私有仓库的成员提交、作者和代码量计入总数，但公开 SVG 不显示私有仓库名、描述、分支名或作者邮箱。作者默认按邮箱聚合；`fyk`、`FangYikaii`、`fangyikai` 和 `Yikai Fang` 归并为同一个贡献者 `FangYikaii`。生成任务依赖 `METRICS_TOKEN`，该令牌必须能读取组织全部仓库内容、组织成员和私有仓库提交详情；认证只通过 `http.extraheader` 的 Basic 头传递（GitHub 的 Git 协议不接受 Bearer），不能写入 remote URL 或日志。显式把 `REPO_ALLOWLIST` 设为逗号分隔的仓库名才会收窄范围，`*` 或 `all` 表示不过滤。
+组织统计看板独立于 Release Portal 发布链路，不再读取 catalog 的六仓库 allowlist。默认统计组织内全部可见仓库的全部分支；fork 只计入相对上游默认分支新增的提交，同一仓库内按 SHA 去重。提交只有在能确认作者是组织当前成员时才会计入仓库提交数、贡献者和趋势图。GitHub noreply 邮箱优先直接识别，其他邮箱通过提交详情 API 解析 GitHub 登录名，并按作者邮箱缓存结果；无法关联账号时，仅允许已有明确的成员别名映射。已确认属于外部账号的提交不能通过显示名别名绕过过滤。私有仓库的成员提交、作者和代码量计入总数，但公开 SVG 不显示私有仓库名、描述、分支名或作者邮箱。`fyk`、`FangYikaii`、`fangyikai` 和 `Yikai Fang` 归并为同一个贡献者 `FangYikaii`。
+
+生成任务优先使用 `METRICS_CLASSIC_TOKEN`，其次使用 `METRICS_TOKEN`。令牌必须能读取全部组织仓库（包括私有仓库）和完整组织成员名单；Classic PAT 需要 `repo`、`read:org`，细粒度令牌需要组织 `Members: read` 和仓库 `Contents: read`。组织可能没有公开成员，空成员列表不代表组织没有成员：成员列表为空、作者 API 请求失败或所有提交均被过滤时，生成任务会失败并保留已有统计图，不再写入全零图表。正常生成会输出成员数、仓库数、贡献者数、纳入及过滤提交数，便于检查权限和统计结果。Git 认证只通过 `http.extraheader` 的 Basic 头传递，不能写入 remote URL 或日志。显式把 `REPO_ALLOWLIST` 设为逗号分隔的仓库名才会收窄范围，`*` 或 `all` 表示不过滤。
 
 ## 隐藏、置顶和改写节点
 

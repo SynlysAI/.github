@@ -69,6 +69,7 @@ def test_metrics_workflow_installs_dashboard_dependencies():
     assert 'INCLUDE_FORKS: "true"' in workflow
     assert 'REPO_ALLOWLIST: "*"' in workflow
     assert "timeout-minutes: 45" in workflow
+    assert "GITHUB_TOKEN: ${{ secrets.METRICS_CLASSIC_TOKEN || secrets.METRICS_TOKEN || secrets.GITHUB_TOKEN }}" in workflow
 
 
 def test_sync_workflow_alerts_after_two_failures_and_closes_on_recovery():

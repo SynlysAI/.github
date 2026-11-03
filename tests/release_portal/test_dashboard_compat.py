@@ -57,12 +57,16 @@ class FakeClient:
     """为看板收集提供最小 GitHub API 替身。"""
 
     def __init__(self, repos, members=None, commit_authors=None):
+        """保存测试仓库、组织成员和提交作者映射。"""
         self._repos = repos
-        self._members = members or ["FangYikaii", "Local Dev"]
+        self._members = members if members is not None else ["FangYikaii", "Local Dev"]
         self._commit_authors = commit_authors or {}
 
     def get_json(self, path):
         """返回组织元数据；fork 详情带上上游默认分支。"""
+        if "/commits/" in path:
+            login = self._commit_authors.get(path.rsplit("/", 1)[-1])
+            return {"author": {"login": login} if login else None}
         if str(path).rsplit("/", 1)[-1] == "ForkedProject":
             return {
                 "fork": True,
@@ -312,6 +316,72 @@ def test_non_member_commits_are_filtered_by_github_author_login():
     assert data["summary"]["total_commits"] == 1
     assert [item["login"] for item in data["contributors"]] == ["synlys-member"]
     assert data["source_facts"]["filtered_commit_count"] == 1
+
+
+def test_empty_member_list_stops_before_reading_history():
+    """私有成员不可见时停止生成，避免把有效图表覆盖为零。"""
+    with pytest.raises(dashboard.HistoryError, match="组织成员名单为空"):
+        dashboard.collect_org_analytics(
+            "SynlysAI",
+            FakeClient(_fake_repo_payload(), members=[]),
+            repo_visibility="all",
+            hide_private_repo_names=True,
+            include_forks=True,
+            repo_allowlist=set(),
+            commit_source=lambda *_args: pytest.fail("空成员名单不应读取历史"),
+        )
+
+
+def test_author_request_failure_stops_instead_of_silently_filtering(monkeypatch):
+    """作者接口权限或限流错误不可当作外部成员而被静默吞掉。"""
+    client = FakeClient([])
+
+    def fail_request(_path):
+        """模拟 GitHub 作者详情请求失败。"""
+        raise PermissionError("forbidden")
+
+    monkeypatch.setattr(client, "get_json", fail_request)
+    commit = dashboard.CommitRecord("a" * 40, "Member", "member@example.com", None)
+    with pytest.raises(dashboard.HistoryError, match="无法校验提交作者"):
+        dashboard._is_organization_member_commit(client, "SynlysAI", "AI4MS", commit, {"member"}, {})
+
+
+def test_author_email_resolution_is_cached_and_external_alias_cannot_bypass_filter(monkeypatch):
+    """同一邮箱只解析一次，Git 显示名不能覆盖已确认的外部账号。"""
+    client = FakeClient([])
+    calls = []
+
+    def author_response(path):
+        """返回与组织成员同名但实际属于外部账号的作者。"""
+        calls.append(path)
+        return {"author": {"login": "yuxi"}}
+
+    monkeypatch.setattr(client, "get_json", author_response)
+    cache = {}
+    for sha in ("a" * 40, "b" * 40):
+        commit = dashboard.CommitRecord(sha, "fyk", "external@example.com", None)
+        assert not dashboard._is_organization_member_commit(
+            client, "SynlysAI", "plane", commit, {"fangyikaii"}, cache,
+        )
+    assert len(calls) == 1
+
+
+def test_every_commit_filtered_stops_generation():
+    """成员列表非空但所有作者均未匹配时，中止异常归零更新。"""
+    def external_history(_repo, _parent):
+        """返回外部作者的 noreply 提交。"""
+        return [dashboard.CommitRecord("f" * 40, "Yuxi", "yuxi@users.noreply.github.com", None)]
+
+    with pytest.raises(dashboard.HistoryError, match="全部提交被过滤"):
+        dashboard.collect_org_analytics(
+            "SynlysAI",
+            FakeClient(_fake_repo_payload()[:1]),
+            repo_visibility="all",
+            hide_private_repo_names=True,
+            include_forks=True,
+            repo_allowlist=set(),
+            commit_source=external_history,
+        )
 
 
 def test_backfill_cli_emits_json_log_without_private_error_text(tmp_path, monkeypatch, capsys):

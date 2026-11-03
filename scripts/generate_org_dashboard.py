@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import base64
 import html
+import json
 import os
 import re
 import subprocess
@@ -19,7 +20,7 @@ from typing import Any
 
 
 API_ROOT = "https://api.github.com"
-USER_AGENT = "synlysai-org-dashboard/2.0.1"
+USER_AGENT = "synlysai-org-dashboard/2.0.2"
 CATALOG_PATH = Path(__file__).resolve().parents[1] / "release-portal" / "catalog.yml"
 
 
@@ -623,7 +624,12 @@ def _load_organization_member_logins(client: GitHubClient, org: str) -> set[str]
             continue
         login = str(member.get("login") or "").strip()
         if login:
-            logins.add(_canonical_contributor_login(login).casefold())
+            logins.add(login.casefold())
+    if not logins:
+        raise HistoryError(
+            "组织成员名单为空，停止更新统计图。请使用具有 read:org 权限的 "
+            "METRICS_CLASSIC_TOKEN，或为 METRICS_TOKEN 配置组织 Members 读取权限。"
+        )
     return logins
 
 
@@ -650,10 +656,20 @@ def _resolve_commit_author_login(
         return commit.author_login
     if commit.sha in cache:
         return cache[commit.sha]
-    payload = client.get_json_safe(f"/repos/{org}/{repo_name}/commits/{commit.sha}", {})
+    email_key = f"email:{_author_key(commit.author_email)}" if commit.author_email.strip() else None
+    if email_key is not None and email_key in cache:
+        return cache[email_key]
+    try:
+        payload = client.get_json(f"/repos/{org}/{repo_name}/commits/{commit.sha}")
+    except Exception as exc:
+        raise HistoryError(f"{repo_name}: 无法校验提交作者，停止更新统计图") from exc
+    if not isinstance(payload, Mapping) or "author" not in payload:
+        raise HistoryError(f"{repo_name}: 提交作者响应无效，停止更新统计图")
     author = payload.get("author") if isinstance(payload, Mapping) else None
     login = str(author.get("login") or "").strip() if isinstance(author, Mapping) else ""
     cache[commit.sha] = login or None
+    if email_key is not None:
+        cache[email_key] = login or None
     return cache[commit.sha]
 
 
@@ -680,23 +696,14 @@ def _is_organization_member_commit(
     Returns:
         作者属于组织时返回 ``True``。
     """
-    raw_name = (commit.author_name or "").strip()
-    direct_logins = [commit.author_login, _noreply_login(commit.author_email)]
-    canonical_name = _canonical_contributor_login(raw_name).strip()
-    if (
-        canonical_name
-        and canonical_name.casefold() != "unknown"
-        and canonical_name.casefold() != raw_name.casefold()
-    ):
-        direct_logins.append(canonical_name)
-    if any(login and _canonical_contributor_login(login).casefold() in member_logins for login in direct_logins):
-        return True
-    if _noreply_login(commit.author_email):
-        return False
-    if commit.author_login:
-        return False
-    resolved_login = _resolve_commit_author_login(client, org, repo_name, commit, login_cache)
-    return bool(resolved_login and _canonical_contributor_login(resolved_login).casefold() in member_logins)
+    login = commit.author_login or _noreply_login(commit.author_email)
+    if login:
+        return login.strip().casefold() in member_logins
+    login = _resolve_commit_author_login(client, org, repo_name, commit, login_cache)
+    if login:
+        return login.casefold() in member_logins
+    alias = _CONTRIBUTOR_ALIASES.get(commit.author_name.strip().casefold())
+    return bool(alias and alias.casefold() in member_logins)
 
 
 def _default_commit_source(client: GitHubClient) -> CommitSource:
@@ -757,7 +764,7 @@ def collect_org_analytics(
     weekly_totals = Counter({bucket: 0 for bucket in week_buckets})
     source = commit_source or _default_commit_source(client)
     member_logins = {
-        _canonical_contributor_login(login).casefold()
+        login.strip().casefold()
         for login in (
             organization_members
             if organization_members is not None
@@ -982,6 +989,8 @@ def collect_org_analytics(
     total_stars = sum(repo.stars for repo in repo_stats)
     total_forks = sum(repo.forks for repo in repo_stats)
     total_watchers = sum(repo.subscribers_count for repo in repo_stats)
+    if filtered_commit_count and not any(repo.total_commits for repo in repo_stats):
+        raise HistoryError("全部提交被过滤，停止更新统计图。请检查组织成员读取权限和作者身份映射。")
 
     last_updated_header = None
     rate_reset = None
@@ -1346,7 +1355,12 @@ def main() -> None:
     parser.add_argument("--output", default="github-analytics.svg")
     args = parser.parse_args()
 
-    token = os.getenv("METRICS_TOKEN") or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+    token = (
+        os.getenv("METRICS_CLASSIC_TOKEN")
+        or os.getenv("METRICS_TOKEN")
+        or os.getenv("GITHUB_TOKEN")
+        or os.getenv("GH_TOKEN")
+    )
     repo_visibility = os.getenv("REPO_VISIBILITY", "public").strip().lower()
     if repo_visibility not in {"public", "private", "all"}:
         repo_visibility = "public"
@@ -1355,6 +1369,8 @@ def main() -> None:
     repo_allowlist = resolve_repo_allowlist()
 
     client = GitHubClient(token=token)
+    members = _load_organization_member_logins(client, args.org)
+    print(json.dumps({"organization_members": len(members)}, ensure_ascii=False), flush=True)
     data = collect_org_analytics(
         args.org,
         client,
@@ -1362,7 +1378,15 @@ def main() -> None:
         hide_private_repo_names=hide_private_repo_names,
         include_forks=include_forks,
         repo_allowlist=repo_allowlist,
+        organization_members=members,
     )
+    print(json.dumps({
+        "organization_members": data["source_facts"]["organization_member_count"],
+        "repositories": data["summary"]["repo_count"],
+        "contributors": data["summary"]["contributor_count"],
+        "included_commits": data["summary"]["total_commits"],
+        "filtered_commits": data["source_facts"]["filtered_commit_count"],
+    }, ensure_ascii=False))
     svg = render_dashboard(data)
     output_path = os.path.abspath(args.output)
     write_file(output_path, svg)
