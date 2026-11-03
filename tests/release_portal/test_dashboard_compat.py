@@ -56,8 +56,10 @@ def _fake_repo_payload():
 class FakeClient:
     """为看板收集提供最小 GitHub API 替身。"""
 
-    def __init__(self, repos):
+    def __init__(self, repos, members=None, commit_authors=None):
         self._repos = repos
+        self._members = members or ["FangYikaii", "Local Dev"]
+        self._commit_authors = commit_authors or {}
 
     def get_json(self, path):
         """返回组织元数据；fork 详情带上上游默认分支。"""
@@ -72,8 +74,10 @@ class FakeClient:
         return {"login": "SynlysAI", "name": "SynlysAI"}
 
     def get_json_safe(self, path, default):
-        """返回空语言统计。"""
-        del path
+        """返回提交作者详情或空语言统计。"""
+        for sha, login in self._commit_authors.items():
+            if str(path).endswith(f"/commits/{sha}"):
+                return {"author": {"login": login}}
         return default
 
     def get_json_response(self, path):
@@ -86,6 +90,8 @@ class FakeClient:
         del max_pages, strict
         if path.startswith("/orgs/SynlysAI/repos"):
             return self._repos
+        if path.startswith("/orgs/SynlysAI/members"):
+            return [{"login": login} for login in self._members]
         return []
 
 
@@ -168,6 +174,7 @@ def test_dashboard_optional_allowlist_filters_and_masks_private():
                 author_name="Local Dev",
                 author_email="local@example.com",
                 authored_at=datetime.now(UTC),
+                author_login="Local Dev",
             )
         ]
 
@@ -180,6 +187,7 @@ def test_dashboard_optional_allowlist_filters_and_masks_private():
         include_forks=True,
         repo_allowlist=allowlist,
         commit_source=commits,
+        organization_members={"Local Dev"},
     )
 
     assert [repo.name for repo in data["repos"]] == ["SmartAccess", "AI4MS"]
@@ -204,7 +212,7 @@ def test_dashboard_optional_allowlist_filters_and_masks_private():
     assert "secret-release" not in svg
     assert "branches=all" in svg
     assert "forks=incremental" in svg
-    assert "git authors" in svg
+    assert "organization members only" in svg
     assert "visible org members" not in svg
     assert "non-tracked" not in svg
 
@@ -244,17 +252,66 @@ def test_fyk_and_fangyikaii_merge_into_one_contributor():
         include_forks=True,
         repo_allowlist=set(),
         commit_source=commits,
+        organization_members={"FangYikaii"},
     )
     contributors = {item["login"]: item for item in data["contributors"]}
 
     assert "fyk" not in contributors
     assert contributors["FangYikaii"]["commits"] == 3
     assert contributors["FangYikaii"]["repo_count"] == 2
-    assert contributors["Other"]["commits"] == 1
-    assert data["summary"]["contributor_count"] == 2
+    assert "Other" not in contributors
+    assert data["summary"]["contributor_count"] == 1
     svg = dashboard.render_dashboard(data)
     assert ">fyk<" not in svg
     assert "FangYikaii" in svg
+
+
+def test_non_member_commits_are_filtered_by_github_author_login():
+    """无法从 Git 邮箱识别时，按提交详情的 GitHub 登录名过滤外部作者。"""
+
+    member_sha = "e" * 40
+    external_sha = "f" * 40
+
+    def commits(repo, parent):
+        """在同一仓库返回组织成员和外部作者的提交。"""
+        del parent
+        if repo["name"] != "AI4MS":
+            return []
+        now = datetime.now(UTC)
+        return [
+            dashboard.CommitRecord(
+                sha=member_sha,
+                author_name="Unknown Member Name",
+                author_email="member@company.example",
+                authored_at=now,
+            ),
+            dashboard.CommitRecord(
+                sha=external_sha,
+                author_name="Yuxi",
+                author_email="yuxi@external.example",
+                authored_at=now,
+            ),
+        ]
+
+    data = dashboard.collect_org_analytics(
+        "SynlysAI",
+        FakeClient(
+            _fake_repo_payload(),
+            members=["synlys-member"],
+            commit_authors={member_sha: "synlys-member", external_sha: "yuxi"},
+        ),
+        repo_visibility="all",
+        hide_private_repo_names=True,
+        include_forks=True,
+        repo_allowlist=set(),
+        commit_source=commits,
+    )
+
+    ai4ms = next(repo for repo in data["repos"] if repo.name == "AI4MS")
+    assert ai4ms.total_commits == 1
+    assert data["summary"]["total_commits"] == 1
+    assert [item["login"] for item in data["contributors"]] == ["synlys-member"]
+    assert data["source_facts"]["filtered_commit_count"] == 1
 
 
 def test_backfill_cli_emits_json_log_without_private_error_text(tmp_path, monkeypatch, capsys):

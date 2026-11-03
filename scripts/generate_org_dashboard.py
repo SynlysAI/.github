@@ -19,7 +19,7 @@ from typing import Any
 
 
 API_ROOT = "https://api.github.com"
-USER_AGENT = "synlysai-org-dashboard/2.0"
+USER_AGENT = "synlysai-org-dashboard/2.0.1"
 CATALOG_PATH = Path(__file__).resolve().parents[1] / "release-portal" / "catalog.yml"
 
 
@@ -242,6 +242,7 @@ class CommitRecord:
     author_name: str
     author_email: str
     authored_at: datetime | None
+    author_login: str | None = None
 
 
 class HistoryError(RuntimeError):
@@ -605,6 +606,99 @@ def _noreply_login(email: str) -> str | None:
     return match.group(1)
 
 
+def _load_organization_member_logins(client: GitHubClient, org: str) -> set[str]:
+    """读取组织当前成员的 GitHub 登录名。
+
+    Args:
+        client: GitHub API 客户端。
+        org: 组织登录名。
+
+    Returns:
+        规范化后的组织成员登录名集合。
+    """
+    members = client.paginate(f"/orgs/{org}/members?per_page=100", max_pages=None, strict=True)
+    logins: set[str] = set()
+    for member in members:
+        if not isinstance(member, Mapping):
+            continue
+        login = str(member.get("login") or "").strip()
+        if login:
+            logins.add(_canonical_contributor_login(login).casefold())
+    return logins
+
+
+def _resolve_commit_author_login(
+    client: GitHubClient,
+    org: str,
+    repo_name: str,
+    commit: CommitRecord,
+    cache: dict[str, str | None],
+) -> str | None:
+    """通过提交详情 API 解析 Git 作者对应的 GitHub 登录名。
+
+    Args:
+        client: GitHub API 客户端。
+        org: 组织登录名。
+        repo_name: 仓库名称。
+        commit: 待解析的提交。
+        cache: 按提交 SHA 缓存解析结果。
+
+    Returns:
+        GitHub 登录名；无法关联 GitHub 账号时返回 ``None``。
+    """
+    if commit.author_login:
+        return commit.author_login
+    if commit.sha in cache:
+        return cache[commit.sha]
+    payload = client.get_json_safe(f"/repos/{org}/{repo_name}/commits/{commit.sha}", {})
+    author = payload.get("author") if isinstance(payload, Mapping) else None
+    login = str(author.get("login") or "").strip() if isinstance(author, Mapping) else ""
+    cache[commit.sha] = login or None
+    return cache[commit.sha]
+
+
+def _is_organization_member_commit(
+    client: GitHubClient,
+    org: str,
+    repo_name: str,
+    commit: CommitRecord,
+    member_logins: set[str],
+    login_cache: dict[str, str | None],
+) -> bool:
+    """判断提交作者是否为组织当前成员。
+
+    无法确认作者属于组织时返回 ``False``，避免把 fork 上游的外部提交计入统计。
+
+    Args:
+        client: GitHub API 客户端。
+        org: 组织登录名。
+        repo_name: 仓库名称。
+        commit: 待判断的提交。
+        member_logins: 组织成员登录名集合。
+        login_cache: 提交作者登录名缓存。
+
+    Returns:
+        作者属于组织时返回 ``True``。
+    """
+    raw_name = (commit.author_name or "").strip()
+    direct_logins = [commit.author_login, _noreply_login(commit.author_email)]
+    canonical_name = _canonical_contributor_login(raw_name).strip()
+    if (
+        canonical_name
+        and canonical_name.casefold() != "unknown"
+        and canonical_name.casefold() != raw_name.casefold()
+    ):
+        direct_logins.append(canonical_name)
+    if any(login and _canonical_contributor_login(login).casefold() in member_logins for login in direct_logins):
+        return True
+    if _noreply_login(commit.author_email):
+        return False
+    if commit.author_login:
+        return False
+    resolved_login = _resolve_commit_author_login(client, org, repo_name, commit, login_cache)
+    return bool(resolved_login and _canonical_contributor_login(resolved_login).casefold() in member_logins)
+
+
 def _default_commit_source(client: GitHubClient) -> CommitSource:
     """绑定当前令牌，生成默认的 Git 历史读取器。
 
@@ -638,6 +732,7 @@ def collect_org_analytics(
     include_forks: bool,
     repo_allowlist: set[str],
     commit_source: CommitSource | None = None,
+    organization_members: set[str] | None = None,
 ) -> dict[str, Any]:
     """汇总组织仓库的全分支提交、作者和公开看板数据。
 
@@ -649,6 +744,7 @@ def collect_org_analytics(
         include_forks: 为真时纳入 fork，并只统计相对上游默认分支的增量提交。
         repo_allowlist: 仓库名集合；空集合表示不过滤。
         commit_source: 可选提交读取器，缺省时用 Git 抓取全部分支。
+        organization_members: 可选组织成员登录名集合；未提供时从 GitHub API 读取。
 
     Returns:
         供 SVG 渲染的统计结果。
@@ -660,6 +756,17 @@ def collect_org_analytics(
     week_buckets = [week_anchor + timedelta(days=7 * index) for index in range(12)]
     weekly_totals = Counter({bucket: 0 for bucket in week_buckets})
     source = commit_source or _default_commit_source(client)
+    member_logins = {
+        _canonical_contributor_login(login).casefold()
+        for login in (
+            organization_members
+            if organization_members is not None
+            else _load_organization_member_logins(client, org)
+        )
+        if str(login).strip()
+    }
+    commit_login_cache: dict[str, str | None] = {}
+    filtered_commit_count = 0
 
     org_payload = client.get_json(f"/orgs/{org}")
     repos_payload = client.paginate(
@@ -711,20 +818,41 @@ def collect_org_analytics(
             display_description = repo.get("description") or "No description available."
             display_default_branch = repo.get("default_branch", "main")
         parent = _load_fork_parent(client, org, repo_name) if repo.get("fork") else None
-        commits = _dedupe_commits(source(repo, parent))
+        all_commits = _dedupe_commits(source(repo, parent))
+        commits = [
+            commit
+            for commit in all_commits
+            if _is_organization_member_commit(
+                client,
+                org,
+                repo_name,
+                commit,
+                member_logins,
+                commit_login_cache,
+            )
+        ]
+        filtered_commit_count += len(all_commits) - len(commits)
         repo_commit_total = len(commits)
         repo_recent_30 = 0
         for commit in commits:
             author_email = commit.author_email or ""
+            author_login = commit.author_login or _noreply_login(author_email)
+            if not author_login:
+                author_login = _resolve_commit_author_login(
+                    client,
+                    org,
+                    repo_name,
+                    commit,
+                    commit_login_cache,
+                )
             entry = contributor_totals.setdefault(
                 _author_key(author_email),
                 {"login": "", "commits": 0, "repos": set(), "names": Counter(), "noreply_login": None},
             )
             entry["commits"] += 1
             entry["repos"].add(display_name)
-            noreply_login = _noreply_login(author_email)
-            if noreply_login:
-                entry["noreply_login"] = noreply_login
+            if author_login:
+                entry["noreply_login"] = author_login
             else:
                 entry["names"][commit.author_name or "unknown"] += 1
             authored_at = commit.authored_at
@@ -903,6 +1031,8 @@ def collect_org_analytics(
             "owner": org,
             "include_forks": include_forks,
             "repo_allowlist": sorted(repo_allowlist),
+            "organization_member_count": len(member_logins),
+            "filtered_commit_count": filtered_commit_count,
             "skipped_repos": dict(skipped_repos),
         },
     }
@@ -1175,7 +1305,7 @@ def render_dashboard(data: dict[str, Any]) -> str:
     fork_label = "incremental" if include_forks else "excluded"
     scope_note = (
         f"Scope={visibility_mode}; owner={data['source_facts']['owner']}; "
-        f"branches=all; forks={fork_label}; deduped by SHA; git authors"
+        f"branches=all; forks={fork_label}; deduped by SHA; organization members only"
     )
     parts.append(svg_rect(52, 1640, 1336, 62, cls="panel-bright", rx=20))
     parts.append(svg_text(74, 1678, f"Telemetry source: git history. {scope_note}.", cls="footer"))
